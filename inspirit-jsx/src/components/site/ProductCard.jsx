@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { FiHeart } from 'react-icons/fi';
 import { useApp } from '@/context/AppContext';
 export default function ProductCard({ p }) {
     const { addToCart, toggleWishlist, wishlist } = useApp();
@@ -13,9 +12,6 @@ export default function ProductCard({ p }) {
         {p.badge && (<span className={`absolute top-3 left-3 text-grotesk text-xs tracking-[0.2em] px-3 py-1 ${p.badge === 'SALE' ? 'bg-black text-white' : 'bg-[oklch(0.55_0.25_27)] text-white'}`}>
             {p.badge}
           </span>)}
-        <button onClick={() => toggleWishlist(p.id)} className={`absolute top-3 right-3 h-10 w-10 rounded-full bg-white/90 flex items-center justify-center transition ${wished ? 'text-[oklch(0.55_0.25_27)]' : 'text-black'} hover:bg-white`}>
-          <FiHeart className={wished ? 'fill-current' : ''}/>
-        </button>
         <div className="absolute inset-x-3 bottom-3 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
           <button onClick={() => addToCart(p)} className="w-full bg-black text-white text-grotesk text-sm tracking-[0.25em] py-3 hover:bg-[oklch(0.48_0.22_25)] transition">
             QUICK ADD

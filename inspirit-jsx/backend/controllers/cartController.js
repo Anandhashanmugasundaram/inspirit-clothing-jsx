@@ -1,32 +1,64 @@
 const Cart = require("../models/Cart");
 
-
-// GET CART
+// ==============================
+// GET CART (USER SPECIFIC)
+// ==============================
 const getCartItems = async (req, res) => {
-
   try {
+    const { email } = req.query;
 
-    const items = await Cart.find();
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "User email required",
+      });
+    }
+
+    const items = await Cart.find({
+      userEmail: email,
+    });
 
     res.json(items);
-
   } catch (error) {
-
     res.status(500).json({
       message: error.message,
     });
-
   }
-
 };
 
-
+// ==============================
 // ADD TO CART
+// ==============================
 const addToCart = async (req, res) => {
-
   try {
+    const {
+      userEmail,
+      productId,
+      name,
+      image,
+      category,
+      price,
+      size,
+      qty,
+    } = req.body;
 
-    const item = new Cart(req.body);
+    if (!userEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "User email required",
+      });
+    }
+
+    const item = new Cart({
+      userEmail,
+      productId,
+      name,
+      image,
+      category,
+      price,
+      size,
+      qty,
+    });
 
     await item.save();
 
@@ -35,40 +67,36 @@ const addToCart = async (req, res) => {
       message: "Added To Cart",
       data: item,
     });
-
   } catch (error) {
-
     res.status(500).json({
+      success: false,
       message: error.message,
     });
-
   }
-
 };
 
-
-// DELETE ITEM
+// ==============================
+// DELETE CART ITEM
+// ==============================
 const deleteCartItem = async (req, res) => {
-
   try {
+    const { email } = req.body;
 
-    await Cart.findByIdAndDelete(req.params.id);
+    await Cart.findOneAndDelete({
+      _id: req.params.id,
+      userEmail: email,
+    });
 
     res.json({
       success: true,
       message: "Deleted",
     });
-
   } catch (error) {
-
     res.status(500).json({
       message: error.message,
     });
-
   }
-
 };
-
 
 module.exports = {
   getCartItems,

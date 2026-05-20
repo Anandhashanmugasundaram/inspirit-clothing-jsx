@@ -20,6 +20,7 @@ import Account from '@/pages/Account';
 
 import Register from '@/pages/Register';
 import Forgot from '@/pages/Forgot';
+import AdminPage from './pages/AdminPage';
 
 function BackToTop() {
   const [show, setShow] = useState(false);
@@ -70,7 +71,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/account" element={<Account />} />
-         
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="*" element={<NotFound />} />

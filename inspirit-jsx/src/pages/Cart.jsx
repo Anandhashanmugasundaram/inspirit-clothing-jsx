@@ -1,73 +1,316 @@
 import { Link } from "react-router-dom";
-import { useState } from 'react';
-import { FiMinus, FiPlus, FiX, FiArrowRight } from 'react-icons/fi';
-import { useApp } from '@/context/AppContext';
-import toast from 'react-hot-toast';
-({ component: Cart,
-    head: () => ({ meta: [{ title: 'Your Bag — INSPIRIT' }] }),
-});
-function Cart() {
-    const { cart, removeFromCart, updateQty, cartTotal } = useApp();
-    const [coupon, setCoupon] = useState('');
-    const [discount, setDiscount] = useState(0);
-    const shipping = cartTotal > 250 || cartTotal === 0 ? 0 : 20;
-    const total = Math.max(0, cartTotal - discount) + shipping;
-    const applyCoupon = (e) => {
-        e.preventDefault();
-        if (coupon.toUpperCase() === 'RITUAL10') {
-            setDiscount(cartTotal * 0.1);
-            toast.success('10% discount applied');
-        }
-        else {
-            toast.error('Invalid code');
-        }
-    };
-    return (<div className="bone-section pt-32 md:pt-40 pb-24">
-      <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-        <p className="text-grotesk text-xs tracking-[0.4em] text-[oklch(0.55_0.25_27)]">— YOUR BAG</p>
-        <h1 className="mt-3 text-display text-5xl md:text-7xl">The ritual cart.</h1>
+import { useState } from "react";
+import {
+  FiTrash2,
+  FiArrowRight,
+  FiShoppingBag,
+} from "react-icons/fi";
+import { useApp } from "@/context/AppContext";
+import toast from "react-hot-toast";
 
-        {cart.length === 0 ? (<div className="mt-20 text-center">
-            <p className="text-display text-3xl">Your bag is empty.</p>
-            <p className="mt-2 text-[oklch(0.45_0.01_20)]">Begin the ritual.</p>
-            <Link to="/shop" className="mt-6 inline-flex btn-blood px-7 py-3 text-grotesk tracking-[0.3em]">ENTER THE SHOP</Link>
-          </div>) : (<div className="mt-12 grid lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 space-y-4">
-              {cart.map(item => (<div key={item.product.id + item.size} className="flex gap-5 p-4 border border-black/10 bg-white">
-                  <img src={item.product.images[0]} className="h-32 w-28 object-cover" alt=""/>
-                  <div className="flex-1">
-                    <p className="text-grotesk text-xs tracking-[0.3em] text-[oklch(0.45_0.01_20)]">{item.product.category.toUpperCase()}</p>
-                    <Link to={`/product/${item.product.slug}`} className="font-medium hover:text-[oklch(0.48_0.22_25)]">{item.product.name}</Link>
-                    <p className="text-sm text-[oklch(0.45_0.01_20)] mt-1">Size {item.size}</p>
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="flex items-center border border-black/15">
-                        <button onClick={() => updateQty(item.product.id, item.size, item.qty - 1)} className="h-9 w-9 flex items-center justify-center"><FiMinus /></button>
-                        <span className="w-8 text-center">{item.qty}</span>
-                        <button onClick={() => updateQty(item.product.id, item.size, item.qty + 1)} className="h-9 w-9 flex items-center justify-center"><FiPlus /></button>
+function Cart() {
+  const {
+    cart = [],
+    removeFromCart,
+    cartTotal = 0,
+  } = useApp();
+
+  const [coupon, setCoupon] = useState("");
+  const [discount, setDiscount] = useState(0);
+
+  const shipping =
+    cartTotal > 250 || cartTotal === 0 ? 0 : 20;
+
+  const total =
+    Math.max(0, cartTotal - discount) + shipping;
+
+  const applyCoupon = (e) => {
+    e.preventDefault();
+
+    if (coupon.toUpperCase() === "RITUAL10") {
+      setDiscount(cartTotal * 0.1);
+      toast.success("10% discount applied");
+    } else {
+      toast.error("Invalid promo code");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white pt-28 pb-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* HEADING */}
+        <div className="mb-10">
+          <p className="uppercase tracking-[0.35em] text-sm text-red-700 font-medium">
+            Your Cart
+          </p>
+
+          <h1 className="text-4xl md:text-6xl font-black mt-3">
+            Shopping Bag
+          </h1>
+
+          <p className="mt-3 text-gray-500">
+            Review your items before checkout.
+          </p>
+        </div>
+
+        {/* EMPTY CART */}
+        {cart.length === 0 ? (
+          <div className="bg-white rounded-3xl p-14 text-center shadow-sm border">
+            <div className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center mx-auto">
+              <FiShoppingBag size={30} />
+            </div>
+
+            <h2 className="text-3xl font-bold mt-6">
+              Your cart is empty
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Looks like you haven’t added anything yet.
+            </p>
+
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 mt-8 bg-black text-white px-8 py-4 rounded-xl hover:opacity-90 transition"
+            >
+              Continue Shopping
+              <FiArrowRight />
+            </Link>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-10">
+            {/* LEFT SIDE */}
+            <div className="lg:col-span-2 space-y-5">
+              {cart.map((item, index) => {
+                const product = item?.product || item;
+
+                if (!product) return null;
+
+                return (
+                  <div
+                    key={`${product?._id || product?.id || index}`}
+                    className="bg-white rounded-3xl border p-5 shadow-sm"
+                  >
+                    <div className="flex flex-col md:flex-row gap-5">
+                      {/* IMAGE */}
+                      <div className="w-full md:w-44 h-52 overflow-hidden rounded-2xl bg-gray-100">
+                        <img
+                          src={
+                            product?.images?.[0] ||
+                            product?.image ||
+                            "https://placehold.co/600x800?text=Product"
+                          }
+                          alt={product?.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <span className="font-semibold">${item.product.price * item.qty}</span>
+
+                      {/* DETAILS */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between gap-5">
+                            <div>
+                              <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+                                {product?.category || "Fashion"}
+                              </p>
+
+                              <Link
+                                to={`/product/${product?.slug || product?._id}`}
+                                className="text-2xl font-bold hover:text-red-700 transition"
+                              >
+                                {product?.name || "Product"}
+                              </Link>
+
+                              <p className="mt-2 text-gray-500 text-sm">
+                                {product?.description?.slice(0, 120) ||
+                                  "Premium quality product."}
+                              </p>
+                            </div>
+
+                            {/* REMOVE */}
+                            <button
+                              onClick={() =>
+                                removeFromCart(
+                                  product?._id || product?.id
+                                )
+                              }
+                              className="text-gray-400 hover:text-red-600 transition"
+                            >
+                              <FiTrash2 size={20} />
+                            </button>
+                          </div>
+
+                          {/* INFO */}
+                          <div className="flex flex-wrap gap-4 mt-5">
+                            <div className="px-4 py-2 rounded-xl bg-gray-100 text-sm">
+                              Quantity:{" "}
+                              <span className="font-semibold">
+                                {item?.qty || 1}
+                              </span>
+                            </div>
+
+                            <div className="px-4 py-2 rounded-xl bg-gray-100 text-sm">
+                              Price:{" "}
+                              <span className="font-semibold">
+                                ${product?.price || 0}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* TOTAL */}
+                        <div className="mt-6 flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-400">
+                              Item Total
+                            </p>
+
+                            <h3 className="text-3xl font-black">
+                              $
+                              {(
+                                (product?.price || 0) *
+                                (item?.qty || 1)
+                              ).toFixed(2)}
+                            </h3>
+                          </div>
+
+                     
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <button onClick={() => removeFromCart(item.product.id, item.size)} className="self-start text-[oklch(0.45_0.01_20)] hover:text-[oklch(0.48_0.22_25)]"><FiX /></button>
-                </div>))}
+                );
+              })}
             </div>
-            <aside className="bg-black text-white p-7 h-fit sticky top-32">
-              <h3 className="text-display text-2xl">Summary</h3>
-              <form onSubmit={applyCoupon} className="mt-5 flex gap-2">
-                <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Promo code (try RITUAL10)" className="flex-1 bg-white/10 px-3 py-2 text-sm outline-none placeholder:text-white/40"/>
-                <button className="px-4 text-grotesk text-xs tracking-[0.25em] bg-[oklch(0.48_0.22_25)]">APPLY</button>
+
+            {/* RIGHT SIDE */}
+            <aside className="bg-white border rounded-3xl p-7 h-fit sticky top-28 shadow-sm">
+              <h2 className="text-3xl font-black">
+                Order Summary
+              </h2>
+
+              <p className="text-gray-500 mt-2 text-sm">
+                Review your order before payment.
+              </p>
+
+              {/* COUPON */}
+              <form
+                onSubmit={applyCoupon}
+                className="mt-7 flex gap-2"
+              >
+                <input
+                  value={coupon}
+                  onChange={(e) =>
+                    setCoupon(e.target.value)
+                  }
+                  placeholder="Promo code"
+                  className="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 outline-none"
+                />
+
+                <button className="bg-red-700 text-white px-5 rounded-xl font-medium hover:bg-red-800 transition">
+                  Apply
+                </button>
               </form>
-              <dl className="mt-6 space-y-3 text-sm">
-                <div className="flex justify-between"><dt className="text-white/60">Subtotal</dt><dd>${cartTotal.toFixed(2)}</dd></div>
-                {discount > 0 && <div className="flex justify-between text-[oklch(0.65_0.25_27)]"><dt>Discount</dt><dd>-${discount.toFixed(2)}</dd></div>}
-                <div className="flex justify-between"><dt className="text-white/60">Shipping</dt><dd>{shipping === 0 ? 'FREE' : `$${shipping}`}</dd></div>
-                <div className="flex justify-between pt-3 border-t border-white/10 text-lg font-semibold"><dt>Total</dt><dd>${total.toFixed(2)}</dd></div>
-              </dl>
-              <Link to="/checkout" className="mt-6 w-full btn-blood inline-flex items-center justify-center gap-2 py-4 text-grotesk text-sm tracking-[0.3em]">CHECKOUT <FiArrowRight /></Link>
-              <p className="mt-4 text-xs text-white/40">Free worldwide shipping on orders over $250.</p>
+
+              {/* SUMMARY */}
+              <div className="mt-8 space-y-4">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>${cartTotal.toFixed(2)}</span>
+                </div>
+
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount</span>
+
+                    <span>
+                      -${discount.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+
+                  <span>
+                    {shipping === 0
+                      ? "FREE"
+                      : `$${shipping}`}
+                  </span>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4 flex justify-between text-2xl font-black">
+                  <span>Total</span>
+
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* ORDER ITEMS */}
+              <div className="mt-8 border-t border-gray-200 pt-6">
+                <h3 className="font-semibold mb-4">
+                  Items You’re Ordering
+                </h3>
+
+                <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                  {cart.map((item, index) => {
+                    const product = item?.product || item;
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex gap-3"
+                      >
+                        <img
+                          src={
+                            product?.images?.[0] ||
+                            product?.image ||
+                            "https://placehold.co/200x250"
+                          }
+                          alt={product?.name}
+                          className="w-16 h-20 rounded-xl object-cover"
+                        />
+
+                        <div className="flex-1">
+                          <p className="font-medium text-sm line-clamp-1">
+                            {product?.name}
+                          </p>
+
+                          <p className="text-xs text-gray-500 mt-1">
+                            Qty: {item?.qty || 1}
+                          </p>
+                        </div>
+
+                        <p className="text-sm font-semibold">
+                          $
+                          {(
+                            (product?.price || 0) *
+                            (item?.qty || 1)
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CHECKOUT */}
+              <Link
+                to="/checkout"
+                className="mt-8 w-full bg-black hover:bg-gray-900 text-white transition rounded-2xl py-4 flex items-center justify-center gap-3 font-semibold"
+              >
+                Proceed To Checkout
+                <FiArrowRight />
+              </Link>
+
+              <p className="text-xs text-gray-400 text-center mt-4">
+                Secure payments • Fast delivery • Easy returns
+              </p>
             </aside>
-          </div>)}
+          </div>
+        )}
       </div>
-    </div>);
+    </div>
+  );
 }
+
 export default Cart;

@@ -1,7 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { HiOutlineMenuAlt4, HiOutlineX } from "react-icons/hi";
-import { FiSearch, FiUser, FiShoppingBag } from "react-icons/fi";
+
+import {
+  HiOutlineMenuAlt4,
+  HiOutlineX,
+} from "react-icons/hi";
+
+import {
+  FiSearch,
+  FiUser,
+  FiShoppingBag,
+  FiShield,
+} from "react-icons/fi";
+
 import Logo from "./Logo";
 import { useApp } from "@/context/AppContext";
 
@@ -14,22 +25,57 @@ const NAV = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [scrolled, setScrolled] =
+    useState(false);
 
-  const { cartCount, user, logout } = useApp();
+  const [open, setOpen] =
+    useState(false);
+
+  const [profileOpen, setProfileOpen] =
+    useState(false);
+
+  const {
+    cartCount,
+    user,
+    logout,
+    isAdmin,
+  } = useApp();
 
   const loc = useLocation();
-  const isProductPage = loc.pathname.includes("/product/");
 
+const isProductPage =
+  loc.pathname.includes("/product/") ||
+  loc.pathname.includes("/account") ||
+  loc.pathname.includes("/cart") ||
+  loc.pathname.includes("/checkout");
+
+  // =========================
+  // SCROLL EFFECT
+  // =========================
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 30);
+    const on = () =>
+      setScrolled(window.scrollY > 30);
+
     on();
-    window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+
+    window.addEventListener(
+      "scroll",
+      on,
+      {
+        passive: true,
+      }
+    );
+
+    return () =>
+      window.removeEventListener(
+        "scroll",
+        on
+      );
   }, []);
 
+  // =========================
+  // CLOSE MENUS ON ROUTE
+  // =========================
   useEffect(() => {
     setOpen(false);
     setProfileOpen(false);
@@ -40,10 +86,14 @@ export default function Navbar() {
       {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled || isProductPage ? "glass py-3" : "py-5"
+          scrolled || isProductPage
+            ? "glass py-3"
+            : "py-5"
         }`}
       >
         <div className="mx-auto max-w-[1500px] px-5 md:px-10 flex items-center justify-between">
+
+          {/* LOGO */}
           <Logo />
 
           {/* DESKTOP NAV */}
@@ -55,6 +105,7 @@ export default function Navbar() {
                 className="text-grotesk text-sm tracking-[0.25em] text-white/80 hover:text-white relative group"
               >
                 {n.label}
+
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-[oklch(0.55_0.25_27)] transition-all duration-500 group-hover:w-full" />
               </Link>
             ))}
@@ -71,21 +122,26 @@ export default function Navbar() {
               <FiSearch className="text-xl" />
             </button>
 
-            {/* USER AUTH */}
+            {/* USER */}
             <div className="relative">
 
               {user ? (
                 <>
                   {/* AVATAR */}
                   <button
-                    onClick={() => setProfileOpen((p) => !p)}
+                    onClick={() =>
+                      setProfileOpen(
+                        (p) => !p
+                      )
+                    }
                     className="hover:text-[oklch(0.65_0.25_27)] transition"
                   >
                     <img
                       src={
                         user.photoURL ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          user.name || "User"
+                          user.name ||
+                            "User"
                         )}`
                       }
                       alt="user"
@@ -99,16 +155,37 @@ export default function Navbar() {
 
                       <Link
                         to="/account"
-                        onClick={() => setProfileOpen(false)}
+                        onClick={() =>
+                          setProfileOpen(
+                            false
+                          )
+                        }
                         className="block px-4 py-3 hover:bg-white/10 text-sm"
                       >
                         My Account
                       </Link>
 
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() =>
+                            setProfileOpen(
+                              false
+                            )
+                          }
+                          className="block px-4 py-3 hover:bg-white/10 text-sm"
+                        >
+                          Admin Panel
+                        </Link>
+                      )}
+
                       <button
                         onClick={async () => {
                           await logout();
-                          setProfileOpen(false);
+
+                          setProfileOpen(
+                            false
+                          );
                         }}
                         className="w-full text-left px-4 py-3 hover:bg-white/10 text-sm text-red-400"
                       >
@@ -126,8 +203,8 @@ export default function Navbar() {
                   <FiUser className="text-xl" />
                 </Link>
               )}
-
             </div>
+            
 
             {/* CART */}
             <Link
@@ -136,6 +213,7 @@ export default function Navbar() {
               aria-label="Bag"
             >
               <FiShoppingBag className="text-xl" />
+
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-[oklch(0.55_0.25_27)] flex items-center justify-center">
                   {cartCount}
@@ -145,51 +223,84 @@ export default function Navbar() {
 
             {/* MOBILE MENU */}
             <button
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                setOpen(true)
+              }
               className="lg:hidden text-white"
             >
               <HiOutlineMenuAlt4 className="text-2xl" />
             </button>
+
           </div>
         </div>
       </header>
 
       {/* MOBILE DRAWER */}
-      <div className={`fixed inset-0 z-[80] lg:hidden transition ${open ? "visible" : "invisible"}`}>
+      <div
+        className={`fixed inset-0 z-[80] lg:hidden transition ${
+          open
+            ? "visible"
+            : "invisible"
+        }`}
+      >
+        {/* OVERLAY */}
         <div
           className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity ${
-            open ? "opacity-100" : "opacity-0"
+            open
+              ? "opacity-100"
+              : "opacity-0"
           }`}
-          onClick={() => setOpen(false)}
+          onClick={() =>
+            setOpen(false)
+          }
         />
 
+        {/* SIDEBAR */}
         <aside
           className={`absolute right-0 top-0 h-full w-[88%] max-w-sm bg-[oklch(0.06_0.005_20)] border-l border-white/10 p-7 flex flex-col transition-transform duration-500 ${
-            open ? "translate-x-0" : "translate-x-full"
+            open
+              ? "translate-x-0"
+              : "translate-x-full"
           }`}
         >
+          {/* TOP */}
           <div className="flex items-center justify-between">
             <Logo />
-            <button onClick={() => setOpen(false)}>
+
+            <button
+              onClick={() =>
+                setOpen(false)
+              }
+            >
               <HiOutlineX className="text-2xl text-white" />
             </button>
           </div>
 
+          {/* NAV */}
           <nav className="mt-12 flex flex-col gap-1">
+
             {NAV.map((n, i) => (
               <Link
                 key={n.to}
                 to={n.to}
-                onClick={() => setOpen(false)}
+                onClick={() =>
+                  setOpen(false)
+                }
                 className="group block py-4 border-b border-white/10"
               >
                 <span className="text-grotesk text-3xl text-white group-hover:text-[oklch(0.65_0.25_27)] transition">
-                  {String(i + 1).padStart(2, "0")}. {n.label}
+                  {String(i + 1).padStart(
+                    2,
+                    "0"
+                  )}
+                  . {n.label}
                 </span>
               </Link>
             ))}
+
           </nav>
 
+          {/* FOOTER */}
           <div className="mt-auto text-white/50 text-xs tracking-[0.3em] text-grotesk">
             © INSPIRIT — RITUAL WEAR
           </div>
@@ -198,20 +309,47 @@ export default function Navbar() {
 
       {/* MOBILE BOTTOM NAV */}
       <div className="lg:hidden fixed bottom-3 left-3 right-3 z-40 glass rounded-full px-6 py-3 flex items-center justify-between text-white">
-        <Link to="/" aria-label="Home">
+
+        {/* HOME */}
+        <Link
+          to="/"
+          aria-label="Home"
+        >
           <FiSearch className="text-lg" />
         </Link>
 
+        {/* SHOP */}
         <Link to="/shop">
-          <span className="text-grotesk text-sm tracking-[0.2em]">SHOP</span>
+          <span className="text-grotesk text-sm tracking-[0.2em]">
+            SHOP
+          </span>
         </Link>
 
-        <Link to="/account" aria-label="Account">
+        {/* ADMIN */}
+        {isAdmin && (
+          <Link
+            to="/admin"
+            aria-label="Admin"
+          >
+            <FiShield className="text-lg" />
+          </Link>
+        )}
+
+        {/* ACCOUNT */}
+        <Link
+          to="/account"
+          aria-label="Account"
+        >
           <FiUser className="text-lg" />
         </Link>
 
-        <Link to="/cart" className="relative">
+        {/* CART */}
+        <Link
+          to="/cart"
+          className="relative"
+        >
           <FiShoppingBag className="text-lg" />
+
           {cartCount > 0 && (
             <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-[oklch(0.55_0.25_27)] flex items-center justify-center">
               {cartCount}
