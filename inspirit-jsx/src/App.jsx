@@ -17,7 +17,7 @@ import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Offers from '@/pages/Offers';
 import Account from '@/pages/Account';
-import Login from '@/pages/Login';
+
 import Register from '@/pages/Register';
 import Forgot from '@/pages/Forgot';
 
@@ -70,7 +70,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/login" element={<Login />} />
+         
           <Route path="/register" element={<Register />} />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="*" element={<NotFound />} />
