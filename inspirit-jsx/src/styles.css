@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+
+/* ============================================================
+   INSPIRIT CLOTHING — Luxury Streetwear Design System
+   Red / White / Black cinematic theme. All tokens oklch.
+============================================================ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  --color-blood: var(--blood);
+  --color-ember: var(--ember);
+  --color-ink: var(--ink);
+  --color-bone: var(--bone);
+  --color-ash: var(--ash);
+
+  --font-display: 'Cinzel', serif;
+  --font-grotesk: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+:root {
+  --radius: 0.25rem;
+  /* Default = LIGHT BONE for clean editorial sections */
+  --background: oklch(0.985 0.003 60);
+  --foreground: oklch(0.12 0.01 20);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.01 20);
+  --popover: oklch(0.12 0.01 20);
+  --popover-foreground: oklch(0.985 0.003 60);
+  --primary: oklch(0.48 0.22 25); /* deep blood red */
+  --primary-foreground: oklch(0.985 0.003 60);
+  --secondary: oklch(0.18 0.01 20);
+  --secondary-foreground: oklch(0.985 0.003 60);
+  --muted: oklch(0.94 0.005 60);
+  --muted-foreground: oklch(0.45 0.01 20);
+  --accent: oklch(0.55 0.25 27);
+  --accent-foreground: oklch(0.985 0.003 60);
+  --destructive: oklch(0.55 0.25 27);
+  --destructive-foreground: oklch(0.985 0.003 60);
+  --border: oklch(0.88 0.005 60);
+  --input: oklch(0.88 0.005 60);
+  --ring: oklch(0.48 0.22 25);
+
+  --blood: oklch(0.48 0.22 25);
+  --ember: oklch(0.62 0.26 28);
+  --ink: oklch(0.08 0.005 20);
+  --bone: oklch(0.985 0.003 60);
+  --ash: oklch(0.65 0.01 20);
+}
+
+.dark {
+  --background: oklch(0.08 0.005 20);
+  --foreground: oklch(0.985 0.003 60);
+  --card: oklch(0.12 0.01 20);
+  --card-foreground: oklch(0.985 0.003 60);
+  --popover: oklch(0.12 0.01 20);
+  --popover-foreground: oklch(0.985 0.003 60);
+  --primary: oklch(0.55 0.25 27);
+  --primary-foreground: oklch(0.985 0.003 60);
+  --secondary: oklch(0.18 0.01 20);
+  --secondary-foreground: oklch(0.985 0.003 60);
+  --muted: oklch(0.18 0.01 20);
+  --muted-foreground: oklch(0.65 0.01 20);
+  --accent: oklch(0.55 0.25 27);
+  --accent-foreground: oklch(0.985 0.003 60);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.55 0.25 27);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { background-color: var(--color-background); color: var(--color-foreground); }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    cursor: none;
+  }
+  @media (max-width: 1024px) { body { cursor: auto; } }
+  h1,h2,h3,h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  ::selection { background: var(--blood); color: var(--bone); }
+}
+
+/* Cinematic utilities */
+@utility ink-section {
+  background: radial-gradient(ellipse at top, oklch(0.14 0.02 22) 0%, oklch(0.06 0.005 20) 70%);
+  color: var(--bone);
+}
+@utility bone-section { background: var(--bone); color: var(--ink); }
+
+@utility text-display { font-family: var(--font-display); }
+@utility text-grotesk { font-family: var(--font-grotesk); letter-spacing: 0.04em; }
+
+@utility glass {
+  background: color-mix(in oklab, var(--ink) 35%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--bone) 12%, transparent);
+}
+@utility glass-light {
+  background: color-mix(in oklab, var(--bone) 65%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+}
+
+@utility glow-red {
+  box-shadow: 0 0 60px -10px color-mix(in oklab, var(--blood) 60%, transparent),
+              0 0 120px -20px color-mix(in oklab, var(--ember) 40%, transparent);
+}
+
+@utility btn-blood {
+  background: linear-gradient(135deg, var(--blood), oklch(0.35 0.20 25));
+  color: var(--bone);
+  box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--blood) 55%, transparent);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+}
+@utility btn-blood-hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 60px -10px color-mix(in oklab, var(--blood) 70%, transparent);
+}
+
+@utility hover-zoom {
+  overflow: hidden;
+}
+@utility hover-zoom-img {
+  transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter .6s;
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@utility animate-marquee { animation: marquee 30s linear infinite; }
+
+@keyframes float-y {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-12px); }
+}
+@utility animate-float { animation: float-y 6s ease-in-out infinite; }
+
+@keyframes pulse-glow {
+  0%,100% { opacity: .6; transform: scale(1); }
+  50%     { opacity: 1; transform: scale(1.06); }
+}
+@utility animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@utility skeleton-shimmer {
+  background: linear-gradient(90deg, oklch(0.18 0.01 20) 0%, oklch(0.25 0.01 20) 50%, oklch(0.18 0.01 20) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* hide scrollbar but keep scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
