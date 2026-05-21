@@ -38,19 +38,17 @@ function ProductPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/products");
+        const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+        const res = await axios.get(`${API}/api/products`);
 
         setAllProducts(res.data);
 
-        const found = res.data.find(
-          (p) =>
-            p.slug === slug ||
-            p.name.toLowerCase().replace(/\s+/g, "-") === slug,
-        );
+        const found = res.data.find((p) => p._id === slug || p.slug === slug);
 
         setProduct(found);
       } catch (error) {
-        console.log(error);
+        console.log("FETCH ERROR:", error);
       }
     };
 
@@ -61,10 +59,19 @@ function ProductPage() {
   // DEFAULT SIZE
   // ======================
   useEffect(() => {
-    if (product?.sizes?.length > 0) {
-      setSize(product.sizes[0]);
+    if (product?.sizes) {
+      const firstSize = Object.keys(product.sizes)[0];
+
+      setSize(firstSize);
     }
   }, [product]);
+
+  // ======================
+  // RESET QTY WHEN SIZE CHANGES
+  // ======================
+  useEffect(() => {
+    setQty(1);
+  }, [size]);
 
   // ======================
   // GSAP
@@ -112,6 +119,11 @@ function ProductPage() {
 
   const wished = wishlist.includes(product._id);
 
+  // ======================
+  // STOCK
+  // ======================
+  const selectedStock = product.sizes?.[size] || 0;
+
   return (
     <div className="pt-28 md:pt-36 pb-24">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
@@ -131,7 +143,7 @@ function ProductPage() {
         <div ref={galleryRef} className="grid lg:grid-cols-12 gap-10">
           {/* LEFT */}
           <div className="lg:col-span-7 grid grid-cols-[80px_minmax(0,1fr)] gap-4 min-w-0">
-            {/* THUMBS */}
+            {/* THUMBNAILS */}
             <div className="hidden md:block">
               <Swiper
                 onSwiper={setThumbsSwiper}
@@ -146,7 +158,7 @@ function ProductPage() {
                 {product.images?.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
-                      src={img || "/placeholder.png"}
+                      src={img?.url || "/placeholder.png"}
                       className="h-[140px] w-full object-cover cursor-pointer"
                       alt={product.name}
                     />
@@ -156,19 +168,21 @@ function ProductPage() {
             </div>
 
             {/* MAIN IMAGE */}
-            <div className="pd-image w-full h-[600px] min-w-0">
+            <div className="pd-image w-full h-[600px] min-w-0 overflow-hidden">
               <Swiper
                 modules={[Thumbs]}
                 thumbs={{
-                  swiper: thumbsSwiper,
+                  swiper:
+                    thumbsSwiper && !thumbsSwiper.destroyed
+                      ? thumbsSwiper
+                      : null,
                 }}
-                className="h-full w-full min-w-0"
-                style={{ width: "100%" }}
+                className="h-full w-full"
               >
                 {product.images?.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
-                      src={img || "/placeholder.png"}
+                      src={img?.url || "/placeholder.png"}
                       className="h-full w-full object-cover"
                       alt={product.name}
                     />
@@ -187,15 +201,15 @@ function ProductPage() {
                 </span>
               )}
 
-              <p className="mt-4 text-xs tracking-widest">
-                {product.category?.toUpperCase()}
+              <p className="mt-4 text-xs tracking-widest uppercase opacity-60">
+                {product.category}
               </p>
 
-              <h1 className="text-4xl mt-2">{product.name}</h1>
+              <h1 className="text-4xl mt-2 font-semibold">{product.name}</h1>
 
               {/* RATING */}
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex">
+                <div className="flex gap-1">
                   {Array.from({
                     length: 5,
                   }).map((_, i) => (
@@ -203,11 +217,13 @@ function ProductPage() {
                   ))}
                 </div>
 
-                <span className="text-sm">5.0 (120 Reviews)</span>
+                <span className="text-sm opacity-70">5.0 (120 Reviews)</span>
               </div>
 
               {/* PRICE */}
-              <div className="mt-5 text-3xl">₹{product.price}</div>
+              <div className="mt-5 text-3xl font-semibold">
+                ₹{product.price}
+              </div>
 
               {/* DESCRIPTION */}
               <p className="mt-5 text-sm opacity-70 leading-7">
@@ -220,57 +236,95 @@ function ProductPage() {
               <p className="text-xs tracking-widest mb-3">SIZE: {size}</p>
 
               <div className="flex gap-2 flex-wrap">
-                {product.sizes?.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSize(s)}
-                    className={`px-4 py-2 border transition ${
-                      size === s ? "bg-black text-white" : ""
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
+                {Object.entries(product.sizes || {}).map(([s, stock]) => {
+                  const outOfStock = stock <= 0;
+
+                  return (
+                    <button
+                      key={s}
+                      disabled={outOfStock}
+                      onClick={() => setSize(s)}
+                      className={`px-4 py-2 border transition ${
+                        size === s ? "bg-black text-white" : ""
+                      } ${
+                        outOfStock
+                          ? "opacity-40 cursor-not-allowed"
+                          : "hover:bg-black hover:text-white"
+                      }`}
+                    >
+                      {s} ({stock})
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* CART */}
-            <div className="flex gap-3 mt-8 items-center">
-              <div className="flex border items-center">
+            {/* QUANTITY + CART */}
+            <div className="flex gap-3 mt-8 items-center flex-wrap">
+              {/* QTY */}
+              <div className="flex border items-center h-[52px]">
                 <button
-                  className="px-3"
+                  className="px-4 h-full"
                   onClick={() => setQty(Math.max(1, qty - 1))}
                 >
                   <FiMinus />
                 </button>
 
-                <span className="px-4">{qty}</span>
+                <span className="px-5">{qty}</span>
 
-                <button className="px-3" onClick={() => setQty(qty + 1)}>
+                <button
+                  className="px-4 h-full"
+                  onClick={() => {
+                    if (qty < selectedStock) {
+                      setQty(qty + 1);
+                    }
+                  }}
+                >
                   <FiPlus />
                 </button>
               </div>
 
+              {/* CART */}
               <button
-                onClick={() => addToCart(product, size, qty)}
-                className="bg-black text-white px-6 py-3"
+                disabled={selectedStock === 0}
+                onClick={() => {
+                  if (qty > selectedStock) {
+                    alert("Out of stock");
+
+                    return;
+                  }
+
+                  addToCart(product, size, qty);
+                }}
+                className="bg-black text-white px-8 py-4 hover:opacity-90 transition disabled:opacity-40"
               >
-                ADD TO BAG ₹{product.price * qty}
+                {selectedStock === 0
+                  ? "OUT OF STOCK"
+                  : `ADD TO BAG • ₹${product.price * qty}`}
               </button>
             </div>
+
+            {/* STOCK TEXT */}
+            <p className="mt-4 text-sm opacity-60">
+              {selectedStock > 0
+                ? `${selectedStock} items left`
+                : "Currently unavailable"}
+            </p>
           </div>
         </div>
 
-        {/* RELATED */}
-        <div className="mt-28">
-          <h2 className="text-3xl mb-10">You Might Also Like</h2>
+        {/* RELATED PRODUCTS */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-28">
+            <h2 className="text-3xl mb-10">You Might Also Like</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p._id} p={p} />
-            ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {relatedProducts.map((p) => (
+                <ProductCard key={p._id} p={p} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

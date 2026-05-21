@@ -1,33 +1,45 @@
 const express = require("express");
 
 const router = express.Router();
+
 const upload = require("../middleware/upload");
 
-const Product =
-  require("../models/Product");
+const Product = require("../models/Product");
+
+// =====================
+// HELPER
+// =====================
+const parseSizes = (sizesString) => {
+  const sizesObject = {};
+
+  if (!sizesString) return sizesObject;
+
+  sizesString.split(",").forEach((item) => {
+    const [size, stock] = item.split(":");
+
+    if (size && stock !== undefined) {
+      sizesObject[size.trim()] = Number(stock);
+    }
+  });
+
+  return sizesObject;
+};
 
 // =====================
 // GET PRODUCTS
 // =====================
 router.get("/", async (req, res) => {
-
   try {
-
-    const products =
-      await Product.find().sort({
-        createdAt: -1,
-      });
+    const products = await Product.find().sort({
+      createdAt: -1,
+    });
 
     res.json(products);
-
   } catch (error) {
-
     res.status(500).json({
       message: error.message,
     });
-
   }
-
 });
 
 // =====================
@@ -39,107 +51,245 @@ router.post(
 
   async (req, res) => {
     try {
+      console.log("REQ BODY:", req.body);
 
-      console.log(req.files);
+      console.log("REQ FILES:", req.files);
 
-      const imageUrls =
-        req.files.map(
-          (file) => file.path
-        );
+      // IMAGES
+      const imageUrls = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
 
-      const product =
-        await Product.create({
-          name: req.body.name,
+      // SLUG
+      const slug = req.body.name.toLowerCase().trim().replace(/\s+/g, "-");
 
-          price: Number(
-            req.body.price
-          ),
+      // SIZES
+      const sizesObject = parseSizes(req.body.sizes);
 
-          category:
-            req.body.category,
+      // CREATE PRODUCT
+      const product = await Product.create({
+        name: req.body.name,
 
-          description:
-            req.body.description,
+        slug,
 
-          badge: req.body.badge,
+        price: Number(req.body.price),
 
-          sizes:
-            req.body.sizes
-              .split(","),
+        category: req.body.category,
 
-          images: imageUrls,
-        });
+        description: req.body.description,
+
+        badge: req.body.badge,
+
+        sizes: sizesObject,
+
+        images: imageUrls,
+      });
 
       res.status(201).json({
         success: true,
         product,
       });
-
     } catch (error) {
-
       console.log(error);
 
       res.status(500).json({
         success: false,
-        message:
-          error.message,
+        message: error.message,
       });
-
     }
-  }
+  },
 );
 
 // =====================
 // UPDATE PRODUCT
 // =====================
-router.put("/:id", async (req, res) => {
+// =====================
+// UPDATE PRODUCT
+// =====================
+router.put(
+  "/:id",
+  upload.array("images", 10),
 
-  try {
+  async (req, res) => {
+    try {
+      console.log("============== UPDATE START ==============");
 
-    const updated =
-      await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-        }
-      );
+      console.log("REQ PARAMS:", req.params);
 
-    res.json(updated);
+      console.log("REQ BODY:", req.body);
 
-  } catch (error) {
+      console.log("REQ FILES:", req.files);
 
-    res.status(500).json({
-      message: error.message,
-    });
+      // FIND PRODUCT
+      const product = await Product.findById(req.params.id);
 
-  }
+      console.log("FOUND PRODUCT:", product);
 
-});
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
 
+      // =====================
+      // BASIC FIELDS
+      // =====================
+      product.name = req.body.name || product.name;
+
+      product.price = req.body.price
+        ? Number(req.body.price)
+        : product.price;
+
+      product.category = req.body.category || product.category;
+
+      product.description =
+        req.body.description || product.description;
+
+      product.badge = req.body.badge || product.badge;
+
+      console.log("BASIC FIELDS UPDATED");
+
+      // =====================
+      // SLUG
+      // =====================
+      if (req.body.name) {
+        product.slug = req.body.name
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-");
+      }
+
+      console.log("SLUG UPDATED");
+
+      // =====================
+      // SIZES
+      // =====================
+      if (req.body.sizes) {
+        console.log("RAW SIZES:", req.body.sizes);
+
+        const sizesObject = parseSizes(req.body.sizes);
+
+        console.log("PARSED SIZES:", sizesObject);
+
+        product.sizes = sizesObject;
+
+        console.log("PRODUCT SIZES SET");
+      }
+
+      // =====================
+      // NEW IMAGES
+      // =====================
+      if (req.files && req.files.length > 0) {
+        const newImages = req.files.map((file) => ({
+          url: file.path,
+          public_id: file.filename,
+        }));
+
+        console.log("NEW IMAGES:", newImages);
+
+        product.images = [
+          ...product.images,
+          ...newImages,
+        ];
+
+        console.log("IMAGES UPDATED");
+      }
+
+      // =====================
+      // BEFORE SAVE
+      // =====================
+      console.log("FINAL PRODUCT:", product);
+
+      await product.save();
+
+      console.log("PRODUCT SAVED");
+
+      res.json({
+        success: true,
+        product,
+      });
+
+      console.log("============== UPDATE END ==============");
+    } catch (error) {
+      console.log("============== UPDATE ERROR ==============");
+
+      console.log(error);
+
+      console.log("ERROR MESSAGE:", error.message);
+
+      console.log("STACK:", error.stack);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+);
 // =====================
 // DELETE PRODUCT
 // =====================
 router.delete("/:id", async (req, res) => {
-
   try {
+    const product = await Product.findById(req.params.id);
 
-    await Product.findByIdAndDelete(
-      req.params.id
-    );
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
+      message: "Product deleted",
     });
-
   } catch (error) {
+    console.log(error);
 
     res.status(500).json({
+      success: false,
       message: error.message,
     });
-
   }
+});
 
+// =====================
+// DELETE SINGLE IMAGE
+// =====================
+router.delete("/:id/image/:public_id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const publicId = decodeURIComponent(req.params.public_id);
+
+    product.images = product.images.filter((img) => img.public_id !== publicId);
+
+    await product.save();
+
+    res.json({
+      success: true,
+      message: "Image deleted",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 module.exports = router;
