@@ -1,17 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import {
-  HiOutlineMenuAlt4,
-  HiOutlineX,
-} from "react-icons/hi";
+import { HiOutlineMenuAlt4, HiOutlineX } from "react-icons/hi";
 
-import {
-  FiSearch,
-  FiUser,
-  FiShoppingBag,
-  FiShield,
-} from "react-icons/fi";
+import { FiSearch, FiUser, FiShoppingBag, FiShield } from "react-icons/fi";
 
 import Logo from "./Logo";
 import { useApp } from "@/context/AppContext";
@@ -25,52 +17,36 @@ const NAV = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] =
-    useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const [open, setOpen] =
-    useState(false);
+  const [open, setOpen] = useState(false);
 
-  const [profileOpen, setProfileOpen] =
-    useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const {
-    cartCount,
-    user,
-    logout,
-    isAdmin,
-  } = useApp();
+  const { cartCount, user, logout, isAdmin } = useApp();
 
   const loc = useLocation();
 
-const isProductPage =
-  loc.pathname.includes("/product/") ||
-  loc.pathname.includes("/account") ||
-  loc.pathname.includes("/cart") ||
-  loc.pathname.includes("/checkout");
+  const isProductPage =
+    loc.pathname.includes("/product/") ||
+    loc.pathname.includes("/account") ||
+    loc.pathname.includes("/cart") ||
+    loc.pathname.includes("/admin") ||
+    loc.pathname.includes("/checkout");
 
   // =========================
   // SCROLL EFFECT
   // =========================
   useEffect(() => {
-    const on = () =>
-      setScrolled(window.scrollY > 30);
+    const on = () => setScrolled(window.scrollY > 30);
 
     on();
 
-    window.addEventListener(
-      "scroll",
-      on,
-      {
-        passive: true,
-      }
-    );
+    window.addEventListener("scroll", on, {
+      passive: true,
+    });
 
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        on
-      );
+    return () => window.removeEventListener("scroll", on);
   }, []);
 
   // =========================
@@ -86,13 +62,10 @@ const isProductPage =
       {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled || isProductPage
-            ? "glass py-3"
-            : "py-5"
+          scrolled || isProductPage ? "glass py-3" : "py-5"
         }`}
       >
         <div className="mx-auto max-w-[1500px] px-5 md:px-10 flex items-center justify-between">
-
           {/* LOGO */}
           <Logo />
 
@@ -113,7 +86,6 @@ const isProductPage =
 
           {/* RIGHT SIDE */}
           <div className="flex items-center gap-3 md:gap-5 text-white">
-
             {/* SEARCH */}
             <button
               className="hidden md:inline-flex hover:text-[oklch(0.65_0.25_27)] transition"
@@ -124,24 +96,18 @@ const isProductPage =
 
             {/* USER */}
             <div className="relative">
-
               {user ? (
                 <>
                   {/* AVATAR */}
                   <button
-                    onClick={() =>
-                      setProfileOpen(
-                        (p) => !p
-                      )
-                    }
+                    onClick={() => setProfileOpen((p) => !p)}
                     className="hover:text-[oklch(0.65_0.25_27)] transition"
                   >
                     <img
                       src={
                         user.photoURL ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          user.name ||
-                            "User"
+                          user.name || "User",
                         )}`
                       }
                       alt="user"
@@ -152,14 +118,9 @@ const isProductPage =
                   {/* DROPDOWN */}
                   {profileOpen && (
                     <div className="absolute right-0 mt-3 w-52 bg-black text-white border border-white/10 rounded-lg shadow-lg overflow-hidden">
-
                       <Link
                         to="/account"
-                        onClick={() =>
-                          setProfileOpen(
-                            false
-                          )
-                        }
+                        onClick={() => setProfileOpen(false)}
                         className="block px-4 py-3 hover:bg-white/10 text-sm"
                       >
                         My Account
@@ -168,11 +129,7 @@ const isProductPage =
                       {isAdmin && (
                         <Link
                           to="/admin"
-                          onClick={() =>
-                            setProfileOpen(
-                              false
-                            )
-                          }
+                          onClick={() => setProfileOpen(false)}
                           className="block px-4 py-3 hover:bg-white/10 text-sm"
                         >
                           Admin Panel
@@ -183,15 +140,12 @@ const isProductPage =
                         onClick={async () => {
                           await logout();
 
-                          setProfileOpen(
-                            false
-                          );
+                          setProfileOpen(false);
                         }}
                         className="w-full text-left px-4 py-3 hover:bg-white/10 text-sm text-red-400"
                       >
                         Logout
                       </button>
-
                     </div>
                   )}
                 </>
@@ -204,7 +158,6 @@ const isProductPage =
                 </Link>
               )}
             </div>
-            
 
             {/* CART */}
             <Link
@@ -223,14 +176,11 @@ const isProductPage =
 
             {/* MOBILE MENU */}
             <button
-              onClick={() =>
-                setOpen(true)
-              }
+              onClick={() => setOpen(true)}
               className="lg:hidden text-white"
             >
               <HiOutlineMenuAlt4 className="text-2xl" />
             </button>
-
           </div>
         </div>
       </header>
@@ -238,66 +188,46 @@ const isProductPage =
       {/* MOBILE DRAWER */}
       <div
         className={`fixed inset-0 z-[80] lg:hidden transition ${
-          open
-            ? "visible"
-            : "invisible"
+          open ? "visible" : "invisible"
         }`}
       >
         {/* OVERLAY */}
         <div
           className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity ${
-            open
-              ? "opacity-100"
-              : "opacity-0"
+            open ? "opacity-100" : "opacity-0"
           }`}
-          onClick={() =>
-            setOpen(false)
-          }
+          onClick={() => setOpen(false)}
         />
 
         {/* SIDEBAR */}
         <aside
           className={`absolute right-0 top-0 h-full w-[88%] max-w-sm bg-[oklch(0.06_0.005_20)] border-l border-white/10 p-7 flex flex-col transition-transform duration-500 ${
-            open
-              ? "translate-x-0"
-              : "translate-x-full"
+            open ? "translate-x-0" : "translate-x-full"
           }`}
         >
           {/* TOP */}
           <div className="flex items-center justify-between">
             <Logo />
 
-            <button
-              onClick={() =>
-                setOpen(false)
-              }
-            >
+            <button onClick={() => setOpen(false)}>
               <HiOutlineX className="text-2xl text-white" />
             </button>
           </div>
 
           {/* NAV */}
           <nav className="mt-12 flex flex-col gap-1">
-
             {NAV.map((n, i) => (
               <Link
                 key={n.to}
                 to={n.to}
-                onClick={() =>
-                  setOpen(false)
-                }
+                onClick={() => setOpen(false)}
                 className="group block py-4 border-b border-white/10"
               >
                 <span className="text-grotesk text-3xl text-white group-hover:text-[oklch(0.65_0.25_27)] transition">
-                  {String(i + 1).padStart(
-                    2,
-                    "0"
-                  )}
-                  . {n.label}
+                  {String(i + 1).padStart(2, "0")}. {n.label}
                 </span>
               </Link>
             ))}
-
           </nav>
 
           {/* FOOTER */}
@@ -309,45 +239,30 @@ const isProductPage =
 
       {/* MOBILE BOTTOM NAV */}
       <div className="lg:hidden fixed bottom-3 left-3 right-3 z-40 glass rounded-full px-6 py-3 flex items-center justify-between text-white">
-
         {/* HOME */}
-        <Link
-          to="/"
-          aria-label="Home"
-        >
+        <Link to="/" aria-label="Home">
           <FiSearch className="text-lg" />
         </Link>
 
         {/* SHOP */}
         <Link to="/shop">
-          <span className="text-grotesk text-sm tracking-[0.2em]">
-            SHOP
-          </span>
+          <span className="text-grotesk text-sm tracking-[0.2em]">SHOP</span>
         </Link>
 
         {/* ADMIN */}
         {isAdmin && (
-          <Link
-            to="/admin"
-            aria-label="Admin"
-          >
+          <Link to="/admin" aria-label="Admin">
             <FiShield className="text-lg" />
           </Link>
         )}
 
         {/* ACCOUNT */}
-        <Link
-          to="/account"
-          aria-label="Account"
-        >
+        <Link to="/account" aria-label="Account">
           <FiUser className="text-lg" />
         </Link>
 
         {/* CART */}
-        <Link
-          to="/cart"
-          className="relative"
-        >
+        <Link to="/cart" className="relative">
           <FiShoppingBag className="text-lg" />
 
           {cartCount > 0 && (

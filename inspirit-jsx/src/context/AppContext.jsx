@@ -1,19 +1,11 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import axios from "axios";
 import toast from "react-hot-toast";
 
 const AppCtx = createContext(null);
 
-const API =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // ======================
 // SAFE LOCAL STORAGE
@@ -23,54 +15,45 @@ const safeGet = (key, fallback) => {
 
   try {
     const value = localStorage.getItem(key);
+
     return value ? JSON.parse(value) : fallback;
   } catch {
     return fallback;
   }
 };
 
+// ======================
+// PROVIDER
+// ======================
 export function AppProvider({ children }) {
-
   // ======================
   // STATES
   // ======================
-  const [user, setUser] = useState(() =>
-    safeGet("inspirit:user", null)
-  );
+  const [user, setUser] = useState(() => safeGet("inspirit:user", null));
 
   const [cart, setCart] = useState([]);
 
-  const [wishlist, setWishlist] = useState(() =>
-    safeGet("inspirit:wish", [])
-  );
+  const [wishlist, setWishlist] = useState(() => safeGet("inspirit:wish", []));
 
   // ======================
   // ADMIN
   // ======================
-  const adminEmail =
-    import.meta.env.VITE_ADMIN_EMAIL;
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 
-  const isAdmin =
-    user?.email === adminEmail;
+  const isAdmin = user?.email === adminEmail;
 
   // ======================
   // SAVE USER
   // ======================
   useEffect(() => {
-    localStorage.setItem(
-      "inspirit:user",
-      JSON.stringify(user)
-    );
+    localStorage.setItem("inspirit:user", JSON.stringify(user));
   }, [user]);
 
   // ======================
   // SAVE WISHLIST
   // ======================
   useEffect(() => {
-    localStorage.setItem(
-      "inspirit:wish",
-      JSON.stringify(wishlist)
-    );
+    localStorage.setItem("inspirit:wish", JSON.stringify(wishlist));
   }, [wishlist]);
 
   // ======================
@@ -80,14 +63,11 @@ export function AppProvider({ children }) {
     try {
       if (!user) return;
 
-      const res = await axios.get(
-        `${API}/api/cart`,
-        {
-          params: {
-            email: user.email,
-          },
-        }
-      );
+      const res = await axios.get(`${API}/api/cart`, {
+        params: {
+          email: user.email,
+        },
+      });
 
       setCart(res.data);
     } catch (error) {
@@ -112,8 +92,7 @@ export function AppProvider({ children }) {
   const login = (email, name) => {
     const newUser = {
       email,
-      name:
-        name || email.split("@")[0],
+      name: name || email.split("@")[0],
     };
 
     setUser(newUser);
@@ -130,6 +109,7 @@ export function AppProvider({ children }) {
   // ======================
   const logout = () => {
     setUser(null);
+
     setCart([]);
 
     toast("Signed out");
@@ -140,47 +120,35 @@ export function AppProvider({ children }) {
   // ======================
   const addToCart = async (
     product,
-    size =
-      product.sizes?.[1] ||
-      product.sizes?.[0],
-    qty = 1
+    size = product.sizes?.[1] || product.sizes?.[0],
+    qty = 1,
   ) => {
     try {
       if (!user) {
-        return toast.error(
-          "Login required"
-        );
+        return toast.error("Login required");
       }
 
-      await axios.post(
-        `${API}/api/cart`,
-        {
-          userEmail: user.email,
+      await axios.post(`${API}/api/cart`, {
+        userEmail: user.email,
 
-          productId:
-            product._id || product.id,
+        productId: product._id || product.id,
 
-          name: product.name,
+        name: product.name,
 
-          image:
-            product.images?.[0] ||
-            product.image,
+        image: product.images?.[0] || product.image,
 
-          category: product.category,
+        category: product.category,
 
-          price: product.price,
+        price: product.price,
 
-          size,
+        size,
 
-          qty,
-        }
-      );
+        qty,
+      });
 
       fetchCart();
 
-      toast.success(
-        `${product.name} added to bag`
-      );
+      toast.success(`${product.name} added to bag`);
     } catch (error) {
       console.log(error);
 
@@ -189,20 +157,15 @@ export function AppProvider({ children }) {
   };
 
   // ======================
-  // REMOVE FROM CART
+  // REMOVE CART
   // ======================
-  const removeFromCart = async (
-    id
-  ) => {
+  const removeFromCart = async (id) => {
     try {
-      await axios.delete(
-        `${API}/api/cart/${id}`,
-        {
-          data: {
-            email: user.email,
-          },
-        }
-      );
+      await axios.delete(`${API}/api/cart/${id}`, {
+        data: {
+          email: user.email,
+        },
+      });
 
       fetchCart();
 
@@ -215,18 +178,12 @@ export function AppProvider({ children }) {
   // ======================
   // UPDATE QTY
   // ======================
-  const updateQty = async (
-    id,
-    qty
-  ) => {
+  const updateQty = async (id, qty) => {
     try {
-      await axios.put(
-        `${API}/api/cart/${id}`,
-        {
-          qty,
-          userEmail: user.email,
-        }
-      );
+      await axios.put(`${API}/api/cart/${id}`, {
+        qty,
+        userEmail: user.email,
+      });
 
       fetchCart();
     } catch (error) {
@@ -241,20 +198,11 @@ export function AppProvider({ children }) {
     setWishlist((prev) => {
       const has = prev.includes(id);
 
-      toast(
-        has
-          ? "Removed from wishlist"
-          : "Saved to wishlist",
-        {
-          icon: has ? "✕" : "♡",
-        }
-      );
+      toast(has ? "Removed from wishlist" : "Saved to wishlist", {
+        icon: has ? "✕" : "♡",
+      });
 
-      return has
-        ? prev.filter(
-            (x) => x !== id
-          )
-        : [...prev, id];
+      return has ? prev.filter((x) => x !== id) : [...prev, id];
     });
   };
 
@@ -262,66 +210,50 @@ export function AppProvider({ children }) {
   // CART COUNT
   // ======================
   const cartCount = useMemo(() => {
-    return cart.reduce(
-      (acc, item) =>
-        acc + item.qty,
-      0
-    );
+    return cart.reduce((acc, item) => acc + item.qty, 0);
   }, [cart]);
 
   // ======================
   // CART TOTAL
   // ======================
   const cartTotal = useMemo(() => {
-    return cart.reduce(
-      (acc, item) =>
-        acc +
-        item.qty * item.price,
-      0
-    );
+    return cart.reduce((acc, item) => acc + item.qty * item.price, 0);
   }, [cart]);
 
   // ======================
-  // PROVIDER
+  // PROVIDER VALUE
   // ======================
-  return (
-    <AppCtx.Provider
-      value={{
-        user,
-        isAdmin,
+  const value = {
+    user,
+    isAdmin,
 
-        login,
-        logout,
+    login,
+    logout,
 
-        cart,
-        addToCart,
-        removeFromCart,
-        updateQty,
+    cart,
+    addToCart,
+    removeFromCart,
+    updateQty,
 
-        cartCount,
-        cartTotal,
-        fetchCart,
+    cartCount,
+    cartTotal,
+    fetchCart,
 
-        wishlist,
-        toggleWishlist,
-      }}
-    >
-      {children}
-    </AppCtx.Provider>
-  );
+    wishlist,
+    toggleWishlist,
+  };
+
+  return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
 }
 
 // ======================
 // CUSTOM HOOK
 // ======================
 export const useApp = () => {
-  const value =
-    useContext(AppCtx);
+  const value = useContext(AppCtx);
 
   if (!value) {
-    throw new Error(
-      "useApp outside provider"
-    );
+    throw new Error("useApp must be used inside AppProvider");
   }
 
   return value;

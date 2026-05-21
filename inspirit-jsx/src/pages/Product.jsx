@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { gsap } from "gsap";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,49 +10,68 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/thumbs";
 
-import {
-  
-  FiMinus,
-  FiPlus,
-  FiStar,
-} from "react-icons/fi";
+import { FiMinus, FiPlus, FiStar } from "react-icons/fi";
 
-import { findProduct, PRODUCTS } from "@/data/products";
 import { useApp } from "@/context/AppContext";
 import ProductCard from "@/components/site/ProductCard";
 
 function ProductPage() {
   const { slug } = useParams();
 
-  const product = findProduct(slug);
-  const { addToCart, toggleWishlist, wishlist } = useApp();
+  const { addToCart, wishlist } = useApp();
+
+  const [product, setProduct] = useState(null);
+
+  const [allProducts, setAllProducts] = useState([]);
 
   const [size, setSize] = useState("");
+
   const [qty, setQty] = useState(1);
+
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   const galleryRef = useRef(null);
 
+  // ======================
+  // FETCH PRODUCT
+  // ======================
   useEffect(() => {
-    console.log("slug:", slug);
-    console.log("product:", product);
-  }, [slug, product]);
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/products");
 
-  if (!product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-        Product Not Found
-      </div>
-    );
-  }
+        setAllProducts(res.data);
 
+        const found = res.data.find(
+          (p) =>
+            p.slug === slug ||
+            p.name.toLowerCase().replace(/\s+/g, "-") === slug,
+        );
+
+        setProduct(found);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchProducts();
+  }, [slug]);
+
+  // ======================
+  // DEFAULT SIZE
+  // ======================
   useEffect(() => {
-    if (product.sizes?.length > 0) {
+    if (product?.sizes?.length > 0) {
       setSize(product.sizes[0]);
     }
   }, [product]);
 
+  // ======================
+  // GSAP
+  // ======================
   useEffect(() => {
+    if (!product) return;
+
     const ctx = gsap.context(() => {
       gsap.from(".pd-fade", {
         y: 30,
@@ -70,33 +90,47 @@ function ProductPage() {
     }, galleryRef);
 
     return () => ctx.revert();
-  }, [slug]);
+  }, [product]);
 
-  const relatedProducts = PRODUCTS.filter(
-    (p) => p.category === product.category && p.id !== product.id
-  ).slice(0, 4);
+  // ======================
+  // LOADING
+  // ======================
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+        Loading Product...
+      </div>
+    );
+  }
 
-  const wished = wishlist.includes(product.id);
+  // ======================
+  // RELATED PRODUCTS
+  // ======================
+  const relatedProducts = allProducts
+    .filter((p) => p.category === product.category && p._id !== product._id)
+    .slice(0, 4);
+
+  const wished = wishlist.includes(product._id);
 
   return (
     <div className="pt-28 md:pt-36 pb-24">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-
-        {/* Breadcrumb */}
+        {/* BREADCRUMB */}
         <nav className="text-xs tracking-[0.3em] mb-8">
-          <Link to="/">HOME</Link> /{" "}
-          <Link to="/shop">SHOP</Link> /{" "}
-          <span>{product.name.toUpperCase()}</span>
+          <Link to="/">HOME</Link>
+
+          {" / "}
+
+          <Link to="/shop">SHOP</Link>
+
+          {" / "}
+
+          <span>{product.name?.toUpperCase()}</span>
         </nav>
 
-        <div
-          ref={galleryRef}
-          className="grid lg:grid-cols-12 gap-10"
-        >
-
+        <div ref={galleryRef} className="grid lg:grid-cols-12 gap-10">
           {/* LEFT */}
           <div className="lg:col-span-7 grid grid-cols-[80px_minmax(0,1fr)] gap-4 min-w-0">
-
             {/* THUMBS */}
             <div className="hidden md:block">
               <Swiper
@@ -112,9 +146,9 @@ function ProductPage() {
                 {product.images?.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
-                      src={img}
+                      src={img || "/placeholder.png"}
                       className="h-[140px] w-full object-cover cursor-pointer"
-                      alt=""
+                      alt={product.name}
                     />
                   </SwiperSlide>
                 ))}
@@ -125,29 +159,28 @@ function ProductPage() {
             <div className="pd-image w-full h-[600px] min-w-0">
               <Swiper
                 modules={[Thumbs]}
-                thumbs={{ swiper: thumbsSwiper }}
+                thumbs={{
+                  swiper: thumbsSwiper,
+                }}
                 className="h-full w-full min-w-0"
                 style={{ width: "100%" }}
               >
                 {product.images?.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
-                      src={img}
+                      src={img || "/placeholder.png"}
                       className="h-full w-full object-cover"
-                      alt=""
+                      alt={product.name}
                     />
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
-
           </div>
 
           {/* RIGHT */}
           <div className="lg:col-span-5 lg:sticky lg:top-32">
-
             <div className="pd-fade">
-
               {product.badge && (
                 <span className="text-xs px-3 py-1 bg-black text-white">
                   {product.badge}
@@ -155,47 +188,43 @@ function ProductPage() {
               )}
 
               <p className="mt-4 text-xs tracking-widest">
-                {product.category.toUpperCase()}
+                {product.category?.toUpperCase()}
               </p>
 
               <h1 className="text-4xl mt-2">{product.name}</h1>
 
-              {/* Rating */}
+              {/* RATING */}
               <div className="flex items-center gap-2 mt-3">
                 <div className="flex">
-                  {Array.from({ length: Math.round(product.rating) }).map(
-                    (_, i) => (
-                      <FiStar key={i} />
-                    )
-                  )}
+                  {Array.from({
+                    length: 5,
+                  }).map((_, i) => (
+                    <FiStar key={i} />
+                  ))}
                 </div>
-                <span className="text-sm">
-                  {product.rating} ({product.reviews})
-                </span>
+
+                <span className="text-sm">5.0 (120 Reviews)</span>
               </div>
 
-              {/* Price */}
-              <div className="mt-5 text-3xl">
-                ₹{product.price}
-              </div>
+              {/* PRICE */}
+              <div className="mt-5 text-3xl">₹{product.price}</div>
 
-              <p className="mt-5 text-sm opacity-70">
+              {/* DESCRIPTION */}
+              <p className="mt-5 text-sm opacity-70 leading-7">
                 {product.description}
               </p>
             </div>
 
             {/* SIZE */}
             <div className="mt-8">
-              <p className="text-xs tracking-widest mb-3">
-                SIZE: {size}
-              </p>
+              <p className="text-xs tracking-widest mb-3">SIZE: {size}</p>
 
               <div className="flex gap-2 flex-wrap">
                 {product.sizes?.map((s) => (
                   <button
                     key={s}
                     onClick={() => setSize(s)}
-                    className={`px-4 py-2 border ${
+                    className={`px-4 py-2 border transition ${
                       size === s ? "bg-black text-white" : ""
                     }`}
                   >
@@ -207,7 +236,6 @@ function ProductPage() {
 
             {/* CART */}
             <div className="flex gap-3 mt-8 items-center">
-
               <div className="flex border items-center">
                 <button
                   className="px-3"
@@ -218,40 +246,31 @@ function ProductPage() {
 
                 <span className="px-4">{qty}</span>
 
-                <button
-                  className="px-3"
-                  onClick={() => setQty(qty + 1)}
-                >
+                <button className="px-3" onClick={() => setQty(qty + 1)}>
                   <FiPlus />
                 </button>
               </div>
 
               <button
                 onClick={() => addToCart(product, size, qty)}
-                className="bg-black text-white px-6 py-2"
+                className="bg-black text-white px-6 py-3"
               >
                 ADD TO BAG ₹{product.price * qty}
               </button>
-
-           
             </div>
-
           </div>
         </div>
 
         {/* RELATED */}
         <div className="mt-28">
-          <h2 className="text-3xl mb-10">
-            You Might Also Like
-          </h2>
+          <h2 className="text-3xl mb-10">You Might Also Like</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {relatedProducts.map((p) => (
-              <ProductCard key={p.id} p={p} />
+              <ProductCard key={p._id} p={p} />
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
