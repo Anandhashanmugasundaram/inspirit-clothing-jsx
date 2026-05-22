@@ -106,6 +106,8 @@ const handleSubmit = async (e) => {
     const isEditing = editingId && editingId !== "null" && editingId !== "";
 
     console.log("EDITING ID:", editingId, "| IS EDITING:", isEditing);
+    console.log("API URL:", API);
+console.log("Posting to:", `${API}/api/products`);
 
     if (isEditing) {
       await axios.put(`${API}/api/products/${editingId}`, data, {
