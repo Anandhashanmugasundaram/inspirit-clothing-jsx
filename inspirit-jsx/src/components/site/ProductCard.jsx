@@ -6,31 +6,51 @@ import { useApp } from "@/context/AppContext";
 export default function ProductCard({ p }) {
   const { addToCart } = useApp();
 
-  // FIX IMAGE URL FOR PRODUCTION
+  console.log("FULL PRODUCT:", p);
+  console.log("PRODUCT IMAGES:", p.images);
+
+  // IMAGE URL FIX
   const getImageUrl = (img) => {
+    console.log("RAW IMAGE:", img);
+
     if (!img) {
-      return "https://placehold.co/600x800?text=Product";
+      console.log("NO IMAGE FOUND");
+      return "https://placehold.co/600x800?text=No+Image";
     }
 
     const url = typeof img === "string" ? img : img.url;
 
-    // if image already has full URL
+    console.log("IMAGE URL FROM DB:", url);
+
+    // already full URL
     if (url.startsWith("http")) {
+      console.log("FULL URL IMAGE:", url);
       return url;
     }
 
-    // append backend URL
-    return `${import.meta.env.VITE_API_URL}${url}`;
+    // fix relative path
+    const fixedUrl = `${import.meta.env.VITE_API_URL}${url}`;
+
+    console.log("FIXED IMAGE URL:", fixedUrl);
+
+    return fixedUrl;
   };
 
   const mainImage = getImageUrl(p.images?.[0]);
-  const hoverImage = p.images?.[1] ? getImageUrl(p.images?.[1]) : null;
+
+  const hoverImage = p.images?.[1]
+    ? getImageUrl(p.images?.[1])
+    : null;
+
+  console.log("FINAL MAIN IMAGE:", mainImage);
+  console.log("FINAL HOVER IMAGE:", hoverImage);
 
   return (
     <article className="group relative max-w-[500px]">
       {/* CARD */}
       <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-slate-100 to-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500">
-        {/* BACKGROUND DESIGN */}
+
+        {/* BG */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-black/5 blur-3xl" />
 
@@ -39,7 +59,7 @@ export default function ProductCard({ p }) {
           <div className="absolute top-1/2 left-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/5" />
         </div>
 
-        {/* IMAGE SECTION */}
+        {/* IMAGE */}
         <Link
           to={`/product/${p._id}`}
           className="relative block h-[320px] overflow-hidden bg-[#f7f7f7]"
@@ -49,6 +69,13 @@ export default function ProductCard({ p }) {
             src={mainImage}
             alt={p.name}
             loading="lazy"
+            onLoad={() => console.log("IMAGE LOADED:", mainImage)}
+            onError={(e) => {
+              console.log("IMAGE FAILED:", mainImage);
+
+              e.target.src =
+                "https://placehold.co/600x800?text=Image+Error";
+            }}
             className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
           />
 
@@ -58,6 +85,12 @@ export default function ProductCard({ p }) {
               src={hoverImage}
               alt=""
               loading="lazy"
+              onLoad={() =>
+                console.log("HOVER IMAGE LOADED:", hoverImage)
+              }
+              onError={() =>
+                console.log("HOVER IMAGE FAILED:", hoverImage)
+              }
               className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
             />
           )}
@@ -78,7 +111,7 @@ export default function ProductCard({ p }) {
             </span>
           )}
 
-          {/* VIEW BUTTON */}
+          {/* VIEW */}
           <div className="absolute top-3 right-3 translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
             <div className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-md border border-white flex items-center justify-center text-black hover:border-black transition">
               <Eye className="w-4 h-4" />
@@ -102,12 +135,13 @@ export default function ProductCard({ p }) {
 
         {/* CONTENT */}
         <div className="relative p-4 backdrop-blur-sm">
+
           {/* CATEGORY */}
           <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500 mb-1">
             {p.category}
           </p>
 
-          {/* PRODUCT NAME */}
+          {/* NAME */}
           <Link
             to={`/product/${p._id}`}
             className="block text-black font-semibold text-sm hover:text-gray-700 transition line-clamp-1"
@@ -117,7 +151,9 @@ export default function ProductCard({ p }) {
 
           {/* PRICE */}
           <div className="flex items-center gap-2 mt-2">
-            <p className="text-black font-bold text-sm">₹{p.price}</p>
+            <p className="text-black font-bold text-sm">
+              ₹{p.price}
+            </p>
 
             {p.oldPrice && (
               <p className="text-xs text-gray-400 line-through">
