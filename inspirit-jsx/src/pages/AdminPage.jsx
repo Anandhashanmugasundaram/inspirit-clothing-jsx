@@ -134,11 +134,7 @@ function AdminPage() {
 
       // CREATE
       else {
-        await axios.post(`${API}/api/products`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await axios.post(`${API}/api/products`, data);
 
         alert("Product Added");
       }
