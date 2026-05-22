@@ -1,31 +1,91 @@
 import { Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import axios from "axios";
+
 import { FiUser, FiPackage, FiLogOut } from "react-icons/fi";
+
 import { useApp } from "@/context/AppContext";
 
 const TABS = [
-  { k: "profile", l: "Profile", i: FiUser },
-  { k: "orders", l: "Orders", i: FiPackage },
+  {
+    k: "profile",
+    l: "Profile",
+    i: FiUser,
+  },
+  {
+    k: "orders",
+    l: "Orders",
+    i: FiPackage,
+  },
 ];
 
 function Account() {
   const { user, logout } = useApp();
+
   const [tab, setTab] = useState("profile");
+
+  const [orders, setOrders] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  // ======================
+  // FETCH ORDERS
+  // ======================
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        if (!user?.email) return;
+
+        const res = await axios.get(`${API}/api/orders/${user.email}`);
+
+        setOrders(res.data || []);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
+
+  // ======================
+  // STATUS COLORS
+  // ======================
+const statusStyle = (status) => {
+  switch (status) {
+    case "Pending":
+      return "bg-yellow-500 text-black";
+
+    case "Processing":
+      return "bg-orange-500 text-white";
+
+    case "Shipped":
+      return "bg-blue-600 text-white";
+
+    case "Delivered":
+      return "bg-green-600 text-white";
+
+    default:
+      return "bg-black text-white";
+  }
+};
 
   if (!user) return <Navigate to="/register" replace />;
 
   return (
-    <div className="bone-section pt-32 md:pt-40 pb-24">
+    <div className="bone-section pt-32 md:pt-40 pb-24 min-h-screen bg-white">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-        <p className="text-grotesk text-xs tracking-[0.4em] text-[oklch(0.55_0.25_27)]">
+        {/* HEADING */}
+        <p className="text-grotesk text-xs tracking-[0.4em] text-red-700">
           — WELCOME BACK
         </p>
 
-        <h1 className="mt-3 text-display text-5xl md:text-7xl">
-          Hello,{" "}
-          <em className="not-italic text-[oklch(0.48_0.22_25)]">
-            {user.name}.
-          </em>
+        <h1 className="mt-3 text-5xl md:text-7xl font-black">
+          Hello, <em className="not-italic text-red-700">{user.name}.</em>
         </h1>
 
         <div className="mt-12 grid lg:grid-cols-[260px_1fr] gap-10">
@@ -35,42 +95,45 @@ function Account() {
               <button
                 key={t.k}
                 onClick={() => setTab(t.k)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-grotesk text-sm tracking-[0.2em] transition ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm tracking-[0.2em] transition rounded-xl ${
                   tab === t.k ? "bg-black text-white" : "hover:bg-black/5"
                 }`}
               >
-                <t.i /> {t.l.toUpperCase()}
+                <t.i />
+                {t.l.toUpperCase()}
               </button>
             ))}
 
+            {/* LOGOUT */}
             <button
               onClick={logout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-grotesk text-sm tracking-[0.2em] text-[oklch(0.48_0.22_25)] hover:bg-[oklch(0.48_0.22_25)] hover:text-white transition"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm tracking-[0.2em] text-red-700 hover:bg-red-700 hover:text-white transition rounded-xl"
             >
-              <FiLogOut /> SIGN OUT
+              <FiLogOut />
+              SIGN OUT
             </button>
           </aside>
 
           {/* CONTENT */}
           <section>
-            {/* PROFILE TAB */}
+            {/* PROFILE */}
             {tab === "profile" && (
               <div className="space-y-8 max-w-lg">
-                <h2 className="text-display text-3xl">Your details</h2>
+                <h2 className="text-3xl font-black">Your details</h2>
 
                 <div>
                   <p className="text-sm text-gray-500 tracking-[0.2em] uppercase">
                     Name
                   </p>
-                  <p className="text-3xl font-semibold mt-2">
-                    {user.name}
-                  </p>
+
+                  <p className="text-3xl font-semibold mt-2">{user.name}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 tracking-[0.2em] uppercase">
                     Email
                   </p>
+
                   <p className="text-2xl font-medium mt-2 break-all">
                     {user.email}
                   </p>
@@ -78,45 +141,121 @@ function Account() {
               </div>
             )}
 
-            {/* ORDERS TAB */}
+            {/* ORDERS */}
             {tab === "orders" && (
               <div>
-                <h2 className="text-display text-3xl mb-6">
-                  Recent orders
-                </h2>
+                <h2 className="text-3xl font-black mb-8">Your Orders</h2>
 
-                {[
-                  {
-                    id: "INSP-2026-0042",
-                    date: "May 12, 2026",
-                    total: "$348",
-                    status: "Delivered",
-                  },
-                  {
-                    id: "INSP-2026-0019",
-                    date: "Apr 02, 2026",
-                    total: "$189",
-                    status: "Delivered",
-                  },
-                ].map((o) => (
-                  <div
-                    key={o.id}
-                    className="flex items-center justify-between p-5 border border-black/10 mb-3"
-                  >
-                    <div>
-                      <p className="font-medium">{o.id}</p>
-                      <p className="text-sm text-[oklch(0.45_0.01_20)]">
-                        {o.date}
-                      </p>
-                    </div>
-
-                    <span className="text-grotesk text-xs tracking-[0.3em] bg-black text-white px-3 py-1">
-                      {o.status.toUpperCase()}
-                    </span>
-
-                    <span className="font-semibold">{o.total}</span>
+                {loading ? (
+                  <div className="flex justify-center py-20">
+                    <div className="w-14 h-14 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
                   </div>
-                ))}
+                ) : orders.length === 0 ? (
+                  <div className="border rounded-3xl p-12 text-center">
+                    <FiPackage size={40} className="mx-auto text-gray-400" />
+
+                    <h3 className="mt-5 text-2xl font-bold">No Orders Yet</h3>
+
+                    <p className="mt-2 text-gray-500">
+                      Your placed orders will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {orders.map((order) => (
+                      <div
+                        key={order._id}
+                        className="border rounded-3xl overflow-hidden"
+                      >
+                        {/* TOP */}
+                        <div className="p-6 border-b bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500 uppercase tracking-[0.2em]">
+                              Order ID
+                            </p>
+
+                            <p className="font-semibold mt-1">{order._id}</p>
+                          </div>
+
+                          <div>
+                            <p className="text-sm text-gray-500 uppercase tracking-[0.2em]">
+                              Ordered Date
+                            </p>
+
+                            <p className="font-medium mt-1">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-sm text-gray-500 uppercase tracking-[0.2em]">
+                              Total
+                            </p>
+
+                            <p className="font-black text-2xl mt-1">
+                              ₹{order.total?.toFixed(2)}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`px-4 py-2 text-xs tracking-[0.25em] rounded-full w-fit ${statusStyle(
+                              order.status,
+                            )}`}
+                          >
+                            {order.status?.toUpperCase()}
+                          </span>
+                        </div>
+
+                        {/* ITEMS */}
+                        <div className="p-6 space-y-5">
+                          {order.items?.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex flex-col md:flex-row gap-5 border rounded-2xl p-4"
+                            >
+                              {/* IMAGE */}
+                              <img
+                                src={item.image || "/placeholder.png"}
+                                alt={item.name}
+                                className="w-full md:w-32 h-40 rounded-2xl object-cover bg-gray-100"
+                              />
+
+                              {/* INFO */}
+                              <div className="flex-1">
+                                <h3 className="text-2xl font-bold">
+                                  {item.name}
+                                </h3>
+
+                                <div className="mt-4 flex flex-wrap gap-4">
+                                  <div className="bg-gray-100 px-4 py-2 rounded-xl text-sm">
+                                    Qty:
+                                    <span className="font-semibold ml-1">
+                                      {item.qty}
+                                    </span>
+                                  </div>
+
+                                  <div className="bg-gray-100 px-4 py-2 rounded-xl text-sm">
+                                    Price:
+                                    <span className="font-semibold ml-1">
+                                      ₹{item.price}
+                                    </span>
+                                  </div>
+
+                                  <div className="bg-black text-white px-4 py-2 rounded-xl text-sm">
+                                    Total:
+                                    <span className="font-semibold ml-1">
+                                      ₹{item.total?.toFixed(2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </section>

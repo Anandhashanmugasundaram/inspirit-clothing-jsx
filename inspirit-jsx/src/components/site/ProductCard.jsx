@@ -4,27 +4,35 @@ import { useApp } from "@/context/AppContext";
 export default function ProductCard({ p }) {
   const { addToCart, wishlist } = useApp();
 
+  console.log("PRODUCT:", p);
+  console.log("IMAGES:", p.images);
+
   const wished = wishlist.includes(p._id);
+
+  // SUPPORT BOTH STRING + OBJECT FORMAT
+  const mainImage =
+    typeof p.images?.[0] === "string" ? p.images[0] : p.images?.[0]?.url;
+
+  const hoverImage =
+    typeof p.images?.[1] === "string" ? p.images[1] : p.images?.[1]?.url;
 
   return (
     <article className="group relative">
       {/* IMAGE */}
       <div className="relative aspect-[3/4] overflow-hidden bg-[oklch(0.92_0.005_60)] rounded-sm">
-        
-        <Link
-          to={`/product/${p._id}`}
-          className="block h-full w-full"
-        >
+        <Link to={`/product/${p._id}`} className="block h-full w-full">
+          {/* MAIN IMAGE */}
           <img
-            src={p.images?.[0]}
+            src={mainImage || "https://placehold.co/600x800?text=Product"}
             alt={p.name}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]"
           />
 
-          {p.images?.[1] && (
+          {/* HOVER IMAGE */}
+          {hoverImage && (
             <img
-              src={p.images[1]}
+              src={hoverImage}
               alt=""
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"

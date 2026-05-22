@@ -1,35 +1,24 @@
 import { Link } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  Autoplay,
-  EffectFade,
-  Pagination,
-} from "swiper/modules";
+import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
-import {
-  FiArrowRight,
-  FiStar,
-  FiShield,
-} from "react-icons/fi";
+import { FiArrowRight, FiStar, FiShield } from "react-icons/fi";
 
 import Marquee from "@/components/site/Marquee";
 import ProductCard from "@/components/site/ProductCard";
 import Counter from "@/components/site/Counter";
 
-import {
-  PRODUCTS,
-  CATEGORIES,
-  TESTIMONIALS,
-} from "@/data/products";
+import { TESTIMONIALS } from "@/data/products";
 
 import { useApp } from "@/context/AppContext";
 
@@ -55,28 +44,48 @@ const HERO_SLIDES = [
 
 function Home() {
   const heroRef = useRef(null);
+
   const horizRef = useRef(null);
 
   const { isAdmin, user } = useApp();
-  console.log(user);
-console.log(isAdmin);
-console.log(import.meta.env.VITE_ADMIN_EMAIL);
 
+  const [products, setProducts] = useState([]);
+
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  // ======================
+  // FETCH PRODUCTS
+  // ======================
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${API}/api/products`);
+
+        console.log("HOME PRODUCTS:", res.data);
+
+        setProducts(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // ======================
+  // GSAP
+  // ======================
   useEffect(() => {
     const ctx = gsap.context(() => {
-
       // HERO TEXT
-      gsap
-        .utils
-        .toArray(".split-line")
-        .forEach((el, i) => {
-          gsap.from(el, {
-            y: "110%",
-            duration: 1.2,
-            ease: "expo.out",
-            delay: 0.2 + i * 0.1,
-          });
+      gsap.utils.toArray(".split-line").forEach((el, i) => {
+        gsap.from(el, {
+          y: "110%",
+          duration: 1.2,
+          ease: "expo.out",
+          delay: 0.2 + i * 0.1,
         });
+      });
 
       gsap.from(".hero-fade", {
         opacity: 0,
@@ -88,52 +97,41 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
       });
 
       // REVEAL
-      gsap
-        .utils
-        .toArray(".reveal")
-        .forEach((el) => {
-          gsap.from(el, {
-            y: 60,
-            opacity: 0,
-            duration: 1,
-            ease: "power3.out",
+      gsap.utils.toArray(".reveal").forEach((el) => {
+        gsap.from(el, {
+          y: 60,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out",
 
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-            },
-          });
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+          },
         });
+      });
 
       // PARALLAX
-      gsap
-        .utils
-        .toArray("[data-parallax]")
-        .forEach((el) => {
-          gsap.to(el, {
-            yPercent: -15,
-            ease: "none",
+      gsap.utils.toArray("[data-parallax]").forEach((el) => {
+        gsap.to(el, {
+          yPercent: -15,
+          ease: "none",
 
-            scrollTrigger: {
-              trigger: el,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          });
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
         });
+      });
 
-      // HORIZONTAL SCROLL
+      // HORIZONTAL
       if (horizRef.current) {
-        const track =
-          horizRef.current.querySelector(
-            ".h-track"
-          );
+        const track = horizRef.current.querySelector(".h-track");
 
         if (track) {
-          const dist =
-            track.scrollWidth -
-            window.innerWidth;
+          const dist = track.scrollWidth - window.innerWidth;
 
           gsap.to(track, {
             x: -dist,
@@ -155,20 +153,14 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
     return () => ctx.revert();
   }, []);
 
-  const featured = PRODUCTS.slice(0, 8);
+  const featured = products.slice(0, 8);
 
   return (
     <div ref={heroRef}>
-
       {/* HERO */}
       <section className="relative h-[100svh] w-full overflow-hidden ink-section">
-
         <Swiper
-          modules={[
-            Autoplay,
-            EffectFade,
-            Pagination,
-          ]}
+          modules={[Autoplay, EffectFade, Pagination]}
           effect="fade"
           autoplay={{
             delay: 5500,
@@ -181,7 +173,6 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
         >
           {HERO_SLIDES.map((s, i) => (
             <SwiperSlide key={i}>
-
               <div className="absolute inset-0">
                 <img
                   src={s.img}
@@ -197,25 +188,19 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
                   }}
                 />
               </div>
-
             </SwiperSlide>
           ))}
         </Swiper>
 
         <div className="relative z-10 mx-auto max-w-[1500px] px-5 md:px-10 h-full flex flex-col justify-end pb-24 md:pb-32">
-
           <div className="hero-fade flex items-center gap-3 text-grotesk text-xs tracking-[0.4em] text-white/70">
             <span className="h-2 w-2 rounded-full bg-[oklch(0.65_0.25_27)] animate-pulse-glow" />
-
             INSPIRIT — CHAPTER 07 LIVE
           </div>
 
           <h1 className="mt-6 text-display text-[18vw] md:text-[10vw] leading-[0.85] text-white tracking-[-0.04em]">
-
             <span className="block overflow-hidden">
-              <span className="split-line block">
-                WEAR THE
-              </span>
+              <span className="split-line block">WEAR THE</span>
             </span>
 
             <span className="block overflow-hidden">
@@ -223,17 +208,14 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
                 RITUAL.
               </span>
             </span>
-
           </h1>
 
           <div className="mt-10 flex flex-col md:flex-row md:items-center gap-6 hero-fade">
-
             <Link
               to="/shop"
               className="group btn-blood inline-flex items-center gap-3 px-8 py-4 text-grotesk tracking-[0.3em]"
             >
               ENTER THE DROP
-
               <FiArrowRight className="transition-transform group-hover:translate-x-1" />
             </Link>
 
@@ -243,46 +225,33 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
             >
               READ THE MANIFESTO
             </Link>
-
           </div>
         </div>
       </section>
 
       {/* FEATURED */}
       <section className="bone-section py-24">
-
         <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-
           <div className="flex items-end justify-between mb-10 reveal">
-
             <h2 className="text-display text-4xl md:text-6xl">
               Featured Pieces
             </h2>
-
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-12">
-
             {featured.map((p) => (
-              <div
-                key={p.id}
-                className="reveal"
-              >
+              <div key={p._id} className="reveal">
                 <ProductCard p={p} />
               </div>
             ))}
-
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
       <section className="bone-section py-24">
-
         <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-
           <div className="text-center reveal">
-
             <p className="text-grotesk text-xs tracking-[0.4em] text-[oklch(0.55_0.25_27)]">
               — THE WEARERS
             </p>
@@ -290,28 +259,17 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
             <h2 className="mt-3 text-display text-5xl md:text-7xl">
               Worn by the world.
             </h2>
-
           </div>
 
           <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
             {TESTIMONIALS.map((t, i) => (
-              <div
-                key={i}
-                className="reveal glass-light p-7 rounded-sm"
-              >
-
+              <div key={i} className="reveal glass-light p-7 rounded-sm">
                 <div className="flex gap-1 text-[oklch(0.48_0.22_25)]">
-
                   {Array.from({
                     length: t.rating,
                   }).map((_, k) => (
-                    <FiStar
-                      key={k}
-                      className="fill-current"
-                    />
+                    <FiStar key={k} className="fill-current" />
                   ))}
-
                 </div>
 
                 <p className="mt-4 text-[oklch(0.18_0.01_20)] leading-relaxed">
@@ -321,25 +279,21 @@ console.log(import.meta.env.VITE_ADMIN_EMAIL);
                 <div className="mt-6 text-grotesk text-xs tracking-[0.3em] text-[oklch(0.45_0.01_20)]">
                   {t.name} — {t.city}
                 </div>
-
               </div>
             ))}
-
           </div>
         </div>
       </section>
 
       {/* ADMIN FLOAT BUTTON */}
-   {/* ADMIN FLOAT BUTTON */}
-{isAdmin && user && (
-  <Link
-    to="/admin"
-    className="fixed bottom-6 left-6 z-[100] h-16 w-16 rounded-full bg-[oklch(0.55_0.25_27)] text-white flex items-center justify-center shadow-2xl border border-white/20 hover:scale-110 transition duration-300"
-  >
-    <FiShield className="text-2xl" />
-  </Link>
-)}
-
+      {isAdmin && user && (
+        <Link
+          to="/admin"
+          className="fixed bottom-6 left-6 z-[100] h-16 w-16 rounded-full bg-[oklch(0.55_0.25_27)] text-white flex items-center justify-center shadow-2xl border border-white/20 hover:scale-110 transition duration-300"
+        >
+          <FiShield className="text-2xl" />
+        </Link>
+      )}
     </div>
   );
 }

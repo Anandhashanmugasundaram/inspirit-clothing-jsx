@@ -33,6 +33,8 @@ export function AppProvider({ children }) {
 
   const [cart, setCart] = useState([]);
 
+  const [cartLoading, setCartLoading] = useState(true);
+
   const [wishlist, setWishlist] = useState(() => safeGet("inspirit:wish", []));
 
   // ======================
@@ -61,7 +63,12 @@ export function AppProvider({ children }) {
   // ======================
   const fetchCart = async () => {
     try {
-      if (!user) return;
+      if (!user) {
+        setCart([]);
+        return;
+      }
+
+      setCartLoading(true);
 
       const res = await axios.get(`${API}/api/cart`, {
         params: {
@@ -69,9 +76,11 @@ export function AppProvider({ children }) {
         },
       });
 
-      setCart(res.data);
+      setCart(res.data || []);
     } catch (error) {
       console.log(error);
+    } finally {
+      setCartLoading(false);
     }
   };
 
@@ -79,11 +88,17 @@ export function AppProvider({ children }) {
   // LOAD CART
   // ======================
   useEffect(() => {
-    if (user) {
-      fetchCart();
-    } else {
-      setCart([]);
-    }
+    const loadCart = async () => {
+      if (!user) {
+        setCart([]);
+        setCartLoading(false);
+        return;
+      }
+
+      await fetchCart();
+    };
+
+    loadCart();
   }, [user]);
 
   // ======================
@@ -112,6 +127,8 @@ export function AppProvider({ children }) {
 
     setCart([]);
 
+    setCartLoading(false);
+
     toast("Signed out");
   };
 
@@ -128,6 +145,8 @@ export function AppProvider({ children }) {
         return toast.error("Login required");
       }
 
+      const image = product?.images?.[0]?.url || product?.image || "";
+
       await axios.post(`${API}/api/cart`, {
         userEmail: user.email,
 
@@ -135,7 +154,7 @@ export function AppProvider({ children }) {
 
         name: product.name,
 
-        image: product.images?.[0] || product.image,
+        image,
 
         category: product.category,
 
@@ -146,7 +165,7 @@ export function AppProvider({ children }) {
         qty,
       });
 
-      fetchCart();
+      await fetchCart();
 
       toast.success(`${product.name} added to bag`);
     } catch (error) {
@@ -157,7 +176,7 @@ export function AppProvider({ children }) {
   };
 
   // ======================
-  // REMOVE CART
+  // REMOVE FROM CART
   // ======================
   const removeFromCart = async (id) => {
     try {
@@ -167,11 +186,30 @@ export function AppProvider({ children }) {
         },
       });
 
-      fetchCart();
+      await fetchCart();
 
       toast.success("Item removed");
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  // ======================
+  // CLEAR CART
+  // ======================
+  const clearCart = async () => {
+    try {
+      if (!user?.email) return;
+
+      await axios.delete(`${API}/api/cart/clear/${user.email}`);
+
+      setCart([]);
+
+      toast.success("Cart cleared");
+    } catch (error) {
+      console.log(error);
+
+      toast.error("Failed to clear cart");
     }
   };
 
@@ -185,7 +223,7 @@ export function AppProvider({ children }) {
         userEmail: user.email,
       });
 
-      fetchCart();
+      await fetchCart();
     } catch (error) {
       console.log(error);
     }
@@ -231,8 +269,11 @@ export function AppProvider({ children }) {
     logout,
 
     cart,
+    cartLoading,
+
     addToCart,
     removeFromCart,
+    clearCart,
     updateQty,
 
     cartCount,
