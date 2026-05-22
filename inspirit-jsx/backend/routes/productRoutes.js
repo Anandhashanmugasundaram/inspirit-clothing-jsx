@@ -46,52 +46,59 @@ router.get("/", async (req, res) => {
 // ADD PRODUCT
 // =====================
 router.post("/", upload.array("images", 10), async (req, res) => {
-  try {
-    console.log("🔥 PRODUCT ROUTE HIT");
-    console.log("BODY:", req.body);
-    console.log("FILES:", req.files);
+  // try {
+  //   console.log("🔥 PRODUCT ROUTE HIT");
+  //   console.log("BODY:", req.body);
+  //   console.log("FILES:", req.files);
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No images uploaded",
-      });
-    }
+  //   if (!req.files || req.files.length === 0) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       message: "No images uploaded",
+  //     });
+  //   }
 
-    const imageUrls = req.files.map((file) => ({
-      url: file.path,
-      public_id: file.filename,
-    }));
+  //   const imageUrls = req.files.map((file) => ({
+  //     url: file.path,
+  //     public_id: file.filename,
+  //   }));
 
-    const slug = req.body.name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-");
+  //   const slug = req.body.name
+  //     .toLowerCase()
+  //     .trim()
+  //     .replace(/\s+/g, "-");
 
-    const sizesObject = parseSizes(req.body.sizes);
+  //   const sizesObject = parseSizes(req.body.sizes);
 
-    const product = await Product.create({
-      name: req.body.name,
-      slug,
-      price: Number(req.body.price),
-      category: req.body.category,
-      description: req.body.description,
-      badge: req.body.badge,
-      sizes: sizesObject,
-      images: imageUrls,
-    });
+  //   const product = await Product.create({
+  //     name: req.body.name,
+  //     slug,
+  //     price: Number(req.body.price),
+  //     category: req.body.category,
+  //     description: req.body.description,
+  //     badge: req.body.badge,
+  //     sizes: sizesObject,
+  //     images: imageUrls,
+  //   });
 
-    res.status(201).json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    console.log("🔥 ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  //   res.status(201).json({
+  //     success: true,
+  //     product,
+  //   });
+  // } catch (error) {
+  //   console.log("🔥 ERROR:", error);
+  //   res.status(500).json({
+  //     success: false,
+  //     message: error.message,
+  //   });
+  // }
+  router.post("/", upload.array("images", 10), async (req, res) => {
+  console.log("🔥 HIT PRODUCT ROUTE");
+  console.log("FILES:", req.files);
+  console.log("BODY:", req.body);
+
+  return res.json({ ok: true });
+});
 });
 
 // =====================
