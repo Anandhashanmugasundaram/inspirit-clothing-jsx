@@ -134,8 +134,7 @@ function AdminPage() {
 
       // CREATE
       else {
-        console.log("FINAL API:", `${API}/api/products`);
-        await axios.post(`${API}/api/products`, data);
+        await axios.post(`${API}/api/products`, data, );
 
         alert("Product Added");
       }
