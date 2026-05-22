@@ -17,6 +17,9 @@ import { FiArrowRight, FiStar, FiShield } from "react-icons/fi";
 import Marquee from "@/components/site/Marquee";
 import ProductCard from "@/components/site/ProductCard";
 import Counter from "@/components/site/Counter";
+import ImageOne from '../assets/cover_img1.jpg'
+import ImageTwo from '../assets/cover_img2.png'
+import ImageThree from '../assets/cover_img3.png'
 
 import { TESTIMONIALS } from "@/data/products";
 
@@ -25,28 +28,38 @@ import { useApp } from "@/context/AppContext";
 gsap.registerPlugin(ScrollTrigger);
 
 const HERO_SLIDES = [
-  {
-    tag: "BLACK EDITION",
-    title: "STREET\nVISION",
-    img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=2000&q=80&auto=format",
-  },
+  // {
+  //   tag: "BLACK EDITION",
+  //   title: "STREET\nVISION",
+  //   img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=2000&q=80&auto=format",
+  // },
 
-  {
-    tag: "URBAN WEAR",
-    title: "MONO\nSTYLE",
-    img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=2000&q=80&auto=format",
-  },
+  // {
+  //   tag: "URBAN WEAR",
+  //   title: "MONO\nSTYLE",
+  //   img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=2000&q=80&auto=format",
+  // },
 
-  {
-    tag: "LIMITED DROP",
-    title: "DARK\nSTREET",
-    img: "https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=2000&q=80&auto=format",
-  },
+  // {
+  //   tag: "LIMITED DROP",
+  //   title: "DARK\nSTREET",
+  //   img: "https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=2000&q=80&auto=format",
+  // },
 
   {
     tag: "MINIMAL FITS",
     title: "BLACK &\nWHITE",
-    img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=2000&q=80&auto=format",
+    img: ImageOne,
+  },
+   {
+    tag: "MINIMAL FITS",
+    title: "BLACK &\nWHITE",
+    img: ImageTwo,
+  },
+   {
+    tag: "MINIMAL FITS",
+    title: "BLACK &\nWHITE",
+    img: ImageThree,
   },
 ];
 
@@ -193,7 +206,7 @@ const featured = [...products]
                 <img
                   src={s.img}
                   alt=""
-                  className="absolute inset-0 h-full w-full object-cover opacity-60 scale-105"
+                  className="absolute inset-0 h-full w-full object-cover opacity-90 scale-105"
                 />
 
                 <div

@@ -41,7 +41,8 @@ function Contact() {
                 </div>
               </div>))}
             <div className="aspect-[4/3] overflow-hidden border border-black/10">
-              <iframe title="Map" src="https://www.openstreetmap.org/export/embed.html?bbox=-9.165%2C38.706%2C-9.155%2C38.713&amp;layer=mapnik" className="h-full w-full" loading="lazy"/>
+              <iframe title="Map"   src="https://www.google.com/maps?q=13.0827,80.2707&z=15&output=embed"
+ className="h-full w-full" loading="lazy"/>
             </div>
           </div>
         </div>

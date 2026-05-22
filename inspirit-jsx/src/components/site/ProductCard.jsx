@@ -18,13 +18,10 @@ export default function ProductCard({ p }) {
       : p.images?.[1]?.url;
 
   return (
-    <article className="group relative max-w-[440px]">
+    <article className="group relative max-w-[500px]">
       {/* CARD */}
       <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-slate-100 to-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500">
-<<<<<<< HEAD
-=======
-
->>>>>>> c4478a1e6f4fda60324cbc408501ee9bb0c334b7
+        
         {/* BACKGROUND DESIGN */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-black/5 blur-3xl" />
@@ -85,11 +82,7 @@ export default function ProductCard({ p }) {
         </Link>
 
         {/* QUICK ADD */}
-<<<<<<< HEAD
-        <div className="absolute left-3 right-3 bottom-[120px] translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-20">
-=======
-        <div className="absolute left-3 right-3 bottom-20 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-20">
->>>>>>> c4478a1e6f4fda60324cbc408501ee9bb0c334b7
+        <div className="absolute left-3 right-3 bottom-28 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-20">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -104,10 +97,7 @@ export default function ProductCard({ p }) {
 
         {/* CONTENT */}
         <div className="relative p-4 backdrop-blur-sm">
-<<<<<<< HEAD
-=======
           
->>>>>>> c4478a1e6f4fda60324cbc408501ee9bb0c334b7
           {/* CATEGORY */}
           <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500 mb-1">
             {p.category}
@@ -123,13 +113,9 @@ export default function ProductCard({ p }) {
 
           {/* PRICE */}
           <div className="flex items-center gap-2 mt-2">
-<<<<<<< HEAD
-            <p className="text-black font-bold text-sm">₹{p.price}</p>
-=======
             <p className="text-black font-bold text-sm">
               ₹{p.price}
             </p>
->>>>>>> c4478a1e6f4fda60324cbc408501ee9bb0c334b7
 
             {p.oldPrice && (
               <p className="text-xs text-gray-400 line-through">
