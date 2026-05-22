@@ -38,7 +38,9 @@ function ProductPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-      const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+        const API =
+          import.meta.env.VITE_API_URL ||
+          "https://inspirit-clothing-jsx.onrender.com";
 
         const res = await axios.get(`${API}/api/products`);
 
@@ -142,8 +144,13 @@ function ProductPage() {
 
         <div ref={galleryRef} className="grid lg:grid-cols-12 gap-10">
           {/* LEFT */}
-          <div className="lg:col-span-7 grid grid-cols-[80px_minmax(0,1fr)] gap-4 min-w-0">
-            {/* THUMBNAILS */}
+          {/*
+            FIX 1: Changed grid-cols-[80px_minmax(0,1fr)] to grid-cols-1 on mobile,
+            so the thumbnail sidebar doesn't squeeze the main image.
+            The 80px thumb column is restored at md+ via md:grid-cols-[80px_minmax(0,1fr)].
+          */}
+          <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-[80px_minmax(0,1fr)] gap-4 min-w-0">
+            {/* THUMBNAILS — hidden on mobile, shown at md+ */}
             <div className="hidden md:block">
               <Swiper
                 onSwiper={setThumbsSwiper}
@@ -168,7 +175,15 @@ function ProductPage() {
             </div>
 
             {/* MAIN IMAGE */}
-            <div className="pd-image w-full h-[600px] min-w-0 overflow-hidden">
+            {/*
+              FIX 2: Replaced h-[70vh] sm:h-[80vh] lg:h-[600px] with:
+                - aspect-[3/4]        → portrait ratio on mobile (scales with screen width)
+                - sm:aspect-auto      → disable aspect-ratio on sm+
+                - sm:h-[80vh]         → restore vh height on sm+
+                - lg:h-[600px]        → fixed height on desktop
+              This prevents the image from being too tall or cut off on small screens.
+            */}
+            <div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px]">
               <Swiper
                 modules={[Thumbs]}
                 thumbs={{
@@ -180,10 +195,15 @@ function ProductPage() {
                 className="h-full w-full"
               >
                 {product.images?.map((img, i) => (
-                  <SwiperSlide key={i}>
+                  /*
+                    FIX 3: Added position: relative to SwiperSlide so the
+                    absolutely positioned img fills the slide correctly in both
+                    aspect-ratio and fixed-height contexts.
+                  */
+                  <SwiperSlide key={i} style={{ position: "relative" }}>
                     <img
                       src={img?.url || "/placeholder.png"}
-                      className="h-full w-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover"
                       alt={product.name}
                     />
                   </SwiperSlide>
@@ -210,9 +230,7 @@ function ProductPage() {
               {/* RATING */}
               <div className="flex items-center gap-2 mt-3">
                 <div className="flex gap-1">
-                  {Array.from({
-                    length: 5,
-                  }).map((_, i) => (
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <FiStar key={i} />
                   ))}
                 </div>

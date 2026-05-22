@@ -62,7 +62,7 @@ export default function ProductCard({ p }) {
         {/* IMAGE */}
         <Link
           to={`/product/${p._id}`}
-          className="relative block h-[320px] overflow-hidden bg-[#f7f7f7]"
+            className="relative block w-full aspect-[3/4] sm:aspect-[4/5] overflow-hidden bg-[#f7f7f7]"
         >
           {/* MAIN IMAGE */}
           <img
