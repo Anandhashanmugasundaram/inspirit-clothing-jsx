@@ -5,7 +5,7 @@ import axios from "axios";
 
 import ProductCard from "@/components/site/ProductCard";
 
-const API =
+
   const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
 
 function useCountdown(target) {
