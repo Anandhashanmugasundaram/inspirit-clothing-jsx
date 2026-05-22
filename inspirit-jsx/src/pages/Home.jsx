@@ -153,7 +153,15 @@ function Home() {
     return () => ctx.revert();
   }, []);
 
-  const featured = products.slice(0, 8);
+  // ONLY LATEST 5 PRODUCTS
+// SHOW ONLY LATEST 5 PRODUCTS
+const featured = [...products]
+  .sort(
+    (a, b) =>
+      new Date(b.createdAt) -
+      new Date(a.createdAt)
+  )
+  .slice(0, 5);
 
   return (
     <div ref={heroRef}>
@@ -230,23 +238,56 @@ function Home() {
       </section>
 
       {/* FEATURED */}
-      <section className="bone-section py-24">
-        <div className="mx-auto max-w-[1500px] px-5 md:px-10">
-          <div className="flex items-end justify-between mb-10 reveal">
-            <h2 className="text-display text-4xl md:text-6xl">
-              Featured Pieces
-            </h2>
-          </div>
+      {/* FEATURED */}
+{/* FEATURED */}
+<section className="bone-section py-24">
+  <div className="mx-auto max-w-[1500px] px-5 md:px-10">
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-12">
-            {featured.map((p) => (
-              <div key={p._id} className="reveal">
-                <ProductCard p={p} />
-              </div>
-            ))}
-          </div>
+    <div className="flex items-end justify-between mb-10 reveal">
+      <div>
+        <p className="text-sm tracking-[0.35em] uppercase text-[oklch(0.55_0.25_27)]">
+          — Featured Collection
+        </p>
+
+        <h2
+          className="mt-3 text-[60px] md:text-[100px] leading-[0.9] tracking-[-0.05em]"
+          style={{
+            fontFamily:
+              '"Bodoni Moda", "Cormorant Garamond", serif',
+            fontWeight: 600,
+          }}
+        >
+          Latest Drops.
+        </h2>
+
+        <p className="mt-4 text-gray-500 max-w-xl">
+          Newly added premium streetwear pieces from the latest collection.
+        </p>
+      </div>
+    </div>
+
+    {/* SHOW ONLY 5 PRODUCTS */}
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      {featured.map((p) => (
+        <div key={p._id} className="reveal">
+          <ProductCard p={p} />
         </div>
-      </section>
+      ))}
+    </div>
+
+    {/* VIEW MORE BUTTON */}
+    <div className="flex justify-center mt-16 reveal">
+      <Link
+        to="/shop"
+        className="group inline-flex items-center gap-3 px-10 py-4 rounded-full bg-black text-white tracking-[0.25em] text-sm uppercase hover:bg-[oklch(0.55_0.25_27)] transition duration-300"
+      >
+        View More
+
+        <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* TESTIMONIALS */}
       <section className="bone-section py-24">
