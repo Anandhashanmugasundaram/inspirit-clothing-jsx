@@ -26,19 +26,27 @@ gsap.registerPlugin(ScrollTrigger);
 
 const HERO_SLIDES = [
   {
-    tag: "CHAPTER 07 — ASHES",
-    title: "WEAR THE\nRITUAL",
-    img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=2000&q=85&auto=format",
+    tag: "BLACK EDITION",
+    title: "STREET\nVISION",
+    img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=2000&q=80&auto=format",
   },
+
   {
-    tag: "LIMITED — 300 PIECES",
-    title: "BLOOD\nTONE",
-    img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=2000&q=85&auto=format",
+    tag: "URBAN WEAR",
+    title: "MONO\nSTYLE",
+    img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=2000&q=80&auto=format",
   },
+
   {
-    tag: "NEW DROP — SS26",
-    title: "CATHEDRAL\nCUTS",
-    img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=2000&q=85&auto=format",
+    tag: "LIMITED DROP",
+    title: "DARK\nSTREET",
+    img: "https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=2000&q=80&auto=format",
+  },
+
+  {
+    tag: "MINIMAL FITS",
+    title: "BLACK &\nWHITE",
+    img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=2000&q=80&auto=format",
   },
 ];
 
@@ -158,7 +166,7 @@ function Home() {
   return (
     <div ref={heroRef}>
       {/* HERO */}
-      <section className="relative h-[100svh] w-full overflow-hidden ink-section">
+      <section className="relative h-[70svh] w-full overflow-hidden ink-section">
         <Swiper
           modules={[Autoplay, EffectFade, Pagination]}
           effect="fade"
@@ -228,6 +236,18 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* MARQUEE */}
+<Marquee
+  variant="red"
+  items={[
+    "LIMITED DROP",
+    "ANIME STREETWEAR",
+    "PREMIUM QUALITY",
+    "NEW ARRIVALS",
+    "INSPIRIT",
+  ]}
+/>
 
       {/* FEATURED */}
       <section className="bone-section py-24">
