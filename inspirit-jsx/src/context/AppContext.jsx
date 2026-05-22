@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
 const AppCtx = createContext(null);
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
 
 // ======================
 // SAFE LOCAL STORAGE

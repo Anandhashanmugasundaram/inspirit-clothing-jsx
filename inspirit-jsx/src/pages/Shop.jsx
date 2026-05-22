@@ -7,7 +7,7 @@ import { FiSearch, FiFilter, FiX } from "react-icons/fi";
 import ProductCard from "@/components/site/ProductCard";
 
 function Shop() {
-  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
 
   // ======================
   // STATES
