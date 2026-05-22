@@ -83,87 +83,55 @@ function AdminPage() {
   // ======================
   // SUBMIT PRODUCT
   // ======================
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    try {
-      setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      const data = new FormData();
+  try {
+    setLoading(true);
 
-      data.append("name", formData.name);
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("price", formData.price);
+    data.append("category", formData.category);
+    data.append("description", formData.description);
+    data.append("badge", formData.badge);
+    data.append("sizes", formData.sizes);
 
-      data.append("price", formData.price);
+    if (mainImage) data.append("images", mainImage);
+    if (hoverImage) data.append("images", hoverImage);
+    galleryImages.forEach((img) => data.append("images", img));
 
-      data.append("category", formData.category);
+    // ✅ FIXED: check editingId is a non-null, non-empty, non-"null" string
+    const isEditing = editingId && editingId !== "null" && editingId !== "";
 
-      data.append("description", formData.description);
+    console.log("EDITING ID:", editingId, "| IS EDITING:", isEditing);
 
-      data.append("badge", formData.badge);
-
-      data.append("sizes", formData.sizes);
-
-      // MAIN IMAGE
-      if (mainImage) {
-        data.append("images", mainImage);
-      }
-
-      // HOVER IMAGE
-      if (hoverImage) {
-        data.append("images", hoverImage);
-      }
-
-      // GALLERY
-      galleryImages.forEach((img) => {
-        data.append("images", img);
+    if (isEditing) {
+      await axios.put(`${API}/api/products/${editingId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      // UPDATE
-      console.log("EDITING ID:", editingId);
-
-      // UPDATE
-      if (editingId && editingId !== "null") {
-        await axios.put(`${API}/api/products/${editingId}`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        alert("Product Updated");
-      }
-
-      // CREATE
-      else {
-        await axios.post(`${API}/api/products`, data, );
-
-        alert("Product Added");
-      }
-
-      // RESET
-      setEditingId(null);
-
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        description: "",
-        badge: "",
-        sizes: "",
-      });
-
-      setMainImage(null);
-
-      setHoverImage(null);
-
-      setGalleryImages([]);
-
-      fetchProducts();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+      alert("Product Updated");
+    } else {
+      await axios.post(`${API}/api/products`, data);
+      alert("Product Added");
     }
-  };
+
+    // RESET
+    setEditingId(null);
+    setFormData({ name: "", price: "", category: "", description: "", badge: "", sizes: "" });
+    setMainImage(null);
+    setHoverImage(null);
+    setGalleryImages([]);
+    fetchProducts();
+
+  } catch (error) {
+    console.log("SUBMIT ERROR:", error);
+    alert("Error: " + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ======================
   // DELETE PRODUCT

@@ -63,10 +63,7 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       public_id: file.filename,
     }));
 
-    const slug = req.body.name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-");
+    const slug = req.body.name.toLowerCase().trim().replace(/\s+/g, "-");
 
     const sizesObject = parseSizes(req.body.sizes);
 
@@ -113,6 +110,10 @@ router.put(
       console.log("REQ BODY:", req.body);
 
       console.log("REQ FILES:", req.files);
+        const { id } = req.params;
+    if (!id || id === "null" || id === "undefined") {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
 
       // FIND PRODUCT
       const product = await Product.findById(req.params.id);
@@ -131,14 +132,11 @@ router.put(
       // =====================
       product.name = req.body.name || product.name;
 
-      product.price = req.body.price
-        ? Number(req.body.price)
-        : product.price;
+      product.price = req.body.price ? Number(req.body.price) : product.price;
 
       product.category = req.body.category || product.category;
 
-      product.description =
-        req.body.description || product.description;
+      product.description = req.body.description || product.description;
 
       product.badge = req.body.badge || product.badge;
 
@@ -148,10 +146,7 @@ router.put(
       // SLUG
       // =====================
       if (req.body.name) {
-        product.slug = req.body.name
-          .toLowerCase()
-          .trim()
-          .replace(/\s+/g, "-");
+        product.slug = req.body.name.toLowerCase().trim().replace(/\s+/g, "-");
       }
 
       console.log("SLUG UPDATED");
@@ -182,10 +177,7 @@ router.put(
 
         console.log("NEW IMAGES:", newImages);
 
-        product.images = [
-          ...product.images,
-          ...newImages,
-        ];
+        product.images = [...product.images, ...newImages];
 
         console.log("IMAGES UPDATED");
       }
