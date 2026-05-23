@@ -206,7 +206,7 @@ const featured = [...products]
                 <img
                   src={s.img}
                   alt=""
-                  className="absolute inset-0 h-full w-full object-cover opacity-90 scale-105"
+className="absolute inset-0 h-full w-full object-cover md:object-contain lg:object-cover opacity-90 scale-100 md:scale-95 lg:scale-105"
                 />
 
                 <div

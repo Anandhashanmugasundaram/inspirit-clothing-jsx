@@ -244,42 +244,6 @@ export default function Navbar() {
       </div>
 
       {/* MOBILE BOTTOM NAV */}
-      <div className="lg:hidden fixed bottom-3 left-3 right-3 z-40 bg-black/70 border border-cyan-500/20 rounded-full px-6 py-3 flex items-center justify-between text-white">
-        {/* HOME */}
-        <Link to="/" aria-label="Home">
-          <FiSearch className="text-lg hover:text-cyan-400 transition duration-300" />
-        </Link>
-
-        {/* SHOP */}
-        <Link to="/shop">
-          <span className="text-grotesk text-sm tracking-[0.2em] hover:text-cyan-400 transition duration-300">
-            SHOP
-          </span>
-        </Link>
-
-        {/* ADMIN */}
-        {isAdmin && (
-          <Link to="/admin" aria-label="Admin">
-            <FiShield className="text-lg hover:text-cyan-400 transition duration-300" />
-          </Link>
-        )}
-
-        {/* ACCOUNT */}
-        <Link to="/account" aria-label="Account">
-          <FiUser className="text-lg hover:text-cyan-400 transition duration-300" />
-        </Link>
-
-        {/* CART */}
-        <Link to="/cart" className="relative">
-          <FiShoppingBag className="text-lg hover:text-cyan-400 transition duration-300" />
-
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-        </Link>
-      </div>
     </>
   );
 }

@@ -33,49 +33,76 @@ const submit = async (e) => {
 
   const form = new FormData(e.target);
 
-  const orderData = {
-    userEmail: user.email,
-
-    customer: {
-      firstName: form.get("firstName"),
-      lastName: form.get("lastName"),
-      email: user.email,
-      phone: form.get("phone"),
-      address: form.get("address"),
-      city: form.get("city"),
-      postalCode: form.get("postalCode"),
-      country: form.get("country"),
-    },
-
-    items: cart.map((item) => ({
-      productId: item.productId || item._id || item?.product?._id,
-      name: item.name || item?.product?.name,
-      image:
-        item.image ||
-        item?.product?.image ||
-        item?.product?.images?.[0]?.url ||
-        "/placeholder.png",
-      price: item.price || item?.product?.price || 0,
-      qty: item.qty || 1,
-      total: (item.price || item?.product?.price || 0) * (item.qty || 1),
-    })),
-
-    subtotal: cartTotal,
-    shipping,
-    total,
-    status: "Pending",
+  const customer = {
+    firstName: form.get("firstName"),
+    lastName: form.get("lastName"),
+    phone: form.get("phone"),
+    address: form.get("address"),
+    city: form.get("city"),
+    postalCode: form.get("postalCode"),
+    country: form.get("country"),
   };
 
-  await axios.post(`${API}/api/orders`, orderData);
+  // ======================
+  // PRODUCTS MESSAGE
+  // ======================
+  const productsText = cart
+    .map((item, index) => {
+      const product = item?.product || item;
 
+      return `
+${index + 1}. ${product?.name}
+Qty: ${item?.qty || 1}
+Price: ₹${product?.price || 0}
+Total: ₹${(product?.price || 0) * (item?.qty || 1)}
+`;
+    })
+    .join("\n");
+
+  // ======================
+  // WHATSAPP MESSAGE
+  // ======================
+  const message = `
+🛍 *NEW ORDER — INSPIRIT CLOTHING*
+
+👤 *Customer Details*
+Name: ${customer.firstName} ${customer.lastName}
+Email: ${user?.email}
+Phone: ${customer.phone}
+
+📍 *Shipping Address*
+${customer.address}
+${customer.city} - ${customer.postalCode}
+${customer.country}
+
+📦 *Order Items*
+${productsText}
+
+💰 *Order Summary*
+Subtotal: ₹${cartTotal.toFixed(2)}
+Shipping: ₹${shipping}
+Total: ₹${total.toFixed(2)}
+`;
+
+  // ======================
+  // CLIENT WHATSAPP NUMBER
+  // ======================
+  const whatsappNumber = "+917397284491";
+
+  // ======================
+  // OPEN WHATSAPP
+  // ======================
+  const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  window.open(whatsappURL, "_blank");
+
+  // OPTIONAL
   await clearCart();
-  setDone(true);
 
-  toast.success("Order placed successfully");
-
-  setTimeout(() => nav("/account"), 4000);
+  toast.success("Redirecting to WhatsApp...");
 };
-
   // ======================
   // SUCCESS PAGE
   // ======================
@@ -196,33 +223,9 @@ const submit = async (e) => {
             </section>
 
             {/* PAYMENT */}
-            <section>
-              <h3 className="text-sm tracking-[0.3em] mb-5 font-semibold">
-                PAYMENT
-              </h3>
-
-              <div className="space-y-4">
-                <input
-                  required
-                  placeholder="Card number"
-                  className="w-full px-4 py-4 border rounded-xl outline-none focus:border-black"
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    required
-                    placeholder="MM / YY"
-                    className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                  />
-
-                  <input
-                    required
-                    placeholder="CVC"
-                    className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                  />
-                </div>
-              </div>
-            </section>
+<button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition">
+  ORDER VIA WHATSAPP
+</button>
           </div>
 
           {/* RIGHT SIDE */}
