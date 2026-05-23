@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 
 import { FiCheck } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
+
 
 import { useApp } from "@/context/AppContext";
 
@@ -223,7 +225,8 @@ Total: ₹${total.toFixed(2)}
             </section>
 
             {/* PAYMENT */}
-<button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition">
+<button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3">
+  <FaWhatsapp className="text-2xl text-green-400" />
   ORDER VIA WHATSAPP
 </button>
           </div>
