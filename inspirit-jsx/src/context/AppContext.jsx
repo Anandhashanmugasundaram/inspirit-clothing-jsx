@@ -1,11 +1,21 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+// AppContext.jsx
+
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import axios from "axios";
 import toast from "react-hot-toast";
 
 const AppCtx = createContext(null);
 
-const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+const API =
+  import.meta.env.VITE_API_URL ||
+  "https://your-backend-url.onrender.com";
 
 // ======================
 // SAFE LOCAL STORAGE
@@ -26,16 +36,21 @@ const safeGet = (key, fallback) => {
 // PROVIDER
 // ======================
 export function AppProvider({ children }) {
+
   // ======================
   // STATES
   // ======================
-  const [user, setUser] = useState(() => safeGet("inspirit:user", null));
+  const [user, setUser] = useState(() =>
+    safeGet("inspirit:user", null)
+  );
 
   const [cart, setCart] = useState([]);
 
   const [cartLoading, setCartLoading] = useState(true);
 
-  const [wishlist, setWishlist] = useState(() => safeGet("inspirit:wish", []));
+  const [wishlist, setWishlist] = useState(() =>
+    safeGet("inspirit:wish", [])
+  );
 
   // ======================
   // ADMIN
@@ -48,14 +63,20 @@ export function AppProvider({ children }) {
   // SAVE USER
   // ======================
   useEffect(() => {
-    localStorage.setItem("inspirit:user", JSON.stringify(user));
+    localStorage.setItem(
+      "inspirit:user",
+      JSON.stringify(user)
+    );
   }, [user]);
 
   // ======================
   // SAVE WISHLIST
   // ======================
   useEffect(() => {
-    localStorage.setItem("inspirit:wish", JSON.stringify(wishlist));
+    localStorage.setItem(
+      "inspirit:wish",
+      JSON.stringify(wishlist)
+    );
   }, [wishlist]);
 
   // ======================
@@ -67,8 +88,6 @@ export function AppProvider({ children }) {
         setCart([]);
         return;
       }
-
-      setCartLoading(true);
 
       const res = await axios.get(`${API}/api/cart`, {
         params: {
@@ -94,6 +113,8 @@ export function AppProvider({ children }) {
         setCartLoading(false);
         return;
       }
+
+      setCartLoading(true);
 
       await fetchCart();
     };
@@ -138,14 +159,17 @@ export function AppProvider({ children }) {
   const addToCart = async (
     product,
     size = product.sizes?.[1] || product.sizes?.[0],
-    qty = 1,
+    qty = 1
   ) => {
     try {
       if (!user) {
         return toast.error("Login required");
       }
 
-      const image = product?.images?.[0]?.url || product?.image || "";
+      const image =
+        product?.images?.[0]?.url ||
+        product?.image ||
+        "";
 
       await axios.post(`${API}/api/cart`, {
         userEmail: user.email,
@@ -180,17 +204,26 @@ export function AppProvider({ children }) {
   // ======================
   const removeFromCart = async (id) => {
     try {
+
+      // INSTANT UI UPDATE
+      setCart((prev) =>
+        prev.filter((item) => item._id !== id)
+      );
+
       await axios.delete(`${API}/api/cart/${id}`, {
         data: {
           email: user.email,
         },
       });
 
-      await fetchCart();
-
       toast.success("Item removed");
+
     } catch (error) {
       console.log(error);
+
+      toast.error("Failed to remove item");
+
+      fetchCart();
     }
   };
 
@@ -201,15 +234,20 @@ export function AppProvider({ children }) {
     try {
       if (!user?.email) return;
 
-      await axios.delete(`${API}/api/cart/clear/${user.email}`);
-
       setCart([]);
 
+      await axios.delete(
+        `${API}/api/cart/clear/${user.email}`
+      );
+
       toast.success("Cart cleared");
+
     } catch (error) {
       console.log(error);
 
       toast.error("Failed to clear cart");
+
+      fetchCart();
     }
   };
 
@@ -218,14 +256,28 @@ export function AppProvider({ children }) {
   // ======================
   const updateQty = async (id, qty) => {
     try {
+
+      // INSTANT UI UPDATE
+      setCart((prev) =>
+        prev.map((item) =>
+          item._id === id
+            ? { ...item, qty }
+            : item
+        )
+      );
+
+      // DATABASE UPDATE
       await axios.put(`${API}/api/cart/${id}`, {
         qty,
         userEmail: user.email,
       });
 
-      await fetchCart();
     } catch (error) {
       console.log(error);
+
+      toast.error("Failed to update quantity");
+
+      fetchCart();
     }
   };
 
@@ -234,13 +286,21 @@ export function AppProvider({ children }) {
   // ======================
   const toggleWishlist = (id) => {
     setWishlist((prev) => {
+
       const has = prev.includes(id);
 
-      toast(has ? "Removed from wishlist" : "Saved to wishlist", {
-        icon: has ? "✕" : "♡",
-      });
+      toast(
+        has
+          ? "Removed from wishlist"
+          : "Saved to wishlist",
+        {
+          icon: has ? "✕" : "♡",
+        }
+      );
 
-      return has ? prev.filter((x) => x !== id) : [...prev, id];
+      return has
+        ? prev.filter((x) => x !== id)
+        : [...prev, id];
     });
   };
 
@@ -248,14 +308,21 @@ export function AppProvider({ children }) {
   // CART COUNT
   // ======================
   const cartCount = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.qty, 0);
+    return cart.reduce(
+      (acc, item) => acc + item.qty,
+      0
+    );
   }, [cart]);
 
   // ======================
   // CART TOTAL
   // ======================
   const cartTotal = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.qty * item.price, 0);
+    return cart.reduce(
+      (acc, item) =>
+        acc + item.qty * item.price,
+      0
+    );
   }, [cart]);
 
   // ======================
@@ -284,17 +351,24 @@ export function AppProvider({ children }) {
     toggleWishlist,
   };
 
-  return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
+  return (
+    <AppCtx.Provider value={value}>
+      {children}
+    </AppCtx.Provider>
+  );
 }
 
 // ======================
 // CUSTOM HOOK
 // ======================
 export const useApp = () => {
+
   const value = useContext(AppCtx);
 
   if (!value) {
-    throw new Error("useApp must be used inside AppProvider");
+    throw new Error(
+      "useApp must be used inside AppProvider"
+    );
   }
 
   return value;
