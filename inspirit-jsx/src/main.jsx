@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import App from './App.jsx';
 import { AppProvider } from '@/context/AppContext';
 import './styles.css';
+import SmoothScroll from './components/site/SmoothScroll.jsx';
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+       <SmoothScroll />
         <AppProvider>
           <App />
           <Toaster position="top-center" toastOptions={{

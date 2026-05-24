@@ -4,7 +4,6 @@ import { FiArrowUp } from 'react-icons/fi';
 import Navbar from '@/components/site/Navbar';
 import Footer from '@/components/site/Footer';
 import Cursor from '@/components/site/Cursor';
-import SmoothScroll from '@/components/site/SmoothScroll';
 import ScrollProgress from '@/components/site/ScrollProgress';
 import IntroLoader from '@/components/site/IntroLoader';
 
@@ -56,7 +55,7 @@ export default function App() {
   return (
     <>
       <IntroLoader />
-      <SmoothScroll />
+   
       <ScrollProgress />
       <Cursor />
       <Navbar />

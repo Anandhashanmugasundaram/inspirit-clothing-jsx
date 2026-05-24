@@ -226,6 +226,7 @@ Total: ₹${total.toFixed(2)}
 
     try {
       // SAVE ORDER
+      console.log("ORDER ITEMS BEING SENT:", orderData.items);
       await axios.post(`${API}/api/orders`, orderData);
 
       // OPEN WHATSAPP

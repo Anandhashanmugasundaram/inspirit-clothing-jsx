@@ -10,40 +10,27 @@ const orderSchema = new mongoose.Schema(
     customer: {
       firstName: String,
       lastName: String,
-
       email: String,
-
       phone: String,
-
       address: String,
-
       city: String,
-
       postalCode: String,
-
       country: String,
     },
 
     items: [
       {
         productId: String,
-
         name: String,
-
         image: String,
-
         price: Number,
-
         qty: Number,
-
         size: String,
       },
     ],
 
     subtotal: Number,
-
     shipping: Number,
-
     total: Number,
 
     status: {
@@ -52,9 +39,7 @@ const orderSchema = new mongoose.Schema(
       default: "Pending",
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Order", orderSchema);

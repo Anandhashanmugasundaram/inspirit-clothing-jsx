@@ -9,48 +9,59 @@ function AdminPage() {
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 
-  const user = JSON.parse(localStorage.getItem("inspirit:user"));
+  const user = JSON.parse(
+    localStorage.getItem("inspirit:user")
+  );
 
   if (!user || user.email !== adminEmail) {
     return <Navigate to="/" replace />;
   }
 
-  const [activeTab, setActiveTab] = useState("upload");
+  const [activeTab, setActiveTab] =
+    useState("upload");
 
   const [products, setProducts] = useState([]);
 
   const [orders, setOrders] = useState([]);
 
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] =
+    useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
   // IMAGES
-  const [mainImage, setMainImage] = useState(null);
+  const [mainImage, setMainImage] =
+    useState(null);
 
-  const [hoverImage, setHoverImage] = useState(null);
+  const [hoverImage, setHoverImage] =
+    useState(null);
 
-  const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryImages, setGalleryImages] =
+    useState([]);
 
   // FORM
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    category: "",
-    description: "",
-    badge: "",
-    sizes: "",
+  const [formData, setFormData] =
+    useState({
+      name: "",
+      price: "",
+      category: "",
+      description: "",
+      badge: "",
+      sizes: "",
 
-    // ✅ SPECIAL OFFER
-    isSpecialOffer: false,
-  });
+      // ✅ SPECIAL OFFER
+      isSpecialOffer: false,
+    });
 
   // ======================
   // FETCH PRODUCTS
   // ======================
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${API}/api/products`);
+      const res = await axios.get(
+        `${API}/api/products`
+      );
 
       setProducts(res.data);
     } catch (error) {
@@ -63,7 +74,9 @@ function AdminPage() {
   // ======================
   const fetchOrders = async () => {
     try {
-      const res = await axios.get(`${API}/api/orders`);
+      const res = await axios.get(
+        `${API}/api/orders`
+      );
 
       setOrders(res.data);
     } catch (error) {
@@ -103,40 +116,66 @@ function AdminPage() {
 
       data.append("price", formData.price);
 
-      data.append("category", formData.category);
+      data.append(
+        "category",
+        formData.category
+      );
 
-      data.append("description", formData.description);
+      data.append(
+        "description",
+        formData.description
+      );
 
       data.append("badge", formData.badge);
 
       data.append("sizes", formData.sizes);
 
       // ✅ SPECIAL OFFER
-      data.append("isSpecialOffer", formData.isSpecialOffer);
+      data.append(
+        "isSpecialOffer",
+        formData.isSpecialOffer
+      );
 
       // IMAGES
-      if (mainImage) data.append("images", mainImage);
+      if (mainImage)
+        data.append("images", mainImage);
 
-      if (hoverImage) data.append("images", hoverImage);
+      if (hoverImage)
+        data.append("images", hoverImage);
 
-      galleryImages.forEach((img) => data.append("images", img));
+      galleryImages.forEach((img) =>
+        data.append("images", img)
+      );
 
-      const isEditing = editingId && editingId !== "null" && editingId !== "";
+      const isEditing =
+        editingId &&
+        editingId !== "null" &&
+        editingId !== "";
 
       if (isEditing) {
-        await axios.put(`${API}/api/products/${editingId}`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await axios.put(
+          `${API}/api/products/${editingId}`,
+          data,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
+          }
+        );
 
         alert("Product Updated");
       } else {
-        await axios.post(`${API}/api/products`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await axios.post(
+          `${API}/api/products`,
+          data,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
+          }
+        );
 
         alert("Product Added");
       }
@@ -164,7 +203,11 @@ function AdminPage() {
     } catch (error) {
       console.log(error);
 
-      alert("Error: " + (error.response?.data?.message || error.message));
+      alert(
+        "Error: " +
+          (error.response?.data?.message ||
+            error.message)
+      );
     } finally {
       setLoading(false);
     }
@@ -174,10 +217,13 @@ function AdminPage() {
   // DELETE PRODUCT
   // ======================
   const deleteProduct = async (id) => {
-    if (!window.confirm("Delete product?")) return;
+    if (!window.confirm("Delete product?"))
+      return;
 
     try {
-      await axios.delete(`${API}/api/products/${id}`);
+      await axios.delete(
+        `${API}/api/products/${id}`
+      );
 
       fetchProducts();
     } catch (error) {
@@ -188,9 +234,14 @@ function AdminPage() {
   // ======================
   // DELETE IMAGE
   // ======================
-  const deleteImage = async (productId, publicId) => {
+  const deleteImage = async (
+    productId,
+    publicId
+  ) => {
     try {
-      await axios.delete(`${API}/api/products/${productId}/image/${publicId}`);
+      await axios.delete(
+        `${API}/api/products/${productId}/image/${publicId}`
+      );
 
       fetchProducts();
 
@@ -218,10 +269,16 @@ function AdminPage() {
       badge: product.badge,
 
       // ✅ SPECIAL OFFER
-      isSpecialOffer: product.isSpecialOffer || false,
+      isSpecialOffer:
+        product.isSpecialOffer || false,
 
-      sizes: Object.entries(product.sizes || {})
-        .map(([size, stock]) => `${size}:${stock}`)
+      sizes: Object.entries(
+        product.sizes || {}
+      )
+        .map(
+          ([size, stock]) =>
+            `${size}:${stock}`
+        )
         .join(","),
     });
 
@@ -236,9 +293,15 @@ function AdminPage() {
   // ======================
   // UPDATE ORDER STATUS
   // ======================
-  const updateOrderStatus = async (id, status) => {
+  const updateOrderStatus = async (
+    id,
+    status
+  ) => {
     try {
-      await axios.put(`${API}/api/orders/${id}`, { status });
+      await axios.put(
+        `${API}/api/orders/${id}`,
+        { status }
+      );
 
       fetchOrders();
     } catch (error) {
@@ -250,10 +313,13 @@ function AdminPage() {
   // DELETE ORDER
   // ======================
   const deleteOrder = async (id) => {
-    if (!window.confirm("Delete order?")) return;
+    if (!window.confirm("Delete order?"))
+      return;
 
     try {
-      await axios.delete(`${API}/api/orders/${id}`);
+      await axios.delete(
+        `${API}/api/orders/${id}`
+      );
 
       fetchOrders();
     } catch (error) {
@@ -267,21 +333,27 @@ function AdminPage() {
         {/* NAV */}
         <div className="flex gap-4 mb-10 flex-wrap">
           <button
-            onClick={() => setActiveTab("upload")}
+            onClick={() =>
+              setActiveTab("upload")
+            }
             className="px-6 py-3 bg-black text-white rounded-lg"
           >
             Add Product
           </button>
 
           <button
-            onClick={() => setActiveTab("products")}
+            onClick={() =>
+              setActiveTab("products")
+            }
             className="px-6 py-3 border rounded-lg"
           >
             View Products
           </button>
 
           <button
-            onClick={() => setActiveTab("orders")}
+            onClick={() =>
+              setActiveTab("orders")
+            }
             className="px-6 py-3 border rounded-lg"
           >
             View Orders
@@ -290,7 +362,10 @@ function AdminPage() {
 
         {/* ADD PRODUCT */}
         {activeTab === "upload" && (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
             <input
               type="text"
               name="name"
@@ -352,34 +427,48 @@ function AdminPage() {
               <input
                 type="checkbox"
                 id="offer"
-                checked={formData.isSpecialOffer}
+                checked={
+                  formData.isSpecialOffer
+                }
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    isSpecialOffer: e.target.checked,
+                    isSpecialOffer:
+                      e.target.checked,
                   })
                 }
                 className="w-5 h-5"
               />
 
-              <label htmlFor="offer" className="font-semibold">
+              <label
+                htmlFor="offer"
+                className="font-semibold"
+              >
                 Special Offer Product
               </label>
             </div>
 
             {/* MAIN IMAGE */}
             <div>
-              <label className="font-bold block mb-2">Main Image</label>
+              <label className="font-bold block mb-2">
+                Main Image
+              </label>
 
               <input
                 type="file"
-                onChange={(e) => setMainImage(e.target.files[0])}
+                onChange={(e) =>
+                  setMainImage(
+                    e.target.files[0]
+                  )
+                }
                 className="w-full border p-4 rounded-lg"
               />
 
               {mainImage && (
                 <img
-                  src={URL.createObjectURL(mainImage)}
+                  src={URL.createObjectURL(
+                    mainImage
+                  )}
                   alt=""
                   className="h-48 w-40 object-cover mt-4 rounded-lg"
                 />
@@ -388,17 +477,25 @@ function AdminPage() {
 
             {/* HOVER IMAGE */}
             <div>
-              <label className="font-bold block mb-2">Hover Image</label>
+              <label className="font-bold block mb-2">
+                Hover Image
+              </label>
 
               <input
                 type="file"
-                onChange={(e) => setHoverImage(e.target.files[0])}
+                onChange={(e) =>
+                  setHoverImage(
+                    e.target.files[0]
+                  )
+                }
                 className="w-full border p-4 rounded-lg"
               />
 
               {hoverImage && (
                 <img
-                  src={URL.createObjectURL(hoverImage)}
+                  src={URL.createObjectURL(
+                    hoverImage
+                  )}
                   alt=""
                   className="h-48 w-40 object-cover mt-4 rounded-lg"
                 />
@@ -407,24 +504,36 @@ function AdminPage() {
 
             {/* GALLERY */}
             <div>
-              <label className="font-bold block mb-2">Gallery Images</label>
+              <label className="font-bold block mb-2">
+                Gallery Images
+              </label>
 
               <input
                 type="file"
                 multiple
-                onChange={(e) => setGalleryImages(Array.from(e.target.files))}
+                onChange={(e) =>
+                  setGalleryImages(
+                    Array.from(
+                      e.target.files
+                    )
+                  )
+                }
                 className="w-full border p-4 rounded-lg"
               />
 
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                {galleryImages.map((img, i) => (
-                  <img
-                    key={i}
-                    src={URL.createObjectURL(img)}
-                    alt=""
-                    className="h-40 w-full object-cover rounded-lg"
-                  />
-                ))}
+                {galleryImages.map(
+                  (img, i) => (
+                    <img
+                      key={i}
+                      src={URL.createObjectURL(
+                        img
+                      )}
+                      alt=""
+                      className="h-40 w-full object-cover rounded-lg"
+                    />
+                  )
+                )}
               </div>
             </div>
 
@@ -443,126 +552,367 @@ function AdminPage() {
         )}
 
         {/* PRODUCTS */}
-        {activeTab === "products" && (
-          <div className="grid md:grid-cols-3 gap-6">
-            {products.map((p) => (
-              <div
-                key={p._id}
-                className="border rounded-xl overflow-hidden bg-white"
-              >
-                <img
-                  src={p.images?.[0]?.url}
-                  alt={p.name}
-                  className="h-72 w-full object-cover"
-                />
+    {/* PRODUCTS */}
+{activeTab === "products" && (
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    {products.length === 0 && (
+      <div className="col-span-full text-center py-20 text-gray-400">
+        <p className="text-5xl mb-4">🛍</p>
+        <p className="text-lg font-medium">No products yet</p>
+      </div>
+    )}
 
-                <div className="p-5">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">{p.name}</h2>
+    {products.map((p, idx) => {
+      const sizes = Object.entries(p.sizes || {});
+      const imageLabels = ["Main", "Hover"];
 
-                    {p.isSpecialOffer && (
-                      <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full">
-                        OFFER
+      return (
+        <div
+          key={p._id}
+          className="rounded-2xl overflow-hidden border border-gray-200 bg-white flex flex-col"
+        >
+          {/* ── MAIN IMAGE ── */}
+          <div className="relative">
+            <img
+              src={p.images?.[0]?.url}
+              alt={p.name}
+              className="w-full h-60 object-cover bg-gray-100"
+            />
+
+            {/* badges top-left */}
+            <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
+              {p.badge && (
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black text-white tracking-wide">
+                  {p.badge}
+                </span>
+              )}
+              {p.isSpecialOffer && (
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-600 text-red-50 tracking-wide">
+                  OFFER
+                </span>
+              )}
+            </div>
+
+            {/* price top-right */}
+            <div className="absolute top-3 right-3">
+              <span className="text-sm font-semibold bg-white border border-gray-200 rounded-full px-3 py-1">
+                ₹{p.price}
+              </span>
+            </div>
+          </div>
+
+          {/* ── BODY ── */}
+          <div className="p-5 flex flex-col flex-1">
+
+            {/* name + category */}
+            <div className="mb-3">
+              <h2 className="text-base font-bold leading-tight">{p.name}</h2>
+              <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">
+                {p.category}
+              </p>
+            </div>
+
+            {/* sizes */}
+            {sizes.length > 0 && (
+              <div className="flex gap-1.5 flex-wrap mb-4">
+                {sizes.map(([size, stock]) => (
+                  <span
+                    key={size}
+                    className={`text-xs px-2 py-0.5 rounded border font-medium ${
+                      Number(stock) === 0
+                        ? "bg-red-50 border-red-200 text-red-600"
+                        : "bg-gray-50 border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {size}: {stock}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* images grid */}
+            <div className="mb-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">
+                Images ({p.images?.length || 0})
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {p.images?.map((img, index) => (
+                  <div key={img.public_id} className="relative group aspect-square">
+                    <img
+                      src={img.url}
+                      alt=""
+                      className="w-full h-full object-cover rounded-lg bg-gray-100"
+                    />
+
+                    {/* label */}
+                    {index < 2 && (
+                      <span className={`absolute bottom-1.5 left-1.5 text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                        index === 0
+                          ? "bg-black text-white"
+                          : "bg-white border border-gray-200 text-gray-600"
+                      }`}>
+                        {imageLabels[index]}
                       </span>
                     )}
-                  </div>
 
-                  <p className="mt-2">₹{p.price}</p>
-
-                  {/* IMAGES */}
-                  <div className="grid grid-cols-2 gap-3 mt-5">
-                    {p.images?.map((img, index) => (
-                      <div key={img.public_id} className="relative">
-                        <img
-                          src={img.url}
-                          alt=""
-                          className="h-32 w-full object-cover rounded-lg"
-                        />
-
-                        <button
-                          onClick={() =>
-                            deleteImage(
-                              p._id,
-                              encodeURIComponent(img.public_id),
-                            )
-                          }
-                          className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded"
-                        >
-                          X
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* ACTIONS */}
-                  <div className="flex gap-3 mt-5">
+                    {/* delete X */}
                     <button
-                      onClick={() => editProduct(p)}
-                      className="flex-1 bg-black text-white py-3 rounded-lg"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => deleteProduct(p._id)}
-                      className="flex-1 bg-red-500 text-white py-3 rounded-lg"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ORDERS */}
-        {activeTab === "orders" && (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <div key={order._id} className="border rounded-2xl p-6 bg-white">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <h2 className="font-bold">{order._id}</h2>
-
-                    <p className="text-gray-500 mt-1">{order.userEmail}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-3xl font-black">₹{order.total}</h3>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        updateOrderStatus(order._id, e.target.value)
+                      onClick={() =>
+                        deleteImage(p._id, encodeURIComponent(img.public_id))
                       }
-                      className="border px-4 py-2 rounded-lg"
+                      className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+                      title="Delete image"
                     >
-                      <option>Pending</option>
-
-                      <option>Processing</option>
-
-                      <option>Shipped</option>
-
-                      <option>Delivered</option>
-                    </select>
-
-                    {order.status === "Delivered" && (
-                      <button
-                        onClick={() => deleteOrder(order._id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-2.5 h-2.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
                       >
-                        Delete
-                      </button>
-                    )}
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* actions */}
+            <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-100">
+              <button
+                onClick={() => editProduct(p)}
+                className="flex items-center justify-center gap-2 bg-black hover:bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Edit
+              </button>
+
+              <button
+                onClick={() => deleteProduct(p._id)}
+                className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
+        {/* ORDERS */}
+    {/* ORDERS */}
+{activeTab === "orders" && (
+  <div className="space-y-5">
+    {orders.length === 0 && (
+      <div className="text-center py-20 text-gray-400">
+        <p className="text-5xl mb-4">📦</p>
+        <p className="text-lg font-medium">No orders yet</p>
+      </div>
+    )}
+
+    {orders.map((order) => {
+      const initials =
+        `${order.customer?.firstName?.[0] || ""}${order.customer?.lastName?.[0] || ""}`.toUpperCase() || "?";
+
+      const statusStyles = {
+        Pending:    "bg-amber-100 text-amber-800",
+        Processing: "bg-blue-100 text-blue-800",
+        Shipped:    "bg-purple-100 text-purple-800",
+        Delivered:  "bg-green-100 text-green-800",
+      };
+
+      return (
+        <div
+          key={order._id}
+          className="rounded-2xl overflow-hidden border border-gray-200 bg-white"
+        >
+          {/* ── HEADER ── */}
+          <div className="bg-black px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
+                {initials}
+              </div>
+              <div>
+                <p className="text-white font-semibold text-sm leading-tight">
+                  {order.customer?.firstName} {order.customer?.lastName}
+                </p>
+                <p className="text-zinc-500 text-xs font-mono mt-0.5">
+                  #{order._id.slice(-10)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyles[order.status] || "bg-gray-100 text-gray-600"}`}
+              >
+                {order.status}
+              </span>
+              <span className="text-zinc-500 text-xs">
+                {new Date(order.createdAt).toLocaleString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          </div>
+
+          {/* ── INFO GRID ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-5 border-b border-gray-100">
+
+            {/* Contact */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">
+                Contact
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-gray-400 text-base">✉</span>
+                  {order.customer?.email}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-gray-400 text-base">📞</span>
+                  {order.customer?.phone}
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Address */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">
+                Shipping Address
+              </p>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {order.customer?.address}<br />
+                {order.customer?.city}, {order.customer?.state}<br />
+                {order.customer?.country} — {order.customer?.postalCode}
+              </p>
+            </div>
+
+            {/* Payment */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">
+                Payment
+              </p>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>Subtotal</span>
+                  <span>₹{order.subtotal?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>Shipping</span>
+                  <span className={order.shipping === 0 ? "text-green-600 font-medium" : ""}>
+                    {order.shipping === 0 ? "FREE" : `₹${order.shipping}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base font-bold border-t border-gray-200 pt-2 mt-2">
+                  <span>Total</span>
+                  <span>₹{order.total?.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* ── ITEMS ── */}
+          <div className="p-5 border-b border-gray-100">
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">
+              Items ({order.items?.length})
+            </p>
+            <div className="space-y-3">
+              {order.items?.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 p-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  <img
+                    src={item.image || "/placeholder.png"}
+                    alt={item.name}
+                    onError={(e) => (e.target.src = "/placeholder.png")}
+                    className="h-16 w-12 object-cover rounded-lg bg-gray-100 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{item.name}</p>
+                    <div className="flex gap-2 mt-1.5 flex-wrap">
+                      <span className="text-xs bg-gray-100 border border-gray-200 rounded px-2 py-0.5 text-gray-600">
+                        Size: {item.size}
+                      </span>
+                      <span className="text-xs bg-gray-100 border border-gray-200 rounded px-2 py-0.5 text-gray-600">
+                        Qty: {item.qty}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs text-gray-400">₹{item.price} × {item.qty}</p>
+                    <p className="font-bold text-sm mt-0.5">
+                      ₹{(item.price * item.qty).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── ACTIONS ── */}
+          <div className="px-5 py-4 bg-gray-50 flex items-center gap-3 flex-wrap">
+            <select
+              value={order.status}
+              onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+              className="border border-gray-200 px-4 py-2 rounded-lg text-sm bg-white"
+            >
+              <option>Pending</option>
+              <option>Processing</option>
+              <option>Shipped</option>
+              <option>Delivered</option>
+            </select>
+
+            {order.status === "Delivered" && (
+              <button
+                onClick={() => deleteOrder(order._id)}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              >
+                Delete Order
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
       </div>
     </div>
   );
