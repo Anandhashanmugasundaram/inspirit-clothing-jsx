@@ -17,9 +17,10 @@ import { FiArrowRight, FiStar, FiShield } from "react-icons/fi";
 import Marquee from "@/components/site/Marquee";
 import ProductCard from "@/components/site/ProductCard";
 import Counter from "@/components/site/Counter";
-import ImageOne from '../assets/cover_img1.jpg'
-import ImageTwo from '../assets/cover_img2.png'
-import ImageThree from '../assets/cover_img3.png'
+
+import ImageOne from "../assets/cover_img1.jpg";
+import ImageTwo from "../assets/cover_img2.png";
+import ImageThree from "../assets/cover_img3.png";
 
 import { TESTIMONIALS } from "@/data/products";
 
@@ -28,35 +29,19 @@ import { useApp } from "@/context/AppContext";
 gsap.registerPlugin(ScrollTrigger);
 
 const HERO_SLIDES = [
-  // {
-  //   tag: "BLACK EDITION",
-  //   title: "STREET\nVISION",
-  //   img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=2000&q=80&auto=format",
-  // },
-
-  // {
-  //   tag: "URBAN WEAR",
-  //   title: "MONO\nSTYLE",
-  //   img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=2000&q=80&auto=format",
-  // },
-
-  // {
-  //   tag: "LIMITED DROP",
-  //   title: "DARK\nSTREET",
-  //   img: "https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=2000&q=80&auto=format",
-  // },
-
   {
     tag: "MINIMAL FITS",
     title: "BLACK &\nWHITE",
     img: ImageOne,
   },
-   {
+
+  {
     tag: "MINIMAL FITS",
     title: "BLACK &\nWHITE",
     img: ImageTwo,
   },
-   {
+
+  {
     tag: "MINIMAL FITS",
     title: "BLACK &\nWHITE",
     img: ImageThree,
@@ -72,7 +57,9 @@ function Home() {
 
   const [products, setProducts] = useState([]);
 
- const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+  const API =
+    import.meta.env.VITE_API_URL ||
+    "https://inspirit-clothing-jsx.onrender.com";
 
   // ======================
   // FETCH PRODUCTS
@@ -175,14 +162,9 @@ function Home() {
   }, []);
 
   // ONLY LATEST 5 PRODUCTS
-// SHOW ONLY LATEST 5 PRODUCTS
-const featured = [...products]
-  .sort(
-    (a, b) =>
-      new Date(b.createdAt) -
-      new Date(a.createdAt)
-  )
-  .slice(0, 5);
+  const featured = [...products]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
 
   return (
     <div ref={heroRef}>
@@ -203,26 +185,18 @@ const featured = [...products]
           {HERO_SLIDES.map((s, i) => (
             <SwiperSlide key={i}>
               <div className="absolute inset-0">
-<<<<<<< HEAD
-<img
-  src={s.img}
-  alt=""
-  className="
-    absolute inset-0
-    h-full w-full
-    object-cover
-    object-[center_20%]
-    md:object-center
-    opacity-90
-  "
-/>
-=======
                 <img
                   src={s.img}
                   alt=""
-className="absolute inset-0 h-full w-full object-cover md:object-contain lg:object-cover opacity-90 scale-100 md:scale-95 lg:scale-105"
+                  className="
+                    absolute inset-0
+                    h-full w-full
+                    object-cover
+                    object-[center_20%]
+                    md:object-center
+                    opacity-90
+                  "
                 />
->>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
 
                 <div
                   className="absolute inset-0"
@@ -274,68 +248,64 @@ className="absolute inset-0 h-full w-full object-cover md:object-contain lg:obje
       </section>
 
       {/* MARQUEE */}
-<Marquee
-  variant="red"
-  items={[
-    "LIMITED DROP",
-    "ANIME STREETWEAR",
-    "PREMIUM QUALITY",
-    "NEW ARRIVALS",
-    "INSPIRIT",
-  ]}
-/>
+      <Marquee
+        variant="red"
+        items={[
+          "LIMITED DROP",
+          "ANIME STREETWEAR",
+          "PREMIUM QUALITY",
+          "NEW ARRIVALS",
+          "INSPIRIT",
+        ]}
+      />
 
       {/* FEATURED */}
-      {/* FEATURED */}
-{/* FEATURED */}
-<section className="bone-section py-24">
-  <div className="mx-auto max-w-[1500px] px-5 md:px-10">
+      <section className="bone-section py-24">
+        <div className="mx-auto max-w-[1500px] px-5 md:px-10">
+          <div className="flex items-end justify-between mb-10 reveal">
+            <div>
+              <p className="text-sm tracking-[0.35em] uppercase text-[oklch(0.55_0.25_27)]">
+                — Featured Collection
+              </p>
 
-    <div className="flex items-end justify-between mb-10 reveal">
-      <div>
-        <p className="text-sm tracking-[0.35em] uppercase text-[oklch(0.55_0.25_27)]">
-          — Featured Collection
-        </p>
+              <h2
+                className="mt-3 text-[60px] md:text-[100px] leading-[0.9] tracking-[-0.05em]"
+                style={{
+                  fontFamily: '"Bodoni Moda", "Cormorant Garamond", serif',
+                  fontWeight: 600,
+                }}
+              >
+                Latest Drops.
+              </h2>
 
-        <h2
-          className="mt-3 text-[60px] md:text-[100px] leading-[0.9] tracking-[-0.05em]"
-          style={{
-            fontFamily:
-              '"Bodoni Moda", "Cormorant Garamond", serif',
-            fontWeight: 600,
-          }}
-        >
-          Latest Drops.
-        </h2>
+              <p className="mt-4 text-gray-500 max-w-xl">
+                Newly added premium streetwear pieces from the latest
+                collection.
+              </p>
+            </div>
+          </div>
 
-        <p className="mt-4 text-gray-500 max-w-xl">
-          Newly added premium streetwear pieces from the latest collection.
-        </p>
-      </div>
-    </div>
+          {/* SHOW ONLY 5 PRODUCTS */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {featured.map((p) => (
+              <div key={p._id} className="reveal">
+                <ProductCard p={p} />
+              </div>
+            ))}
+          </div>
 
-    {/* SHOW ONLY 5 PRODUCTS */}
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-      {featured.map((p) => (
-        <div key={p._id} className="reveal">
-          <ProductCard p={p} />
+          {/* VIEW MORE BUTTON */}
+          <div className="flex justify-center mt-16 reveal">
+            <Link
+              to="/shop"
+              className="group inline-flex items-center gap-3 px-10 py-4 rounded-full bg-black text-white tracking-[0.25em] text-sm uppercase hover:bg-[oklch(0.55_0.25_27)] transition duration-300"
+            >
+              View More
+              <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
-      ))}
-    </div>
-
-    {/* VIEW MORE BUTTON */}
-    <div className="flex justify-center mt-16 reveal">
-      <Link
-        to="/shop"
-        className="group inline-flex items-center gap-3 px-10 py-4 rounded-full bg-black text-white tracking-[0.25em] text-sm uppercase hover:bg-[oklch(0.55_0.25_27)] transition duration-300"
-      >
-        View More
-
-        <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
-      </Link>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* TESTIMONIALS */}
       <section className="bone-section py-24">

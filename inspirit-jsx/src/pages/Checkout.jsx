@@ -6,7 +6,6 @@ import axios from "axios";
 import { FiCheck } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
-
 import { useApp } from "@/context/AppContext";
 
 import toast from "react-hot-toast";
@@ -62,7 +61,6 @@ function Checkout() {
 
     const form = new FormData(e.target);
 
-<<<<<<< HEAD
     // ======================
     // FORM VALUES
     // ======================
@@ -81,31 +79,41 @@ function Checkout() {
     const address = form.get("address")?.trim();
 
     // ======================
+    // COUNTRY / STATE NAMES
+    // ======================
+    const selectedCountry = countries.find(
+      (c) => c.isoCode === countryCode
+    );
+
+    const selectedState = states.find(
+      (s) => s.isoCode === state
+    );
+
+    const countryName = selectedCountry?.name || countryCode;
+
+    const stateName = selectedState?.name || state;
+
+    // ======================
     // VALIDATION
     // ======================
     const nameRegex = /^[A-Za-z\s]+$/;
 
-    // FIRST NAME
     if (!nameRegex.test(firstName)) {
       return toast.error("Invalid first name");
     }
 
-    // LAST NAME
     if (!nameRegex.test(lastName)) {
       return toast.error("Invalid last name");
     }
 
-    // CITY
     if (!city) {
       return toast.error("Select city");
     }
 
-    // STATE
     if (!state) {
       return toast.error("Select state");
     }
 
-    // ADDRESS
     if (
       address.length < 10 ||
       !/[a-zA-Z]/.test(address) ||
@@ -114,19 +122,16 @@ function Checkout() {
       return toast.error("Enter valid address");
     }
 
-    // PHONE
     const phoneNumber = parsePhoneNumberFromString(phone);
 
     if (!phoneNumber?.isValid()) {
       return toast.error("Invalid phone number");
     }
 
-    // POSTAL CODE
     if (!validator.isPostalCode(postalCode, countryCode)) {
       return toast.error("Invalid postal code");
     }
 
-    // EMPTY CART
     if (cart.length === 0) {
       return toast.error("Cart is empty");
     }
@@ -144,15 +149,25 @@ function Checkout() {
         phone,
         address,
         city,
-        state,
+        state: stateName,
         postalCode,
-        country: countryCode,
+        country: countryName,
       },
 
       items: cart.map((item) => ({
-        productId: item.productId || item._id || item?.product?._id,
+        productId:
+          item.productId ||
+          item._id ||
+          item?.product?._id,
 
-        name: item.name || item?.product?.name,
+        name:
+          item.name ||
+          item?.product?.name,
+
+        size:
+          item?.size ||
+          item?.product?.size ||
+          "N/A",
 
         image:
           item.image ||
@@ -160,11 +175,17 @@ function Checkout() {
           item?.product?.images?.[0]?.url ||
           "/placeholder.png",
 
-        price: item.price || item?.product?.price || 0,
+        price:
+          item.price ||
+          item?.product?.price ||
+          0,
 
         qty: item.qty || 1,
 
-        total: (item.price || item?.product?.price || 0) * (item.qty || 1),
+        total:
+          (item.price ||
+            item?.product?.price ||
+            0) * (item.qty || 1),
       })),
 
       subtotal: cartTotal,
@@ -176,9 +197,83 @@ function Checkout() {
       status: "Pending",
     };
 
+    // ======================
+    // PRODUCTS MESSAGE
+    // ======================
+    const productsText = cart
+      .map((item, index) => {
+        const product = item?.product || item;
+
+        const image =
+          product?.images?.[0]?.url ||
+          product?.image ||
+          "/placeholder.png";
+
+        return `
+${index + 1}. ${product?.name}
+
+📏 Size: ${item?.size || product?.size || "N/A"}
+
+🔢 Qty: ${item?.qty || 1}
+
+💵 Price: ₹${product?.price || 0}
+
+🧾 Total: ₹${
+          (product?.price || 0) *
+          (item?.qty || 1)
+        }
+
+🖼 Product Image:
+${image}
+`;
+      })
+      .join("\n");
+
+    // ======================
+    // WHATSAPP MESSAGE
+    // ======================
+    const message = `
+🛍 *NEW ORDER — INSPIRIT CLOTHING*
+
+👤 *Customer Details*
+Name: ${firstName} ${lastName}
+Email: ${user?.email}
+Phone: ${phone}
+
+📍 *Shipping Address*
+${address}
+${city}, ${stateName}
+${countryName} - ${postalCode}
+
+📦 *Order Items*
+${productsText}
+
+💰 *Order Summary*
+Subtotal: ₹${cartTotal.toFixed(2)}
+Shipping: ₹${shipping}
+Total: ₹${total.toFixed(2)}
+`;
+
+    // ======================
+    // WHATSAPP NUMBER
+    // ======================
+    const whatsappNumber = "917397284491";
+
+    // ======================
+    // OPEN WHATSAPP
+    // ======================
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+
     try {
+      // SAVE ORDER
       await axios.post(`${API}/api/orders`, orderData);
 
+      // OPEN WHATSAPP
+      window.open(whatsappURL, "_blank");
+
+      // CLEAR CART
       await clearCart();
 
       setDone(true);
@@ -193,78 +288,6 @@ function Checkout() {
     }
   };
 
-=======
-  const customer = {
-    firstName: form.get("firstName"),
-    lastName: form.get("lastName"),
-    phone: form.get("phone"),
-    address: form.get("address"),
-    city: form.get("city"),
-    postalCode: form.get("postalCode"),
-    country: form.get("country"),
-  };
-
-  // ======================
-  // PRODUCTS MESSAGE
-  // ======================
-  const productsText = cart
-    .map((item, index) => {
-      const product = item?.product || item;
-
-      return `
-${index + 1}. ${product?.name}
-Qty: ${item?.qty || 1}
-Price: ₹${product?.price || 0}
-Total: ₹${(product?.price || 0) * (item?.qty || 1)}
-`;
-    })
-    .join("\n");
-
-  // ======================
-  // WHATSAPP MESSAGE
-  // ======================
-  const message = `
-🛍 *NEW ORDER — INSPIRIT CLOTHING*
-
-👤 *Customer Details*
-Name: ${customer.firstName} ${customer.lastName}
-Email: ${user?.email}
-Phone: ${customer.phone}
-
-📍 *Shipping Address*
-${customer.address}
-${customer.city} - ${customer.postalCode}
-${customer.country}
-
-📦 *Order Items*
-${productsText}
-
-💰 *Order Summary*
-Subtotal: ₹${cartTotal.toFixed(2)}
-Shipping: ₹${shipping}
-Total: ₹${total.toFixed(2)}
-`;
-
-  // ======================
-  // CLIENT WHATSAPP NUMBER
-  // ======================
-  const whatsappNumber = "+917397284491";
-
-  // ======================
-  // OPEN WHATSAPP
-  // ======================
-  const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-    message
-  )}`;
-
-  window.open(whatsappURL, "_blank");
-
-  // OPTIONAL
-  await clearCart();
-
-  toast.success("Redirecting to WhatsApp...");
-};
->>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
   // ======================
   // SUCCESS PAGE
   // ======================
@@ -276,7 +299,9 @@ Total: ₹${total.toFixed(2)}
             <FiCheck className="text-4xl" />
           </div>
 
-          <h1 className="mt-8 text-5xl font-black">Order Confirmed</h1>
+          <h1 className="mt-8 text-5xl font-black">
+            Order Confirmed
+          </h1>
 
           <p className="mt-4 text-gray-500">
             Your order has been received successfully.
@@ -307,7 +332,10 @@ Total: ₹${total.toFixed(2)}
           </h1>
         </div>
 
-        <form onSubmit={submit} className="grid lg:grid-cols-3 gap-10">
+        <form
+          onSubmit={submit}
+          className="grid lg:grid-cols-3 gap-10"
+        >
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-10">
             {/* CONTACT */}
@@ -332,7 +360,6 @@ Total: ₹${total.toFixed(2)}
               </h3>
 
               <div className="grid md:grid-cols-2 gap-4">
-                {/* FIRST NAME */}
                 <input
                   required
                   name="firstName"
@@ -340,7 +367,6 @@ Total: ₹${total.toFixed(2)}
                   className="px-4 py-4 border rounded-xl outline-none focus:border-black"
                 />
 
-                {/* LAST NAME */}
                 <input
                   required
                   name="lastName"
@@ -360,7 +386,6 @@ Total: ₹${total.toFixed(2)}
                   />
                 </div>
 
-                {/* ADDRESS */}
                 <input
                   required
                   name="address"
@@ -375,15 +400,19 @@ Total: ₹${total.toFixed(2)}
                   value={country}
                   onChange={(e) => {
                     setCountry(e.target.value);
-
                     setStateCode("");
                   }}
                   className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
                 >
-                  <option value="">Select Country</option>
+                  <option value="">
+                    Select Country
+                  </option>
 
                   {countries.map((c) => (
-                    <option key={c.isoCode} value={c.isoCode}>
+                    <option
+                      key={c.isoCode}
+                      value={c.isoCode}
+                    >
                       {c.name}
                     </option>
                   ))}
@@ -394,13 +423,20 @@ Total: ₹${total.toFixed(2)}
                   required
                   name="state"
                   value={stateCode}
-                  onChange={(e) => setStateCode(e.target.value)}
+                  onChange={(e) =>
+                    setStateCode(e.target.value)
+                  }
                   className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
                 >
-                  <option value="">Select State</option>
+                  <option value="">
+                    Select State
+                  </option>
 
                   {states.map((s) => (
-                    <option key={s.isoCode} value={s.isoCode}>
+                    <option
+                      key={s.isoCode}
+                      value={s.isoCode}
+                    >
                       {s.name}
                     </option>
                   ))}
@@ -412,16 +448,21 @@ Total: ₹${total.toFixed(2)}
                   name="city"
                   className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
                 >
-                  <option value="">Select City</option>
+                  <option value="">
+                    Select City
+                  </option>
 
                   {cities.map((c) => (
-                    <option key={c.name} value={c.name}>
+                    <option
+                      key={c.name}
+                      value={c.name}
+                    >
                       {c.name}
                     </option>
                   ))}
                 </select>
 
-                {/* POSTAL CODE */}
+                {/* POSTAL */}
                 <input
                   required
                   name="postalCode"
@@ -430,25 +471,25 @@ Total: ₹${total.toFixed(2)}
                 />
               </div>
             </section>
-<<<<<<< HEAD
-=======
 
-            {/* PAYMENT */}
-<button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3">
-  <FaWhatsapp className="text-2xl text-green-400" />
-  ORDER VIA WHATSAPP
-</button>
->>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
+            {/* BUTTON */}
+            <button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3">
+              <FaWhatsapp className="text-2xl text-green-400" />
+              ORDER VIA WHATSAPP
+            </button>
           </div>
 
           {/* RIGHT */}
           <aside className="bg-white border rounded-3xl p-7 h-fit sticky top-28 shadow-sm">
-            <h3 className="text-3xl font-black">Order Summary</h3>
+            <h3 className="text-3xl font-black">
+              Order Summary
+            </h3>
 
             {/* PRODUCTS */}
             <div className="mt-6 space-y-4 max-h-96 overflow-auto">
               {cart.map((item, index) => {
-                const product = item?.product || item;
+                const product =
+                  item?.product || item;
 
                 if (!product) return null;
 
@@ -473,6 +514,13 @@ Total: ₹${total.toFixed(2)}
                       </p>
 
                       <p className="text-sm text-gray-500 mt-1">
+                        Size:{" "}
+                        {item?.size ||
+                          product?.size ||
+                          "N/A"}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
                         Qty: {item?.qty || 1}
                       </p>
 
@@ -482,7 +530,11 @@ Total: ₹${total.toFixed(2)}
                     </div>
 
                     <div className="font-semibold">
-                      ₹{((product?.price || 0) * (item?.qty || 1)).toFixed(2)}
+                      ₹
+                      {(
+                        (product?.price || 0) *
+                        (item?.qty || 1)
+                      ).toFixed(2)}
                     </div>
                   </div>
                 );
@@ -494,26 +546,29 @@ Total: ₹${total.toFixed(2)}
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
 
-                <span>₹{cartTotal.toFixed(2)}</span>
+                <span>
+                  ₹{cartTotal.toFixed(2)}
+                </span>
               </div>
 
               <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
 
-                <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
+                <span>
+                  {shipping === 0
+                    ? "FREE"
+                    : `₹${shipping}`}
+                </span>
               </div>
 
               <div className="flex justify-between pt-4 border-t text-2xl font-black">
                 <span>Total</span>
 
-                <span>₹{total.toFixed(2)}</span>
+                <span>
+                  ₹{total.toFixed(2)}
+                </span>
               </div>
             </div>
-
-            {/* BUTTON */}
-            <button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition">
-              CONFIRM ORDER
-            </button>
 
             <p className="text-xs text-gray-400 text-center mt-4">
               Secure payments • Fast delivery
