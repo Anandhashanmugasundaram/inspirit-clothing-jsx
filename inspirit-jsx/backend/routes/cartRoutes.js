@@ -1,10 +1,9 @@
 // routes/cartRoutes.js
 
 const express = require("express");
-
 const router = express.Router();
-
 const Cart = require("../models/Cart");
+const Product = require("../models/Product");
 
 const {
   getCartItems,
@@ -35,24 +34,27 @@ router.delete("/:id", deleteCartItem);
 
 // ======================
 // CLEAR USER CART
+// ✅ Restores stock for all items before clearing
 // ======================
 router.delete("/clear/:email", async (req, res) => {
   try {
-    await Cart.deleteMany({
-      userEmail: req.params.email,
-    });
+    const items = await Cart.find({ userEmail: req.params.email });
 
-    res.json({
-      success: true,
-      message: "Cart cleared",
-    });
+    // ✅ Restore each item's qty back to product stock
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        const currentStock = product.sizes.get(item.size) || 0;
+        product.sizes.set(item.size, currentStock + item.qty);
+        await product.save();
+      }
+    }
+
+    await Cart.deleteMany({ userEmail: req.params.email });
+
+    res.json({ success: true, message: "Cart cleared" });
   } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

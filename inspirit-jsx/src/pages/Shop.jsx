@@ -82,24 +82,15 @@ function Shop() {
   // ======================
   // FILTER PRODUCTS
   // ======================
-  const filtered = useMemo(() => {
+const filtered = useMemo(() => {
     let list = products.filter((p) => {
-      // CATEGORY
-      const categoryMatch =
-        cat === "All" || p.category === cat;
-
-      // SIZE
+      const categoryMatch = cat === "All" || p.category === cat;
       const sizeMatch =
         size === "All" ||
         (p.sizes &&
           typeof p.sizes === "object" &&
           Object.keys(p.sizes).includes(size));
-
-      // SEARCH
-      const searchMatch = p.name
-        ?.toLowerCase()
-        .includes(q.toLowerCase());
-
+      const searchMatch = p.name?.toLowerCase().includes(q.toLowerCase());
       return categoryMatch && sizeMatch && searchMatch;
     });
 
@@ -107,16 +98,27 @@ function Shop() {
     if (sort === "price-asc") {
       list = [...list].sort((a, b) => a.price - b.price);
     }
-
     if (sort === "price-desc") {
       list = [...list].sort((a, b) => b.price - a.price);
     }
-
     if (sort === "latest") {
       list = [...list].sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
     }
+
+    // ✅ PUSH OUT OF STOCK TO END (after all other sorting)
+    const isOOS = (p) => {
+      const sizesObj = p.sizes instanceof Map
+        ? Object.fromEntries(p.sizes)
+        : p.sizes || {};
+      return Object.values(sizesObj).every((stock) => stock <= 0);
+    };
+
+    list = [
+      ...list.filter((p) => !isOOS(p)),
+      ...list.filter((p) => isOOS(p)),
+    ];
 
     return list;
   }, [products, cat, size, q, sort]);

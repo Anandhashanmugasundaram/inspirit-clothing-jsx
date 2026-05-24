@@ -1,3 +1,4 @@
+// models/Cart.js
 const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema(
@@ -7,7 +8,6 @@ const cartSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-
     productId: String,
     name: String,
     image: String,
@@ -15,6 +15,7 @@ const cartSchema = new mongoose.Schema(
     price: Number,
     size: String,
     qty: Number,
+    stock: { type: Number, default: 99 }, // ✅ size-specific stock snapshot
   },
   { timestamps: true }
 );

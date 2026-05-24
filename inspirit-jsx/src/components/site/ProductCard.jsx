@@ -1,45 +1,40 @@
 import { Link } from "react-router-dom";
 import { ShoppingBag, Eye } from "lucide-react";
-
 import { useApp } from "@/context/AppContext";
 
 export default function ProductCard({ p }) {
   const { addToCart } = useApp();
 
-  // IMAGE URL FIX
+  // ==========================
+  // OUT OF STOCK CHECK
+  // ==========================
+  const sizesObj = p.sizes instanceof Map
+    ? Object.fromEntries(p.sizes)
+    : p.sizes || {};
+
+  const isOutOfStock = Object.values(sizesObj).every((stock) => stock <= 0);
+
+  // ==========================
+  // IMAGE URL
+  // ==========================
   const getImageUrl = (img) => {
-    if (!img) {
-      return "https://placehold.co/600x800?text=No+Image";
-    }
-
+    if (!img) return "https://placehold.co/600x800?text=No+Image";
     const url = typeof img === "string" ? img : img.url;
-
-    // already full URL
-    if (url.startsWith("http")) {
-      return url;
-    }
-
-    // relative path fix
+    if (url?.startsWith("http")) return url;
     return `${import.meta.env.VITE_API_URL}${url}`;
   };
 
   const mainImage = getImageUrl(p.images?.[0]);
-
-  const hoverImage = p.images?.[1]
-    ? getImageUrl(p.images?.[1])
-    : null;
+  const hoverImage = p.images?.[1] ? getImageUrl(p.images?.[1]) : null;
 
   return (
     <article className="group relative h-full">
-      {/* CARD */}
       <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-slate-100 to-gray-200 shadow-lg transition-all duration-500 hover:shadow-2xl">
-        
+
         {/* BG */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-black/5 blur-3xl" />
-
           <div className="absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-gray-400/10 blur-3xl" />
-
           <div className="absolute top-1/2 left-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/5" />
         </div>
 
@@ -55,14 +50,15 @@ export default function ProductCard({ p }) {
               alt={p.name}
               loading="lazy"
               onError={(e) => {
-                e.target.src =
-                  "https://placehold.co/600x800?text=Image+Error";
+                e.target.src = "https://placehold.co/600x800?text=Image+Error";
               }}
-              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+              className={`absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 ${
+                isOutOfStock ? "grayscale opacity-60" : ""
+              }`}
             />
 
             {/* HOVER IMAGE */}
-            {hoverImage && (
+            {hoverImage && !isOutOfStock && (
               <img
                 src={hoverImage}
                 alt=""
@@ -74,8 +70,17 @@ export default function ProductCard({ p }) {
             {/* OVERLAY */}
             <div className="absolute inset-0 bg-black/5 opacity-0 transition duration-500 group-hover:opacity-100" />
 
-            {/* BADGE */}
-            {p.badge && (
+            {/* OUT OF STOCK OVERLAY */}
+            {isOutOfStock && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+                <span className="bg-white text-black text-[10px] font-bold tracking-[0.35em] px-5 py-2 rounded-full shadow-lg">
+                  OUT OF STOCK
+                </span>
+              </div>
+            )}
+
+            {/* BADGE — hide if out of stock */}
+            {p.badge && !isOutOfStock && (
               <span
                 className={`absolute top-3 left-3 z-10 rounded-full px-3 py-1 text-[9px] font-bold tracking-[0.2em] backdrop-blur-md ${
                   p.badge === "SALE"
@@ -95,24 +100,26 @@ export default function ProductCard({ p }) {
             </div>
           </Link>
 
-          {/* QUICK ADD */}
-          <div className="absolute left-3 right-3 bottom-4 z-20 translate-y-10 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                addToCart(p);
-              }}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3 text-[11px] font-semibold tracking-[0.15em] text-white transition hover:bg-gray-800"
-            >
-              <ShoppingBag className="h-3 w-3" />
-              QUICK ADD
-            </button>
-          </div>
+          {/* QUICK ADD — hidden if out of stock */}
+          {!isOutOfStock && (
+            <div className="absolute left-3 right-3 bottom-4 z-20 translate-y-10 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  addToCart(p);
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3 text-[11px] font-semibold tracking-[0.15em] text-white transition hover:bg-gray-800"
+              >
+                <ShoppingBag className="h-3 w-3" />
+                QUICK ADD
+              </button>
+            </div>
+          )}
         </div>
 
         {/* CONTENT */}
         <div className="relative flex flex-1 flex-col p-4 backdrop-blur-sm">
-          
+
           {/* CATEGORY */}
           <p className="mb-1 text-[10px] uppercase tracking-[0.25em] text-gray-500">
             {p.category}
@@ -128,14 +135,16 @@ export default function ProductCard({ p }) {
 
           {/* PRICE */}
           <div className="mt-2 flex items-center gap-2">
-            <p className="text-sm font-bold text-black">
+            <p className={`text-sm font-bold ${isOutOfStock ? "text-gray-400" : "text-black"}`}>
               ₹{p.price}
             </p>
-
             {p.oldPrice && (
-              <p className="text-xs text-gray-400 line-through">
-                ₹{p.oldPrice}
-              </p>
+              <p className="text-xs text-gray-400 line-through">₹{p.oldPrice}</p>
+            )}
+            {isOutOfStock && (
+              <span className="text-[10px] text-red-500 font-semibold tracking-wider">
+                SOLD OUT
+              </span>
             )}
           </div>
         </div>

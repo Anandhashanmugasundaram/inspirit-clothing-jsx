@@ -22,10 +22,8 @@ const API =
 // ======================
 const safeGet = (key, fallback) => {
   if (typeof window === "undefined") return fallback;
-
   try {
     const value = localStorage.getItem(key);
-
     return value ? JSON.parse(value) : fallback;
   } catch {
     return fallback;
@@ -37,46 +35,20 @@ const safeGet = (key, fallback) => {
 // ======================
 export function AppProvider({ children }) {
 
-  // ======================
-  // STATES
-  // ======================
-  const [user, setUser] = useState(() =>
-    safeGet("inspirit:user", null)
-  );
-
+  const [user, setUser] = useState(() => safeGet("inspirit:user", null));
   const [cart, setCart] = useState([]);
-
   const [cartLoading, setCartLoading] = useState(true);
+  const [wishlist, setWishlist] = useState(() => safeGet("inspirit:wish", []));
 
-  const [wishlist, setWishlist] = useState(() =>
-    safeGet("inspirit:wish", [])
-  );
-
-  // ======================
-  // ADMIN
-  // ======================
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-
   const isAdmin = user?.email === adminEmail;
 
-  // ======================
-  // SAVE USER
-  // ======================
   useEffect(() => {
-    localStorage.setItem(
-      "inspirit:user",
-      JSON.stringify(user)
-    );
+    localStorage.setItem("inspirit:user", JSON.stringify(user));
   }, [user]);
 
-  // ======================
-  // SAVE WISHLIST
-  // ======================
   useEffect(() => {
-    localStorage.setItem(
-      "inspirit:wish",
-      JSON.stringify(wishlist)
-    );
+    localStorage.setItem("inspirit:wish", JSON.stringify(wishlist));
   }, [wishlist]);
 
   // ======================
@@ -88,13 +60,9 @@ export function AppProvider({ children }) {
         setCart([]);
         return;
       }
-
       const res = await axios.get(`${API}/api/cart`, {
-        params: {
-          email: user.email,
-        },
+        params: { email: user.email },
       });
-
       setCart(res.data || []);
     } catch (error) {
       console.log(error);
@@ -103,9 +71,6 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ======================
-  // LOAD CART
-  // ======================
   useEffect(() => {
     const loadCart = async () => {
       if (!user) {
@@ -113,116 +78,98 @@ export function AppProvider({ children }) {
         setCartLoading(false);
         return;
       }
-
       setCartLoading(true);
-
       await fetchCart();
     };
-
     loadCart();
   }, [user]);
 
   // ======================
-  // LOGIN
+  // LOGIN / LOGOUT
   // ======================
   const login = (email, name) => {
-    const newUser = {
-      email,
-      name: name || email.split("@")[0],
-    };
-
+    const newUser = { email, name: name || email.split("@")[0] };
     setUser(newUser);
-
-    if (email === adminEmail) {
-      toast.success("Welcome Admin");
-    } else {
-      toast.success("Welcome to INSPIRIT");
-    }
+    toast.success(email === adminEmail ? "Welcome Admin" : "Welcome to INSPIRIT");
   };
 
-  // ======================
-  // LOGOUT
-  // ======================
   const logout = () => {
     setUser(null);
-
     setCart([]);
-
     setCartLoading(false);
-
     toast("Signed out");
   };
 
   // ======================
   // ADD TO CART
+  // ✅ Server validates & decrements stock — we just handle the response
   // ======================
-  const addToCart = async (
-    product,
-    size = product.sizes?.[1] || product.sizes?.[0],
-    qty = 1
-  ) => {
+  const addToCart = async (product, size, qty = 1) => {
     try {
-      if (!user) {
-        return toast.error("Login required");
-      }
+      if (!user) return toast.error("Login required");
+
+      // Resolve size if not passed
+      const resolvedSize =
+        size || Object.keys(product?.sizes || {})[0] || "";
 
       const image =
         product?.images?.[0]?.url ||
         product?.image ||
         "";
 
+      // ✅ Client-side pre-check using sizes object { S: 2, M: 5 }
+      const sizes = product?.sizes || {};
+      // Mongoose Map serializes to plain object on frontend
+      const clientStock =
+        typeof sizes.get === "function"
+          ? sizes.get(resolvedSize)     // Mongoose Map (shouldn't happen on frontend)
+          : sizes[resolvedSize];        // Plain object (normal case)
+
+      if (clientStock !== undefined && qty > clientStock) {
+        toast.error(`Only ${clientStock} items available in size ${resolvedSize}`);
+        return;
+      }
+
       await axios.post(`${API}/api/cart`, {
         userEmail: user.email,
-
         productId: product._id || product.id,
-
         name: product.name,
-
         image,
-
         category: product.category,
-
         price: product.price,
-
-        size,
-
+        size: resolvedSize,
         qty,
+        stock: clientStock ?? 99,
       });
 
+      // ✅ Refresh cart so stock field is up to date from server
       await fetchCart();
 
       toast.success(`${product.name} added to bag`);
     } catch (error) {
-      console.log(error);
-
-      toast.error("Failed to add");
+      // ✅ Show the server's error message (e.g. "Only 2 items available in size S")
+      const msg =
+        error?.response?.data?.message || "Failed to add";
+      toast.error(msg);
     }
   };
 
   // ======================
   // REMOVE FROM CART
+  // ✅ Server restores stock on delete
   // ======================
   const removeFromCart = async (id) => {
     try {
-
-      // INSTANT UI UPDATE
-      setCart((prev) =>
-        prev.filter((item) => item._id !== id)
-      );
+      setCart((prev) => prev.filter((item) => item._id !== id));
 
       await axios.delete(`${API}/api/cart/${id}`, {
-        data: {
-          email: user.email,
-        },
+        data: { email: user.email },
       });
 
       toast.success("Item removed");
-
     } catch (error) {
       console.log(error);
-
       toast.error("Failed to remove item");
-
       fetchCart();
     }
   };
@@ -233,50 +180,48 @@ export function AppProvider({ children }) {
   const clearCart = async () => {
     try {
       if (!user?.email) return;
-
       setCart([]);
-
-      await axios.delete(
-        `${API}/api/cart/clear/${user.email}`
-      );
-
+      await axios.delete(`${API}/api/cart/clear/${user.email}`);
       toast.success("Cart cleared");
-
     } catch (error) {
       console.log(error);
-
       toast.error("Failed to clear cart");
-
       fetchCart();
     }
   };
 
   // ======================
   // UPDATE QTY
+  // ✅ Server adjusts stock diff — client clamps optimistically
   // ======================
   const updateQty = async (id, qty) => {
     try {
+      const item = cart.find((i) => i._id === id);
+      const maxQty = item?.stock ?? 99;
+      const safeQty = Math.min(qty, maxQty);
 
-      // INSTANT UI UPDATE
+      if (qty > maxQty) {
+        toast.error(
+          `Only ${maxQty} items available in size ${item?.size || ""}`
+        );
+        if (safeQty === item?.qty) return;
+      }
+
+      // Optimistic UI update
       setCart((prev) =>
-        prev.map((item) =>
-          item._id === id
-            ? { ...item, qty }
-            : item
-        )
+        prev.map((i) => (i._id === id ? { ...i, qty: safeQty } : i))
       );
 
-      // DATABASE UPDATE
       await axios.put(`${API}/api/cart/${id}`, {
-        qty,
+        qty: safeQty,
         userEmail: user.email,
       });
 
+      // ✅ Refresh so stock snapshot stays accurate
+      await fetchCart();
     } catch (error) {
-      console.log(error);
-
-      toast.error("Failed to update quantity");
-
+      const msg = error?.response?.data?.message || "Failed to update quantity";
+      toast.error(msg);
       fetchCart();
     }
   };
@@ -286,90 +231,47 @@ export function AppProvider({ children }) {
   // ======================
   const toggleWishlist = (id) => {
     setWishlist((prev) => {
-
       const has = prev.includes(id);
-
-      toast(
-        has
-          ? "Removed from wishlist"
-          : "Saved to wishlist",
-        {
-          icon: has ? "✕" : "♡",
-        }
-      );
-
-      return has
-        ? prev.filter((x) => x !== id)
-        : [...prev, id];
+      toast(has ? "Removed from wishlist" : "Saved to wishlist", {
+        icon: has ? "✕" : "♡",
+      });
+      return has ? prev.filter((x) => x !== id) : [...prev, id];
     });
   };
 
-  // ======================
-  // CART COUNT
-  // ======================
-  const cartCount = useMemo(() => {
-    return cart.reduce(
-      (acc, item) => acc + item.qty,
-      0
-    );
-  }, [cart]);
+  const cartCount = useMemo(
+    () => cart.reduce((acc, item) => acc + item.qty, 0),
+    [cart]
+  );
 
-  // ======================
-  // CART TOTAL
-  // ======================
-  const cartTotal = useMemo(() => {
-    return cart.reduce(
-      (acc, item) =>
-        acc + item.qty * item.price,
-      0
-    );
-  }, [cart]);
+  const cartTotal = useMemo(
+    () => cart.reduce((acc, item) => acc + item.qty * item.price, 0),
+    [cart]
+  );
 
-  // ======================
-  // PROVIDER VALUE
-  // ======================
   const value = {
     user,
     isAdmin,
-
     login,
     logout,
-
     cart,
     cartLoading,
-
     addToCart,
     removeFromCart,
     clearCart,
     updateQty,
-
     cartCount,
     cartTotal,
     fetchCart,
-
     wishlist,
     toggleWishlist,
   };
 
-  return (
-    <AppCtx.Provider value={value}>
-      {children}
-    </AppCtx.Provider>
-  );
+  return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
 }
 
-// ======================
-// CUSTOM HOOK
-// ======================
 export const useApp = () => {
-
   const value = useContext(AppCtx);
-
-  if (!value) {
-    throw new Error(
-      "useApp must be used inside AppProvider"
-    );
-  }
-
+  if (!value) throw new Error("useApp must be used inside AppProvider");
   return value;
 };

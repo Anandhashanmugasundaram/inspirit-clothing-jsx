@@ -1,5 +1,3 @@
-// Cart.jsx
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -25,7 +23,6 @@ function Cart() {
   } = useApp();
 
   const [coupon, setCoupon] = useState("");
-
   const [discount, setDiscount] = useState(0);
 
   // ======================
@@ -43,7 +40,6 @@ function Cart() {
 
     if (coupon.toUpperCase() === "RITUAL10") {
       setDiscount(cartTotal * 0.1);
-
       toast.success("10% discount applied");
     } else {
       toast.error("Invalid promo code");
@@ -52,14 +48,23 @@ function Cart() {
 
   // ======================
   // QTY UPDATE
+  // ✅ Reads item.stock (now always present from addToCart fix)
   // ======================
   const increaseQty = (item) => {
+    const maxQty = item?.stock ?? 99;
+
+    if (item.qty >= maxQty) {
+      toast.error(
+        `Only ${maxQty} items available in size ${item.size || ""}`
+      );
+      return;
+    }
+
     updateQty(item._id, item.qty + 1);
   };
 
   const decreaseQty = (item) => {
     if (item.qty <= 1) return;
-
     updateQty(item._id, item.qty - 1);
   };
 
@@ -85,8 +90,9 @@ function Cart() {
         {/* LOADING */}
         {cartLoading ? (
           <div className="flex items-center justify-center py-32 md:py-40">
-            <div className="w-12 h-12 md:w-14 md:h-14 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 md:w-14 md:h-14 border-4 border-black border-t-transparent rounded-full animate-spin" />
           </div>
+
         ) : cart.length === 0 ? (
 
           /* EMPTY CART */
@@ -100,7 +106,7 @@ function Cart() {
             </h2>
 
             <p className="text-sm md:text-base text-gray-500 mt-2">
-              Looks like you haven’t added anything yet.
+              Looks like you haven't added anything yet.
             </p>
 
             <Link
@@ -111,20 +117,22 @@ function Cart() {
               <FiArrowRight />
             </Link>
           </div>
+
         ) : (
 
           /* CART CONTENT */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
 
-            {/* LEFT */}
+            {/* LEFT — CART ITEMS */}
             <div className="lg:col-span-2 space-y-4 md:space-y-5">
-
               {cart.map((item, index) => {
-
                 const image =
                   item?.images?.[0]?.url ||
                   item?.image ||
                   "/placeholder.png";
+
+                const maxQty = item?.stock ?? 99;
+                const atMax = item.qty >= maxQty;
 
                 return (
                   <div
@@ -141,7 +149,6 @@ function Cart() {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
-
                             e.currentTarget.src = "/placeholder.png";
                           }}
                         />
@@ -149,12 +156,10 @@ function Cart() {
 
                       {/* DETAILS */}
                       <div className="flex-1 flex flex-col justify-between min-w-0">
-
                         <div>
 
-                          {/* TOP */}
+                          {/* TOP ROW */}
                           <div className="flex items-start justify-between gap-3">
-
                             <div className="min-w-0 flex-1">
 
                               <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.3em] text-gray-400">
@@ -162,11 +167,35 @@ function Cart() {
                               </p>
 
                               <Link
-                                to={`/product/${item?.slug || item?._id}`}
+                                to={`/product/${item?.productId || item?._id}`}
                                 className="block text-lg sm:text-xl md:text-2xl font-bold hover:text-red-700 transition leading-tight break-words"
                               >
                                 {item?.name}
                               </Link>
+
+                              {/* SIZE + STOCK */}
+                              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                {item?.size && (
+                                  <span className="inline-flex items-center px-3 py-1 bg-gray-100 rounded-lg text-xs font-semibold tracking-widest">
+                                    SIZE: {item.size}
+                                  </span>
+                                )}
+
+                                {/* ✅ Show stock badge only when stock is known (not the 99 fallback) */}
+                                {item?.stock !== undefined && (
+                                  <span
+                                    className={`text-xs font-medium ${
+                                      atMax
+                                        ? "text-red-500 font-bold"
+                                        : "text-gray-400"
+                                    }`}
+                                  >
+                                    {atMax
+                                      ? "Max stock reached"
+                                      : `${maxQty} available`}
+                                  </span>
+                                )}
+                              </div>
 
                               <p className="mt-2 text-gray-500 text-xs sm:text-sm line-clamp-2 md:line-clamp-3">
                                 {item?.description?.slice(0, 120)}
@@ -182,14 +211,14 @@ function Cart() {
                             </button>
                           </div>
 
-                          {/* INFO */}
+                          {/* QTY + PRICE */}
                           <div className="flex flex-wrap items-center gap-3 md:gap-4 mt-5 md:mt-6">
 
                             {/* QTY */}
                             <div className="flex items-center border rounded-xl overflow-hidden">
                               <button
                                 onClick={() => decreaseQty(item)}
-                                className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100"
+                                className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 transition"
                               >
                                 <FiMinus />
                               </button>
@@ -198,22 +227,28 @@ function Cart() {
                                 {item?.qty || 1}
                               </div>
 
+                              {/* ✅ + BUTTON DISABLED WHEN AT MAX STOCK */}
                               <button
                                 onClick={() => increaseQty(item)}
-                                className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100"
+                                disabled={atMax}
+                                className={`w-9 h-9 md:w-10 md:h-10 flex items-center justify-center transition ${
+                                  atMax
+                                    ? "opacity-30 cursor-not-allowed"
+                                    : "hover:bg-gray-100"
+                                }`}
                               >
                                 <FiPlus />
                               </button>
                             </div>
 
-                            {/* PRICE */}
+                            {/* UNIT PRICE */}
                             <div className="px-3 md:px-4 py-2 rounded-xl bg-gray-100 text-sm">
                               ₹{item?.price || 0}
                             </div>
                           </div>
                         </div>
 
-                        {/* TOTAL */}
+                        {/* ITEM TOTAL */}
                         <div className="mt-5 md:mt-6 flex items-center justify-between">
                           <div>
                             <p className="text-xs md:text-sm text-gray-400">
@@ -221,11 +256,7 @@ function Cart() {
                             </p>
 
                             <h3 className="text-2xl md:text-3xl font-black">
-                              ₹
-                              {(
-                                (item?.price || 0) *
-                                (item?.qty || 1)
-                              ).toFixed(2)}
+                              ₹{((item?.price || 0) * (item?.qty || 1)).toFixed(2)}
                             </h3>
                           </div>
                         </div>
@@ -236,7 +267,7 @@ function Cart() {
               })}
             </div>
 
-            {/* RIGHT */}
+            {/* RIGHT — ORDER SUMMARY */}
             <aside className="bg-white border rounded-2xl md:rounded-3xl p-5 md:p-7 h-fit lg:sticky lg:top-28 shadow-sm">
               <h2 className="text-2xl md:text-3xl font-black">
                 Order Summary
@@ -263,36 +294,27 @@ function Cart() {
                 </button>
               </form>
 
-              {/* SUMMARY */}
+              {/* SUMMARY ROWS */}
               <div className="mt-7 md:mt-8 space-y-4">
                 <div className="flex justify-between text-sm md:text-base text-gray-600">
                   <span>Subtotal</span>
-
                   <span>₹{cartTotal.toFixed(2)}</span>
                 </div>
 
                 {discount > 0 && (
                   <div className="flex justify-between text-sm md:text-base text-green-600">
                     <span>Discount</span>
-
-                    <span>
-                      -₹
-                      {discount.toFixed(2)}
-                    </span>
+                    <span>-₹{discount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-sm md:text-base text-gray-600">
                   <span>Shipping</span>
-
-                  <span>
-                    {shipping === 0 ? "FREE" : `₹${shipping}`}
-                  </span>
+                  <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
                 </div>
 
                 <div className="border-t border-gray-200 pt-4 flex justify-between text-xl md:text-2xl font-black">
                   <span>Total</span>
-
                   <span>₹{total.toFixed(2)}</span>
                 </div>
               </div>
