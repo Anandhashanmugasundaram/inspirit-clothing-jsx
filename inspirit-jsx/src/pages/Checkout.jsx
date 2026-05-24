@@ -61,9 +61,6 @@ function Checkout() {
 
     const form = new FormData(e.target);
 
-    // ======================
-    // FORM VALUES
-    // ======================
     const firstName = form.get("firstName")?.trim();
 
     const lastName = form.get("lastName")?.trim();
@@ -78,24 +75,16 @@ function Checkout() {
 
     const address = form.get("address")?.trim();
 
-    // ======================
     // COUNTRY / STATE NAMES
-    // ======================
-    const selectedCountry = countries.find(
-      (c) => c.isoCode === countryCode
-    );
+    const selectedCountry = countries.find((c) => c.isoCode === countryCode);
 
-    const selectedState = states.find(
-      (s) => s.isoCode === state
-    );
+    const selectedState = states.find((s) => s.isoCode === state);
 
     const countryName = selectedCountry?.name || countryCode;
 
     const stateName = selectedState?.name || state;
 
-    // ======================
     // VALIDATION
-    // ======================
     const nameRegex = /^[A-Za-z\s]+$/;
 
     if (!nameRegex.test(firstName)) {
@@ -136,9 +125,7 @@ function Checkout() {
       return toast.error("Cart is empty");
     }
 
-    // ======================
     // ORDER DATA
-    // ======================
     const orderData = {
       userEmail: user.email,
 
@@ -155,19 +142,11 @@ function Checkout() {
       },
 
       items: cart.map((item) => ({
-        productId:
-          item.productId ||
-          item._id ||
-          item?.product?._id,
+        productId: item.productId || item._id || item?.product?._id,
 
-        name:
-          item.name ||
-          item?.product?.name,
+        name: item.name || item?.product?.name,
 
-        size:
-          item?.size ||
-          item?.product?.size ||
-          "N/A",
+        size: item?.size || item?.product?.size || "N/A",
 
         image:
           item.image ||
@@ -175,17 +154,11 @@ function Checkout() {
           item?.product?.images?.[0]?.url ||
           "/placeholder.png",
 
-        price:
-          item.price ||
-          item?.product?.price ||
-          0,
+        price: item.price || item?.product?.price || 0,
 
         qty: item.qty || 1,
 
-        total:
-          (item.price ||
-            item?.product?.price ||
-            0) * (item.qty || 1),
+        total: (item.price || item?.product?.price || 0) * (item.qty || 1),
       })),
 
       subtotal: cartTotal,
@@ -197,17 +170,13 @@ function Checkout() {
       status: "Pending",
     };
 
-    // ======================
     // PRODUCTS MESSAGE
-    // ======================
     const productsText = cart
       .map((item, index) => {
         const product = item?.product || item;
 
         const image =
-          product?.images?.[0]?.url ||
-          product?.image ||
-          "/placeholder.png";
+          product?.images?.[0]?.url || product?.image || "/placeholder.png";
 
         return `
 ${index + 1}. ${product?.name}
@@ -218,10 +187,7 @@ ${index + 1}. ${product?.name}
 
 💵 Price: ₹${product?.price || 0}
 
-🧾 Total: ₹${
-          (product?.price || 0) *
-          (item?.qty || 1)
-        }
+🧾 Total: ₹${(product?.price || 0) * (item?.qty || 1)}
 
 🖼 Product Image:
 ${image}
@@ -229,9 +195,7 @@ ${image}
       })
       .join("\n");
 
-    // ======================
     // WHATSAPP MESSAGE
-    // ======================
     const message = `
 🛍 *NEW ORDER — INSPIRIT CLOTHING*
 
@@ -254,16 +218,10 @@ Shipping: ₹${shipping}
 Total: ₹${total.toFixed(2)}
 `;
 
-    // ======================
-    // WHATSAPP NUMBER
-    // ======================
     const whatsappNumber = "917397284491";
 
-    // ======================
-    // OPEN WHATSAPP
-    // ======================
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      message
+      message,
     )}`;
 
     try {
@@ -295,21 +253,21 @@ Total: ₹${total.toFixed(2)}
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-5">
         <div className="text-center max-w-md">
-          <div className="mx-auto h-24 w-24 rounded-full bg-black text-white flex items-center justify-center">
-            <FiCheck className="text-4xl" />
+          <div className="mx-auto h-20 w-20 md:h-24 md:w-24 rounded-full bg-black text-white flex items-center justify-center">
+            <FiCheck className="text-3xl md:text-4xl" />
           </div>
 
-          <h1 className="mt-8 text-5xl font-black">
+          <h1 className="mt-6 md:mt-8 text-3xl md:text-5xl font-black">
             Order Confirmed
           </h1>
 
-          <p className="mt-4 text-gray-500">
+          <p className="mt-4 text-sm md:text-base text-gray-500">
             Your order has been received successfully.
           </p>
 
           <Link
             to="/account"
-            className="mt-8 inline-block font-medium underline underline-offset-4"
+            className="mt-8 inline-block font-medium underline underline-offset-4 text-sm md:text-base"
           >
             VIEW ORDERS →
           </Link>
@@ -319,28 +277,28 @@ Total: ₹${total.toFixed(2)}
   }
 
   return (
-    <div className="min-h-screen bg-white pt-28 pb-20">
-      <div className="mx-auto max-w-7xl px-5 md:px-10">
+    <div className="min-h-screen bg-white pt-24 md:pt-28 pb-16 md:pb-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-10">
         {/* HEADING */}
-        <div className="mb-10">
-          <p className="uppercase tracking-[0.35em] text-sm text-red-700 font-medium">
+        <div className="mb-8 md:mb-10">
+          <p className="uppercase tracking-[0.3em] md:tracking-[0.35em] text-[11px] md:text-sm text-red-700 font-medium">
             Checkout
           </p>
 
-          <h1 className="text-4xl md:text-6xl font-black mt-3">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black mt-2 md:mt-3 leading-none">
             Complete Your Order
           </h1>
         </div>
 
         <form
           onSubmit={submit}
-          className="grid lg:grid-cols-3 gap-10"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10"
         >
           {/* LEFT */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-8 md:space-y-10">
             {/* CONTACT */}
             <section>
-              <h3 className="text-sm tracking-[0.3em] mb-5 font-semibold">
+              <h3 className="text-[11px] md:text-sm tracking-[0.25em] md:tracking-[0.3em] mb-4 md:mb-5 font-semibold">
                 CONTACT
               </h3>
 
@@ -349,29 +307,29 @@ Total: ₹${total.toFixed(2)}
                 type="email"
                 defaultValue={user?.email}
                 disabled
-                className="w-full px-4 py-4 border rounded-xl outline-none bg-gray-100"
+                className="w-full px-4 py-3 md:py-4 border rounded-xl outline-none bg-gray-100 text-sm md:text-base"
               />
             </section>
 
             {/* SHIPPING */}
             <section>
-              <h3 className="text-sm tracking-[0.3em] mb-5 font-semibold">
+              <h3 className="text-[11px] md:text-sm tracking-[0.25em] md:tracking-[0.3em] mb-4 md:mb-5 font-semibold">
                 SHIPPING
               </h3>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <input
                   required
                   name="firstName"
                   placeholder="First name"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black"
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
                 />
 
                 <input
                   required
                   name="lastName"
                   placeholder="Last name"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black"
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
                 />
 
                 {/* PHONE */}
@@ -382,15 +340,16 @@ Total: ₹${total.toFixed(2)}
                     value={phone}
                     onChange={setPhone}
                     placeholder="Enter phone number"
-                    className="border rounded-xl px-4 py-4"
+                    className="border rounded-xl px-4 py-3 md:py-4 text-sm md:text-base"
                   />
                 </div>
 
+                {/* ADDRESS */}
                 <input
                   required
                   name="address"
                   placeholder="Address"
-                  className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black"
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
                 />
 
                 {/* COUNTRY */}
@@ -402,17 +361,12 @@ Total: ₹${total.toFixed(2)}
                     setCountry(e.target.value);
                     setStateCode("");
                   }}
-                  className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base"
                 >
-                  <option value="">
-                    Select Country
-                  </option>
+                  <option value="">Select Country</option>
 
                   {countries.map((c) => (
-                    <option
-                      key={c.isoCode}
-                      value={c.isoCode}
-                    >
+                    <option key={c.isoCode} value={c.isoCode}>
                       {c.name}
                     </option>
                   ))}
@@ -423,20 +377,13 @@ Total: ₹${total.toFixed(2)}
                   required
                   name="state"
                   value={stateCode}
-                  onChange={(e) =>
-                    setStateCode(e.target.value)
-                  }
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                  onChange={(e) => setStateCode(e.target.value)}
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base"
                 >
-                  <option value="">
-                    Select State
-                  </option>
+                  <option value="">Select State</option>
 
                   {states.map((s) => (
-                    <option
-                      key={s.isoCode}
-                      value={s.isoCode}
-                    >
+                    <option key={s.isoCode} value={s.isoCode}>
                       {s.name}
                     </option>
                   ))}
@@ -446,17 +393,12 @@ Total: ₹${total.toFixed(2)}
                 <select
                   required
                   name="city"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base"
                 >
-                  <option value="">
-                    Select City
-                  </option>
+                  <option value="">Select City</option>
 
                   {cities.map((c) => (
-                    <option
-                      key={c.name}
-                      value={c.name}
-                    >
+                    <option key={c.name} value={c.name}>
                       {c.name}
                     </option>
                   ))}
@@ -467,36 +409,33 @@ Total: ₹${total.toFixed(2)}
                   required
                   name="postalCode"
                   placeholder="Postal code"
-                  className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black"
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
                 />
               </div>
             </section>
 
             {/* BUTTON */}
-            <button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3">
-              <FaWhatsapp className="text-2xl text-green-400" />
+            <button className="mt-4 md:mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3 text-sm md:text-base">
+              <FaWhatsapp className="text-xl md:text-2xl text-green-400" />
               ORDER VIA WHATSAPP
             </button>
           </div>
 
           {/* RIGHT */}
-          <aside className="bg-white border rounded-3xl p-7 h-fit sticky top-28 shadow-sm">
-            <h3 className="text-3xl font-black">
-              Order Summary
-            </h3>
+          <aside className="bg-white border rounded-2xl md:rounded-3xl p-5 md:p-7 h-fit lg:sticky lg:top-28 shadow-sm">
+            <h3 className="text-2xl md:text-3xl font-black">Order Summary</h3>
 
             {/* PRODUCTS */}
-            <div className="mt-6 space-y-4 max-h-96 overflow-auto">
+            <div className="mt-5 md:mt-6 space-y-4 max-h-80 md:max-h-96 overflow-auto">
               {cart.map((item, index) => {
-                const product =
-                  item?.product || item;
+                const product = item?.product || item;
 
                 if (!product) return null;
 
                 return (
                   <div
                     key={product?._id || index}
-                    className="flex gap-4 border-b pb-4"
+                    className="flex gap-3 md:gap-4 border-b pb-4"
                   >
                     <img
                       src={
@@ -505,36 +444,29 @@ Total: ₹${total.toFixed(2)}
                         "/placeholder.png"
                       }
                       alt={product?.name}
-                      className="h-20 w-16 rounded-xl object-cover bg-gray-100"
+                      className="h-20 w-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                     />
 
-                    <div className="flex-1">
-                      <p className="font-semibold line-clamp-1">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm md:text-base line-clamp-2 break-words">
                         {product?.name}
                       </p>
 
-                      <p className="text-sm text-gray-500 mt-1">
-                        Size:{" "}
-                        {item?.size ||
-                          product?.size ||
-                          "N/A"}
+                      <p className="text-xs md:text-sm text-gray-500 mt-1">
+                        Size: {item?.size || product?.size || "N/A"}
                       </p>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs md:text-sm text-gray-500">
                         Qty: {item?.qty || 1}
                       </p>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs md:text-sm text-gray-500">
                         ₹{product?.price || 0}
                       </p>
                     </div>
 
-                    <div className="font-semibold">
-                      ₹
-                      {(
-                        (product?.price || 0) *
-                        (item?.qty || 1)
-                      ).toFixed(2)}
+                    <div className="font-semibold text-sm md:text-base whitespace-nowrap">
+                      ₹{((product?.price || 0) * (item?.qty || 1)).toFixed(2)}
                     </div>
                   </div>
                 );
@@ -543,34 +475,26 @@ Total: ₹${total.toFixed(2)}
 
             {/* PRICE */}
             <div className="mt-6 pt-6 border-t space-y-3">
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-sm md:text-base text-gray-600">
                 <span>Subtotal</span>
 
-                <span>
-                  ₹{cartTotal.toFixed(2)}
-                </span>
+                <span>₹{cartTotal.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-sm md:text-base text-gray-600">
                 <span>Shipping</span>
 
-                <span>
-                  {shipping === 0
-                    ? "FREE"
-                    : `₹${shipping}`}
-                </span>
+                <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
               </div>
 
-              <div className="flex justify-between pt-4 border-t text-2xl font-black">
+              <div className="flex justify-between pt-4 border-t text-xl md:text-2xl font-black">
                 <span>Total</span>
 
-                <span>
-                  ₹{total.toFixed(2)}
-                </span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
 
-            <p className="text-xs text-gray-400 text-center mt-4">
+            <p className="text-[11px] md:text-xs text-gray-400 text-center mt-4">
               Secure payments • Fast delivery
             </p>
           </aside>
