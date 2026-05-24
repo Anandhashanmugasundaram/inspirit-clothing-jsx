@@ -3,7 +3,9 @@ import { Navigate } from "react-router-dom";
 import axios from "axios";
 
 function AdminPage() {
-  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+  const API =
+    import.meta.env.VITE_API_URL ||
+    "https://inspirit-clothing-jsx.onrender.com";
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 
@@ -23,13 +25,14 @@ function AdminPage() {
 
   const [loading, setLoading] = useState(false);
 
-  // NEW IMAGES
+  // IMAGES
   const [mainImage, setMainImage] = useState(null);
 
   const [hoverImage, setHoverImage] = useState(null);
 
   const [galleryImages, setGalleryImages] = useState([]);
 
+  // FORM
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -37,6 +40,9 @@ function AdminPage() {
     description: "",
     badge: "",
     sizes: "",
+
+    // ✅ SPECIAL OFFER
+    isSpecialOffer: false,
   });
 
   // ======================
@@ -74,66 +80,95 @@ function AdminPage() {
   // HANDLE CHANGE
   // ======================
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
   // ======================
   // SUBMIT PRODUCT
   // ======================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    try {
+      setLoading(true);
 
-  try {
-    setLoading(true);
+      const data = new FormData();
 
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("price", formData.price);
-    data.append("category", formData.category);
-    data.append("description", formData.description);
-    data.append("badge", formData.badge);
-    data.append("sizes", formData.sizes);
+      data.append("name", formData.name);
 
-    if (mainImage) data.append("images", mainImage);
-    if (hoverImage) data.append("images", hoverImage);
-    galleryImages.forEach((img) => data.append("images", img));
+      data.append("price", formData.price);
 
-    // ✅ FIXED: check editingId is a non-null, non-empty, non-"null" string
-    const isEditing = editingId && editingId !== "null" && editingId !== "";
+      data.append("category", formData.category);
 
-    console.log("EDITING ID:", editingId, "| IS EDITING:", isEditing);
-    console.log("API URL:", API);
-console.log("Posting to:", `${API}/api/products`);
+      data.append("description", formData.description);
 
-    if (isEditing) {
-      await axios.put(`${API}/api/products/${editingId}`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      data.append("badge", formData.badge);
+
+      data.append("sizes", formData.sizes);
+
+      // ✅ SPECIAL OFFER
+      data.append("isSpecialOffer", formData.isSpecialOffer);
+
+      // IMAGES
+      if (mainImage) data.append("images", mainImage);
+
+      if (hoverImage) data.append("images", hoverImage);
+
+      galleryImages.forEach((img) => data.append("images", img));
+
+      const isEditing = editingId && editingId !== "null" && editingId !== "";
+
+      if (isEditing) {
+        await axios.put(`${API}/api/products/${editingId}`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        alert("Product Updated");
+      } else {
+        await axios.post(`${API}/api/products`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        alert("Product Added");
+      }
+
+      // RESET
+      setEditingId(null);
+
+      setFormData({
+        name: "",
+        price: "",
+        category: "",
+        description: "",
+        badge: "",
+        sizes: "",
+        isSpecialOffer: false,
       });
-      alert("Product Updated");
-    } else {
-      await axios.post(`${API}/api/products`, data);
-      alert("Product Added");
+
+      setMainImage(null);
+
+      setHoverImage(null);
+
+      setGalleryImages([]);
+
+      fetchProducts();
+    } catch (error) {
+      console.log(error);
+
+      alert("Error: " + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
     }
-
-    // RESET
-    setEditingId(null);
-    setFormData({ name: "", price: "", category: "", description: "", badge: "", sizes: "" });
-    setMainImage(null);
-    setHoverImage(null);
-    setGalleryImages([]);
-    fetchProducts();
-
-  } catch (error) {
-    console.log("SUBMIT ERROR:", error);
-    alert("Error: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // ======================
   // DELETE PRODUCT
@@ -173,10 +208,17 @@ console.log("Posting to:", `${API}/api/products`);
 
     setFormData({
       name: product.name,
+
       price: product.price,
+
       category: product.category,
+
       description: product.description,
+
       badge: product.badge,
+
+      // ✅ SPECIAL OFFER
+      isSpecialOffer: product.isSpecialOffer || false,
 
       sizes: Object.entries(product.sizes || {})
         .map(([size, stock]) => `${size}:${stock}`)
@@ -223,7 +265,7 @@ console.log("Posting to:", `${API}/api/products`);
     <div className="min-h-screen bg-[#f8f8f8] pt-32 pb-20 px-5">
       <div className="max-w-7xl mx-auto bg-white p-8 rounded-2xl">
         {/* NAV */}
-        <div className="flex gap-4 mb-10">
+        <div className="flex gap-4 mb-10 flex-wrap">
           <button
             onClick={() => setActiveTab("upload")}
             className="px-6 py-3 bg-black text-white rounded-lg"
@@ -299,11 +341,32 @@ console.log("Posting to:", `${API}/api/products`);
             <input
               type="text"
               name="sizes"
-              placeholder="S:2,M:3,L:4,XL:1,XXL:0"
+              placeholder="S:2,M:3,L:4,XL:1"
               value={formData.sizes}
               onChange={handleChange}
               className="w-full border p-4 rounded-lg"
             />
+
+            {/* ✅ SPECIAL OFFER */}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="offer"
+                checked={formData.isSpecialOffer}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    isSpecialOffer: e.target.checked,
+                  })
+                }
+                className="w-5 h-5"
+              />
+
+              <label htmlFor="offer" className="font-semibold">
+                Special Offer Product
+              </label>
+            </div>
+
             {/* MAIN IMAGE */}
             <div>
               <label className="font-bold block mb-2">Main Image</label>
@@ -394,11 +457,19 @@ console.log("Posting to:", `${API}/api/products`);
                 />
 
                 <div className="p-5">
-                  <h2 className="text-2xl font-bold">{p.name}</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold">{p.name}</h2>
+
+                    {p.isSpecialOffer && (
+                      <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full">
+                        OFFER
+                      </span>
+                    )}
+                  </div>
 
                   <p className="mt-2">₹{p.price}</p>
 
-                  {/* PRODUCT IMAGES */}
+                  {/* IMAGES */}
                   <div className="grid grid-cols-2 gap-3 mt-5">
                     {p.images?.map((img, index) => (
                       <div key={img.public_id} className="relative">
@@ -408,16 +479,6 @@ console.log("Posting to:", `${API}/api/products`);
                           className="h-32 w-full object-cover rounded-lg"
                         />
 
-                        {/* LABEL */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1">
-                          {index === 0 && "MAIN IMAGE"}
-
-                          {index === 1 && "HOVER IMAGE"}
-
-                          {index >= 2 && `GALLERY ${index - 1}`}
-                        </div>
-
-                        {/* DELETE */}
                         <button
                           onClick={() =>
                             deleteImage(
@@ -457,164 +518,51 @@ console.log("Posting to:", `${API}/api/products`);
 
         {/* ORDERS */}
         {activeTab === "orders" && (
-  <div className="space-y-8">
-    {orders.map((order) => (
-      <div
-        key={order._id}
-        className="border rounded-3xl bg-white overflow-hidden"
-      >
-        {/* TOP */}
-        <div className="p-6 border-b bg-gray-50 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-              Order ID
-            </p>
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div key={order._id} className="border rounded-2xl p-6 bg-white">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h2 className="font-bold">{order._id}</h2>
 
-            <h2 className="font-bold mt-1 break-all">
-              {order._id}
-            </h2>
+                    <p className="text-gray-500 mt-1">{order.userEmail}</p>
+                  </div>
 
-            <p className="mt-3 text-sm text-gray-500">
-              {new Date(order.createdAt).toLocaleString()}
-            </p>
-          </div>
+                  <div>
+                    <h3 className="text-3xl font-black">₹{order.total}</h3>
+                  </div>
 
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-              Total
-            </p>
+                  <div className="flex gap-3">
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        updateOrderStatus(order._id, e.target.value)
+                      }
+                      className="border px-4 py-2 rounded-lg"
+                    >
+                      <option>Pending</option>
 
-            <h3 className="text-3xl font-black mt-1">
-              ₹{order.total}
-            </h3>
-          </div>
+                      <option>Processing</option>
 
-          <div className="flex gap-3 flex-wrap">
-            <select
-              value={order.status}
-              onChange={(e) =>
-                updateOrderStatus(order._id, e.target.value)
-              }
-              className="border px-4 py-3 rounded-xl font-medium"
-            >
-              <option>Pending</option>
+                      <option>Shipped</option>
 
-              <option>Processing</option>
+                      <option>Delivered</option>
+                    </select>
 
-              <option>Shipped</option>
-
-              <option>Delivered</option>
-            </select>
-
-            {order.status === "Delivered" && (
-              <button
-                onClick={() => deleteOrder(order._id)}
-                className="bg-red-600 text-white px-5 py-3 rounded-xl"
-              >
-                Delete Order
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* CUSTOMER */}
-        <div className="p-6 border-b">
-          <h3 className="text-2xl font-black mb-5">
-            Customer Details
-          </h3>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            <div className="bg-gray-50 p-5 rounded-2xl">
-              <p className="text-sm text-gray-500">Name</p>
-
-              <h4 className="font-bold text-xl mt-1">
-                {order.customer?.firstName}{" "}
-                {order.customer?.lastName}
-              </h4>
-            </div>
-
-            <div className="bg-gray-50 p-5 rounded-2xl">
-              <p className="text-sm text-gray-500">Email</p>
-
-              <h4 className="font-medium mt-1 break-all">
-                {order.userEmail}
-              </h4>
-            </div>
-
-            <div className="bg-gray-50 p-5 rounded-2xl md:col-span-2">
-              <p className="text-sm text-gray-500">Address</p>
-
-              <h4 className="font-medium mt-1">
-                {order.customer?.address},{" "}
-                {order.customer?.city},{" "}
-                {order.customer?.postalCode},{" "}
-                {order.customer?.country}
-              </h4>
-            </div>
-          </div>
-        </div>
-
-        {/* PRODUCTS */}
-        <div className="p-6">
-          <h3 className="text-2xl font-black mb-5">
-            Ordered Products
-          </h3>
-
-          <div className="space-y-5">
-            {order.items?.map((item, i) => (
-              <div
-                key={i}
-                className="border rounded-2xl p-4 flex flex-col md:flex-row gap-5"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full md:w-32 h-40 object-cover rounded-2xl bg-gray-100"
-                />
-
-                <div className="flex-1">
-                  <h4 className="text-2xl font-bold">
-                    {item.name}
-                  </h4>
-
-                  <div className="flex flex-wrap gap-3 mt-4">
-                    <div className="bg-gray-100 px-4 py-2 rounded-xl">
-                      Qty:
-                      <span className="font-bold ml-1">
-                        {item.qty}
-                      </span>
-                    </div>
-
-                    <div className="bg-gray-100 px-4 py-2 rounded-xl">
-                      Size:
-                      <span className="font-bold ml-1">
-                        {item.size}
-                      </span>
-                    </div>
-
-                    <div className="bg-gray-100 px-4 py-2 rounded-xl">
-                      Price:
-                      <span className="font-bold ml-1">
-                        ₹{item.price}
-                      </span>
-                    </div>
-
-                    <div className="bg-black text-white px-4 py-2 rounded-xl">
-                      Total:
-                      <span className="font-bold ml-1">
-                        ₹{item.price * item.qty}
-                      </span>
-                    </div>
+                    {order.status === "Delivered" && (
+                      <button
+                        onClick={() => deleteOrder(order._id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+        )}
       </div>
     </div>
   );

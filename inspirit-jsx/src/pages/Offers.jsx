@@ -70,9 +70,13 @@ function Offers() {
   // ======================
   // PRODUCT SPLIT
   // ======================
-  const newDrop = products.slice(0, 4);
+ const offerProducts = products.filter(
+  (p) => p.isSpecialOffer
+);
 
-  const exclusive = products.slice(4, 8);
+const newDrop = offerProducts.slice(0, 4);
+
+const exclusive = offerProducts.slice(4, 8);
 
   // ======================
   // TIMER CELL

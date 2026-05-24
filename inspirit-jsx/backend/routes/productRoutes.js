@@ -67,17 +67,27 @@ router.post("/", upload.array("images", 10), async (req, res) => {
 
     const sizesObject = parseSizes(req.body.sizes);
 
-    const product = await Product.create({
-      name: req.body.name,
-      slug,
-      price: Number(req.body.price),
-      category: req.body.category,
-      description: req.body.description,
-      badge: req.body.badge,
-      sizes: sizesObject,
-      images: imageUrls,
-    });
+   const product = await Product.create({
+  name: req.body.name,
 
+  slug,
+
+  price: Number(req.body.price),
+
+  category: req.body.category,
+
+  description: req.body.description,
+
+  badge: req.body.badge,
+
+  // ✅ SPECIAL OFFER
+  isSpecialOffer:
+    req.body.isSpecialOffer === "true",
+
+  sizes: sizesObject,
+
+  images: imageUrls,
+});
     res.status(201).json({
       success: true,
       product,
@@ -89,6 +99,7 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       message: error.message,
     });
   }
+  
 });
 
 // =====================
@@ -139,6 +150,11 @@ router.put(
       product.description = req.body.description || product.description;
 
       product.badge = req.body.badge || product.badge;
+      // ✅ SPECIAL OFFER
+if (req.body.isSpecialOffer !== undefined) {
+  product.isSpecialOffer =
+    req.body.isSpecialOffer === "true";
+}
 
       console.log("BASIC FIELDS UPDATED");
 
