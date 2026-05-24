@@ -1,3 +1,4 @@
+// Cart.jsx
 
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -119,16 +120,15 @@ function Cart() {
             <div className="lg:col-span-2 space-y-4 md:space-y-5">
 
               {cart.map((item, index) => {
-                const product = item?.product || item;
 
                 const image =
-                  product?.images?.[0]?.url ||
-                  product?.image ||
+                  item?.images?.[0]?.url ||
+                  item?.image ||
                   "/placeholder.png";
 
                 return (
                   <div
-                    key={product?._id || index}
+                    key={item?._id || index}
                     className="bg-white rounded-2xl md:rounded-3xl border p-3 sm:p-4 md:p-5 shadow-sm"
                   >
                     <div className="flex flex-col sm:flex-row gap-4 md:gap-5">
@@ -137,7 +137,7 @@ function Cart() {
                       <div className="w-full sm:w-36 md:w-44 h-56 sm:h-44 md:h-52 overflow-hidden rounded-2xl bg-gray-100 flex-shrink-0">
                         <img
                           src={image}
-                          alt={product?.name}
+                          alt={item?.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
@@ -158,18 +158,18 @@ function Cart() {
                             <div className="min-w-0 flex-1">
 
                               <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.3em] text-gray-400">
-                                {product?.category || "Fashion"}
+                                {item?.category || "Fashion"}
                               </p>
 
                               <Link
-                                to={`/product/${product?.slug || product?._id}`}
+                                to={`/product/${item?.slug || item?._id}`}
                                 className="block text-lg sm:text-xl md:text-2xl font-bold hover:text-red-700 transition leading-tight break-words"
                               >
-                                {product?.name}
+                                {item?.name}
                               </Link>
 
                               <p className="mt-2 text-gray-500 text-xs sm:text-sm line-clamp-2 md:line-clamp-3">
-                                {product?.description?.slice(0, 120)}
+                                {item?.description?.slice(0, 120)}
                               </p>
                             </div>
 
@@ -208,7 +208,7 @@ function Cart() {
 
                             {/* PRICE */}
                             <div className="px-3 md:px-4 py-2 rounded-xl bg-gray-100 text-sm">
-                              ₹{product?.price || 0}
+                              ₹{item?.price || 0}
                             </div>
                           </div>
                         </div>
@@ -223,7 +223,7 @@ function Cart() {
                             <h3 className="text-2xl md:text-3xl font-black">
                               ₹
                               {(
-                                (product?.price || 0) *
+                                (item?.price || 0) *
                                 (item?.qty || 1)
                               ).toFixed(2)}
                             </h3>
@@ -297,52 +297,6 @@ function Cart() {
                 </div>
               </div>
 
-              {/* ITEMS */}
-              <div className="mt-7 md:mt-8 border-t border-gray-200 pt-5 md:pt-6">
-                <h3 className="font-semibold mb-4 text-sm md:text-base">
-                  Items You’re Ordering
-                </h3>
-
-                <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
-                  {cart.map((item, index) => {
-                    const product = item?.product || item;
-
-                    const image =
-                      product?.images?.[0]?.url ||
-                      product?.image ||
-                      "/placeholder.png";
-
-                    return (
-                      <div key={index} className="flex gap-3">
-                        <img
-                          src={image}
-                          alt={product?.name}
-                          className="w-14 h-16 md:w-16 md:h-20 rounded-xl object-cover flex-shrink-0"
-                        />
-
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-xs md:text-sm line-clamp-2">
-                            {product?.name}
-                          </p>
-
-                          <p className="text-[11px] md:text-xs text-gray-500 mt-1">
-                            Qty: {item?.qty || 1}
-                          </p>
-                        </div>
-
-                        <p className="text-xs md:text-sm font-semibold whitespace-nowrap">
-                          ₹
-                          {(
-                            (product?.price || 0) *
-                            (item?.qty || 1)
-                          ).toFixed(2)}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* CHECKOUT */}
               <Link
                 to="/checkout"
@@ -360,4 +314,3 @@ function Cart() {
 }
 
 export default Cart;
-

@@ -1,3 +1,5 @@
+// routes/cartRoutes.js
+
 const express = require("express");
 
 const router = express.Router();
@@ -7,6 +9,7 @@ const Cart = require("../models/Cart");
 const {
   getCartItems,
   addToCart,
+  updateCartQty,
   deleteCartItem,
 } = require("../controllers/cartController");
 
@@ -19,6 +22,11 @@ router.get("/", getCartItems);
 // ADD TO CART
 // ======================
 router.post("/", addToCart);
+
+// ======================
+// UPDATE QTY
+// ======================
+router.put("/:id", updateCartQty);
 
 // ======================
 // DELETE ITEM
