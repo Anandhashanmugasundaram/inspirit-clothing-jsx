@@ -359,7 +359,7 @@ className="absolute inset-0 h-full w-full object-cover md:object-contain lg:obje
         </div>
       </section>
 
-      {/* ADMIN FLOAT BUTTON */}
+      {/* ADMIN FLOAT BUTTON
       {isAdmin && user && (
         <Link
           to="/admin"
@@ -367,7 +367,7 @@ className="absolute inset-0 h-full w-full object-cover md:object-contain lg:obje
         >
           <FiShield className="text-2xl" />
         </Link>
-      )}
+      )} */}
     </div>
   );
 }
