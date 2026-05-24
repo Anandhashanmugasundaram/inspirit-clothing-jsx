@@ -203,6 +203,7 @@ const featured = [...products]
           {HERO_SLIDES.map((s, i) => (
             <SwiperSlide key={i}>
               <div className="absolute inset-0">
+<<<<<<< HEAD
 <img
   src={s.img}
   alt=""
@@ -215,6 +216,13 @@ const featured = [...products]
     opacity-90
   "
 />
+=======
+                <img
+                  src={s.img}
+                  alt=""
+className="absolute inset-0 h-full w-full object-cover md:object-contain lg:object-cover opacity-90 scale-100 md:scale-95 lg:scale-105"
+                />
+>>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
 
                 <div
                   className="absolute inset-0"
@@ -366,7 +374,7 @@ const featured = [...products]
         </div>
       </section>
 
-      {/* ADMIN FLOAT BUTTON */}
+      {/* ADMIN FLOAT BUTTON
       {isAdmin && user && (
         <Link
           to="/admin"
@@ -374,7 +382,7 @@ const featured = [...products]
         >
           <FiShield className="text-2xl" />
         </Link>
-      )}
+      )} */}
     </div>
   );
 }

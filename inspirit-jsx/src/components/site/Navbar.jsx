@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { HiOutlineMenuAlt4, HiOutlineX } from "react-icons/hi";
 
 import {
-  FiSearch,
+  FiHome,
   FiUser,
- FiShoppingBag,
+  FiShoppingBag,
   FiShield,
+  FiSearch,
+  FiGift
 } from "react-icons/fi";
 
 import Logo from "./Logo";
@@ -68,7 +70,7 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled || isProductPage
-            ? "bg-black/70 border-b border-cyan-500/20 py-3"
+            ? "bg-black/70 border-b border-cyan-500/20 py-3 backdrop-blur-xl"
             : "bg-transparent py-5"
         }`}
       >
@@ -91,11 +93,11 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* RIGHT SIDE */}
-          <div className="flex items-center gap-3 md:gap-5 text-white">
+          {/* DESKTOP RIGHT SIDE */}
+          <div className="hidden lg:flex items-center gap-5 text-white">
             {/* SEARCH */}
             <button
-              className="hidden md:inline-flex hover:text-cyan-400 transition duration-300"
+              className="hover:text-cyan-400 transition duration-300"
               aria-label="Search"
             >
               <FiSearch className="text-xl" />
@@ -114,7 +116,7 @@ export default function Navbar() {
                       src={
                         user.photoURL ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          user.name || "User",
+                          user.name || "User"
                         )}`
                       }
                       alt="user"
@@ -124,7 +126,7 @@ export default function Navbar() {
 
                   {/* DROPDOWN */}
                   {profileOpen && (
-                    <div className="absolute right-0 mt-3 w-52 bg-slate-900/95 border border-cyan-500/20 rounded-xl shadow-2xl overflow-hidden">
+                    <div className="absolute right-0 mt-3 w-52 bg-slate-900/95 border border-cyan-500/20 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
                       <Link
                         to="/account"
                         onClick={() => setProfileOpen(false)}
@@ -179,15 +181,33 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-
-            {/* MOBILE MENU */}
-            <button
-              onClick={() => setOpen(true)}
-              className="lg:hidden text-white hover:text-cyan-400 transition duration-300"
-            >
-              <HiOutlineMenuAlt4 className="text-2xl" />
-            </button>
           </div>
+
+          {/* MOBILE MENU BUTTON */}
+{/* MOBILE/TABLET RIGHT SIDE */}
+<div className="flex lg:hidden items-center gap-4 text-white">
+  {/* CART */}
+  <Link
+    to="/cart"
+    className="relative hover:text-cyan-400 transition duration-300"
+  >
+    <FiShoppingBag className="text-2xl" />
+
+    {cartCount > 0 && (
+      <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
+        {cartCount}
+      </span>
+    )}
+  </Link>
+
+  {/* MENU */}
+  <button
+    onClick={() => setOpen(true)}
+    className="hover:text-cyan-400 transition duration-300"
+  >
+    <HiOutlineMenuAlt4 className="text-2xl" />
+  </button>
+</div>
         </div>
       </header>
 
@@ -199,7 +219,7 @@ export default function Navbar() {
       >
         {/* OVERLAY */}
         <div
-          className={`absolute inset-0 bg-black/70 transition-opacity ${
+          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity ${
             open ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setOpen(false)}
@@ -220,7 +240,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* NAV */}
+          {/* MOBILE NAV */}
           <nav className="mt-12 flex flex-col gap-1">
             {NAV.map((n, i) => (
               <Link
@@ -236,6 +256,35 @@ export default function Navbar() {
             ))}
           </nav>
 
+          {/* EXTRA LINKS */}
+          <div className="mt-10 flex flex-col gap-4">
+            <Link
+              to="/account"
+              className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+            >
+              <FiUser />
+              Account
+            </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+              >
+                <FiShield />
+                Admin
+              </Link>
+            )}
+
+            <Link
+              to="/cart"
+              className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+            >
+              <FiShoppingBag />
+              Cart ({cartCount})
+            </Link>
+          </div>
+
           {/* FOOTER */}
           <div className="mt-auto text-white/40 text-xs tracking-[0.3em] text-grotesk">
             © INSPIRIT — RITUAL WEAR
@@ -243,43 +292,73 @@ export default function Navbar() {
         </aside>
       </div>
 
-      {/* MOBILE BOTTOM NAV */}
-      <div className="lg:hidden fixed bottom-3 left-3 right-3 z-40 bg-black/70 border border-cyan-500/20 rounded-full px-6 py-3 flex items-center justify-between text-white">
-        {/* HOME */}
-        <Link to="/" aria-label="Home">
-          <FiSearch className="text-lg hover:text-cyan-400 transition duration-300" />
-        </Link>
+      {/* MOBILE + TABLET BOTTOM NAV */}
+{/* MOBILE + TABLET BOTTOM NAV */}
+<div className="lg:hidden fixed bottom-3 left-3 right-3 z-50">
+  <div className="bg-black/70 border border-cyan-500/20 rounded-full px-8 py-3 flex items-center justify-between text-white backdrop-blur-xl shadow-2xl">
+    
+    {/* HOME */}
+    <Link
+      to="/"
+      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+    >
+      <FiHome className="text-lg" />
 
-        {/* SHOP */}
-        <Link to="/shop">
-          <span className="text-grotesk text-sm tracking-[0.2em] hover:text-cyan-400 transition duration-300">
-            SHOP
-          </span>
-        </Link>
+      <span className="text-[10px] tracking-[0.2em] text-grotesk">
+        HOME
+      </span>
+    </Link>
 
-        {/* ADMIN */}
-        {isAdmin && (
-          <Link to="/admin" aria-label="Admin">
-            <FiShield className="text-lg hover:text-cyan-400 transition duration-300" />
-          </Link>
-        )}
+    {/* SHOP */}
+    <Link
+      to="/shop"
+      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+    >
+      <FiShoppingBag className="text-lg" />
 
-        {/* ACCOUNT */}
-        <Link to="/account" aria-label="Account">
-          <FiUser className="text-lg hover:text-cyan-400 transition duration-300" />
-        </Link>
+      <span className="text-[10px] tracking-[0.2em] text-grotesk">
+        SHOP
+      </span>
+    </Link>
+    {/* SHOP */}
+    <Link
+      to="/offers"
+      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+    >
+      <FiGift className="text-lg" />
 
-        {/* CART */}
-        <Link to="/cart" className="relative">
-          <FiShoppingBag className="text-lg hover:text-cyan-400 transition duration-300" />
+      <span className="text-[10px] tracking-[0.2em] text-grotesk">
+        OFFERS
+      </span>
+    </Link>
 
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-        </Link>
-      </div>
+    {/* ACCOUNT */}
+    <Link
+      to="/account"
+      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+    >
+      <FiUser className="text-lg" />
+
+      <span className="text-[10px] tracking-[0.2em] text-grotesk">
+        ACCOUNT
+      </span>
+    </Link>
+
+    {/* ADMIN */}
+    {isAdmin && (
+      <Link
+        to="/admin"
+        className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+      >
+        <FiShield className="text-lg" />
+
+        <span className="text-[10px] tracking-[0.2em] text-grotesk">
+          ADMIN
+        </span>
+      </Link>
+    )}
+  </div>
+</div>
     </>
   );
 }

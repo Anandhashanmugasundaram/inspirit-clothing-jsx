@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 
 import { FiCheck } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
+
 
 import { useApp } from "@/context/AppContext";
 
@@ -60,6 +62,7 @@ function Checkout() {
 
     const form = new FormData(e.target);
 
+<<<<<<< HEAD
     // ======================
     // FORM VALUES
     // ======================
@@ -190,6 +193,78 @@ function Checkout() {
     }
   };
 
+=======
+  const customer = {
+    firstName: form.get("firstName"),
+    lastName: form.get("lastName"),
+    phone: form.get("phone"),
+    address: form.get("address"),
+    city: form.get("city"),
+    postalCode: form.get("postalCode"),
+    country: form.get("country"),
+  };
+
+  // ======================
+  // PRODUCTS MESSAGE
+  // ======================
+  const productsText = cart
+    .map((item, index) => {
+      const product = item?.product || item;
+
+      return `
+${index + 1}. ${product?.name}
+Qty: ${item?.qty || 1}
+Price: ₹${product?.price || 0}
+Total: ₹${(product?.price || 0) * (item?.qty || 1)}
+`;
+    })
+    .join("\n");
+
+  // ======================
+  // WHATSAPP MESSAGE
+  // ======================
+  const message = `
+🛍 *NEW ORDER — INSPIRIT CLOTHING*
+
+👤 *Customer Details*
+Name: ${customer.firstName} ${customer.lastName}
+Email: ${user?.email}
+Phone: ${customer.phone}
+
+📍 *Shipping Address*
+${customer.address}
+${customer.city} - ${customer.postalCode}
+${customer.country}
+
+📦 *Order Items*
+${productsText}
+
+💰 *Order Summary*
+Subtotal: ₹${cartTotal.toFixed(2)}
+Shipping: ₹${shipping}
+Total: ₹${total.toFixed(2)}
+`;
+
+  // ======================
+  // CLIENT WHATSAPP NUMBER
+  // ======================
+  const whatsappNumber = "+917397284491";
+
+  // ======================
+  // OPEN WHATSAPP
+  // ======================
+  const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  window.open(whatsappURL, "_blank");
+
+  // OPTIONAL
+  await clearCart();
+
+  toast.success("Redirecting to WhatsApp...");
+};
+>>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
   // ======================
   // SUCCESS PAGE
   // ======================
@@ -355,6 +430,15 @@ function Checkout() {
                 />
               </div>
             </section>
+<<<<<<< HEAD
+=======
+
+            {/* PAYMENT */}
+<button className="mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3">
+  <FaWhatsapp className="text-2xl text-green-400" />
+  ORDER VIA WHATSAPP
+</button>
+>>>>>>> f547090db3007ef9d53384e1de3f14c7fbc32489
           </div>
 
           {/* RIGHT */}

@@ -200,3 +200,29 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: clip; }
+.product-swiper {
+  overflow: hidden;
+}
+
+.product-swiper .swiper-slide {
+  overflow: hidden;
+}
+
+.product-swiper .swiper-pagination {
+  bottom: 16px !important;
+}
+
+.product-swiper .swiper-pagination-bullet {
+  width: 7px;
+  height: 7px;
+  background: rgba(255,255,255,0.45);
+  opacity: 1;
+  border-radius: 999px;
+  transition: all 0.35s ease;
+  margin: 0 4px !important;
+}
+
+.product-swiper .swiper-pagination-bullet-active {
+  width: 24px;
+  background: #22d3ee;
+}
