@@ -9,14 +9,41 @@ import { useApp } from "@/context/AppContext";
 
 import toast from "react-hot-toast";
 
+import validator from "validator";
+
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+
+import PhoneInput from "react-phone-number-input";
+
+import "react-phone-number-input/style.css";
+
+import { Country, State, City } from "country-state-city";
+
 function Checkout() {
   const { user, cart = [], cartTotal = 0, clearCart } = useApp();
 
   const [done, setDone] = useState(false);
 
+  const [phone, setPhone] = useState("");
+
+  const [country, setCountry] = useState("IN");
+
+  const [stateCode, setStateCode] = useState("");
+
   const nav = useNavigate();
 
- const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+  const API =
+    import.meta.env.VITE_API_URL ||
+    "https://inspirit-clothing-jsx.onrender.com";
+
+  // ======================
+  // COUNTRY / STATE / CITY
+  // ======================
+  const countries = Country.getAllCountries();
+
+  const states = State.getStatesOfCountry(country);
+
+  const cities = City.getCitiesOfState(country, stateCode);
 
   // ======================
   // SHIPPING
@@ -28,53 +55,140 @@ function Checkout() {
   // ======================
   // SUBMIT ORDER
   // ======================
-const submit = async (e) => {
-  e.preventDefault();
+  const submit = async (e) => {
+    e.preventDefault();
 
-  const form = new FormData(e.target);
+    const form = new FormData(e.target);
 
-  const orderData = {
-    userEmail: user.email,
+    // ======================
+    // FORM VALUES
+    // ======================
+    const firstName = form.get("firstName")?.trim();
 
-    customer: {
-      firstName: form.get("firstName"),
-      lastName: form.get("lastName"),
-      email: user.email,
-      phone: form.get("phone"),
-      address: form.get("address"),
-      city: form.get("city"),
-      postalCode: form.get("postalCode"),
-      country: form.get("country"),
-    },
+    const lastName = form.get("lastName")?.trim();
 
-    items: cart.map((item) => ({
-      productId: item.productId || item._id || item?.product?._id,
-      name: item.name || item?.product?.name,
-      image:
-        item.image ||
-        item?.product?.image ||
-        item?.product?.images?.[0]?.url ||
-        "/placeholder.png",
-      price: item.price || item?.product?.price || 0,
-      qty: item.qty || 1,
-      total: (item.price || item?.product?.price || 0) * (item.qty || 1),
-    })),
+    const city = form.get("city")?.trim();
 
-    subtotal: cartTotal,
-    shipping,
-    total,
-    status: "Pending",
+    const state = form.get("state")?.trim();
+
+    const postalCode = form.get("postalCode")?.trim();
+
+    const countryCode = form.get("country");
+
+    const address = form.get("address")?.trim();
+
+    // ======================
+    // VALIDATION
+    // ======================
+    const nameRegex = /^[A-Za-z\s]+$/;
+
+    // FIRST NAME
+    if (!nameRegex.test(firstName)) {
+      return toast.error("Invalid first name");
+    }
+
+    // LAST NAME
+    if (!nameRegex.test(lastName)) {
+      return toast.error("Invalid last name");
+    }
+
+    // CITY
+    if (!city) {
+      return toast.error("Select city");
+    }
+
+    // STATE
+    if (!state) {
+      return toast.error("Select state");
+    }
+
+    // ADDRESS
+    if (
+      address.length < 10 ||
+      !/[a-zA-Z]/.test(address) ||
+      !/[0-9]/.test(address)
+    ) {
+      return toast.error("Enter valid address");
+    }
+
+    // PHONE
+    const phoneNumber = parsePhoneNumberFromString(phone);
+
+    if (!phoneNumber?.isValid()) {
+      return toast.error("Invalid phone number");
+    }
+
+    // POSTAL CODE
+    if (!validator.isPostalCode(postalCode, countryCode)) {
+      return toast.error("Invalid postal code");
+    }
+
+    // EMPTY CART
+    if (cart.length === 0) {
+      return toast.error("Cart is empty");
+    }
+
+    // ======================
+    // ORDER DATA
+    // ======================
+    const orderData = {
+      userEmail: user.email,
+
+      customer: {
+        firstName,
+        lastName,
+        email: user.email,
+        phone,
+        address,
+        city,
+        state,
+        postalCode,
+        country: countryCode,
+      },
+
+      items: cart.map((item) => ({
+        productId: item.productId || item._id || item?.product?._id,
+
+        name: item.name || item?.product?.name,
+
+        image:
+          item.image ||
+          item?.product?.image ||
+          item?.product?.images?.[0]?.url ||
+          "/placeholder.png",
+
+        price: item.price || item?.product?.price || 0,
+
+        qty: item.qty || 1,
+
+        total: (item.price || item?.product?.price || 0) * (item.qty || 1),
+      })),
+
+      subtotal: cartTotal,
+
+      shipping,
+
+      total,
+
+      status: "Pending",
+    };
+
+    try {
+      await axios.post(`${API}/api/orders`, orderData);
+
+      await clearCart();
+
+      setDone(true);
+
+      toast.success("Order placed successfully");
+
+      setTimeout(() => nav("/account"), 4000);
+    } catch (error) {
+      console.log(error);
+
+      toast.error("Failed to place order");
+    }
   };
-
-  await axios.post(`${API}/api/orders`, orderData);
-
-  await clearCart();
-  setDone(true);
-
-  toast.success("Order placed successfully");
-
-  setTimeout(() => nav("/account"), 4000);
-};
 
   // ======================
   // SUCCESS PAGE
@@ -119,7 +233,7 @@ const submit = async (e) => {
         </div>
 
         <form onSubmit={submit} className="grid lg:grid-cols-3 gap-10">
-          {/* LEFT SIDE */}
+          {/* LEFT */}
           <div className="lg:col-span-2 space-y-10">
             {/* CONTACT */}
             <section>
@@ -131,8 +245,8 @@ const submit = async (e) => {
                 required
                 type="email"
                 defaultValue={user?.email}
-                placeholder="Email address"
-                className="w-full px-4 py-4 border rounded-xl outline-none focus:border-black"
+                disabled
+                className="w-full px-4 py-4 border rounded-xl outline-none bg-gray-100"
               />
             </section>
 
@@ -143,13 +257,15 @@ const submit = async (e) => {
               </h3>
 
               <div className="grid md:grid-cols-2 gap-4">
+                {/* FIRST NAME */}
                 <input
                   required
-                  name="firstName" 
+                  name="firstName"
                   placeholder="First name"
                   className="px-4 py-4 border rounded-xl outline-none focus:border-black"
                 />
 
+                {/* LAST NAME */}
                 <input
                   required
                   name="lastName"
@@ -157,13 +273,19 @@ const submit = async (e) => {
                   className="px-4 py-4 border rounded-xl outline-none focus:border-black"
                 />
 
-                 <input
-                  required
-                  name="phone" 
-                  placeholder="Phone number"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                />
+                {/* PHONE */}
+                <div className="md:col-span-2">
+                  <PhoneInput
+                    international
+                    defaultCountry={country}
+                    value={phone}
+                    onChange={setPhone}
+                    placeholder="Enter phone number"
+                    className="border rounded-xl px-4 py-4"
+                  />
+                </div>
 
+                {/* ADDRESS */}
                 <input
                   required
                   name="address"
@@ -171,61 +293,71 @@ const submit = async (e) => {
                   className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black"
                 />
 
-                <input
-                  required
-                  name="city"
-
-                  placeholder="City"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                />
-
-                <input
-                  required
-                  name="postalCode" 
-                  placeholder="Postal code"
-                  className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                />
-
-                <input
+                {/* COUNTRY */}
+                <select
                   required
                   name="country"
-                  placeholder="Country"
+                  value={country}
+                  onChange={(e) => {
+                    setCountry(e.target.value);
+
+                    setStateCode("");
+                  }}
+                  className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                >
+                  <option value="">Select Country</option>
+
+                  {countries.map((c) => (
+                    <option key={c.isoCode} value={c.isoCode}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* STATE */}
+                <select
+                  required
+                  name="state"
+                  value={stateCode}
+                  onChange={(e) => setStateCode(e.target.value)}
+                  className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                >
+                  <option value="">Select State</option>
+
+                  {states.map((s) => (
+                    <option key={s.isoCode} value={s.isoCode}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* CITY */}
+                <select
+                  required
+                  name="city"
+                  className="px-4 py-4 border rounded-xl outline-none focus:border-black bg-white"
+                >
+                  <option value="">Select City</option>
+
+                  {cities.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* POSTAL CODE */}
+                <input
+                  required
+                  name="postalCode"
+                  placeholder="Postal code"
                   className="md:col-span-2 px-4 py-4 border rounded-xl outline-none focus:border-black"
                 />
               </div>
             </section>
-
-            {/* PAYMENT */}
-            <section>
-              <h3 className="text-sm tracking-[0.3em] mb-5 font-semibold">
-                PAYMENT
-              </h3>
-
-              <div className="space-y-4">
-                <input
-                  required
-                  placeholder="Card number"
-                  className="w-full px-4 py-4 border rounded-xl outline-none focus:border-black"
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    required
-                    placeholder="MM / YY"
-                    className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                  />
-
-                  <input
-                    required
-                    placeholder="CVC"
-                    className="px-4 py-4 border rounded-xl outline-none focus:border-black"
-                  />
-                </div>
-              </div>
-            </section>
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
           <aside className="bg-white border rounded-3xl p-7 h-fit sticky top-28 shadow-sm">
             <h3 className="text-3xl font-black">Order Summary</h3>
 
@@ -238,10 +370,9 @@ const submit = async (e) => {
 
                 return (
                   <div
-                    key={`${product?._id || product?.id || index}`}
+                    key={product?._id || index}
                     className="flex gap-4 border-b pb-4"
                   >
-                    {/* IMAGE */}
                     <img
                       src={
                         product?.images?.[0]?.url ||
@@ -252,10 +383,9 @@ const submit = async (e) => {
                       className="h-20 w-16 rounded-xl object-cover bg-gray-100"
                     />
 
-                    {/* DETAILS */}
                     <div className="flex-1">
                       <p className="font-semibold line-clamp-1">
-                        {product?.name || "Unknown Product"}
+                        {product?.name}
                       </p>
 
                       <p className="text-sm text-gray-500 mt-1">
@@ -267,7 +397,6 @@ const submit = async (e) => {
                       </p>
                     </div>
 
-                    {/* TOTAL */}
                     <div className="font-semibold">
                       ₹{((product?.price || 0) * (item?.qty || 1)).toFixed(2)}
                     </div>

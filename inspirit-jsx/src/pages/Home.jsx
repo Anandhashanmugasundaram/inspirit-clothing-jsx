@@ -203,11 +203,18 @@ const featured = [...products]
           {HERO_SLIDES.map((s, i) => (
             <SwiperSlide key={i}>
               <div className="absolute inset-0">
-                <img
-                  src={s.img}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover opacity-90 scale-105"
-                />
+<img
+  src={s.img}
+  alt=""
+  className="
+    absolute inset-0
+    h-full w-full
+    object-cover
+    object-[center_20%]
+    md:object-center
+    opacity-90
+  "
+/>
 
                 <div
                   className="absolute inset-0"
