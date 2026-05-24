@@ -4,11 +4,12 @@ import axios from "axios";
 import { gsap } from "gsap";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Thumbs } from "swiper/modules";
+import { FreeMode, Thumbs, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/thumbs";
+import "swiper/css/pagination";
 
 import { FiMinus, FiPlus, FiStar } from "react-icons/fi";
 
@@ -183,33 +184,40 @@ function ProductPage() {
                 - lg:h-[600px]        → fixed height on desktop
               This prevents the image from being too tall or cut off on small screens.
             */}
-            <div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px]">
-              <Swiper
-                modules={[Thumbs]}
-                thumbs={{
-                  swiper:
-                    thumbsSwiper && !thumbsSwiper.destroyed
-                      ? thumbsSwiper
-                      : null,
-                }}
-                className="h-full w-full"
-              >
-                {product.images?.map((img, i) => (
-                  /*
-                    FIX 3: Added position: relative to SwiperSlide so the
-                    absolutely positioned img fills the slide correctly in both
-                    aspect-ratio and fixed-height contexts.
-                  */
-                  <SwiperSlide key={i} style={{ position: "relative" }}>
-                    <img
-                      src={img?.url || "/placeholder.png"}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      alt={product.name}
-                    />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
+<div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px] relative">
+  <Swiper
+    modules={[Pagination, Thumbs]}
+    slidesPerView={1}
+    spaceBetween={0}
+    grabCursor={true}
+    touchRatio={1}
+    simulateTouch={true}
+    pagination={{
+      clickable: true,
+    }}
+    thumbs={{
+      swiper:
+        window.innerWidth >= 768 &&
+        thumbsSwiper &&
+        !thumbsSwiper.destroyed
+          ? thumbsSwiper
+          : null,
+    }}
+    className="h-full w-full product-swiper"
+  >
+    {product.images?.map((img, i) => (
+      <SwiperSlide key={i}>
+        <div className="relative w-full h-full">
+          <img
+            src={img?.url || "/placeholder.png"}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</div>
           </div>
 
           {/* RIGHT */}
