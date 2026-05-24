@@ -244,7 +244,7 @@ const statusStyle = (status) => {
                                   <div className="bg-black text-white px-4 py-2 rounded-xl text-sm">
                                     Total:
                                     <span className="font-semibold ml-1">
-                                      ₹{item.total?.toFixed(2)}
+                                      ₹{(item.total ?? item.price * item.qty)?.toFixed(2)}
                                     </span>
                                   </div>
                                 </div>
