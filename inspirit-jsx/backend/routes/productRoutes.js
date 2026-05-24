@@ -1,279 +1,125 @@
 const express = require("express");
-
 const router = express.Router();
-
 const Product = require("../models/Product");
-const Order = require("../models/Order");
-const Cart = require("../models/Cart");
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 
 // ==========================
-// CREATE ORDER
-// ==========================
-router.post("/", async (req, res) => {
-  try {
-    const {
-      userEmail,
-      items,
-      total,
-      shippingAddress,
-      paymentMethod,
-    } = req.body;
-
-    // ==========================
-    // VALIDATION
-    // ==========================
-    if (!userEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "User email required",
-      });
-    }
-
-    if (!items || items.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Cart is empty",
-      });
-    }
-
-    // ==========================
-    // CHECK STOCK
-    // ==========================
-    for (const item of items) {
-      const product =
-        await Product.findById(
-          item.productId
-        );
-
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: `${item.name} not found`,
-        });
-      }
-
-      const currentStock =
-        product.sizes.get(item.size) || 0;
-
-      // OUT OF STOCK
-      if (currentStock <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: `${product.name} (${item.size}) is out of stock`,
-        });
-      }
-
-      // NOT ENOUGH STOCK
-      if (currentStock < item.qty) {
-        return res.status(400).json({
-          success: false,
-          message:
-            `Only ${currentStock} left for ${product.name} (${item.size})`,
-        });
-      }
-    }
-
-    // ==========================
-    // CREATE ORDER
-    // ==========================
-    const order = await Order.create({
-      userEmail,
-
-      items,
-
-      total,
-
-      shippingAddress,
-
-      paymentMethod,
-
-      status: "Processing",
-    });
-
-    // ==========================
-    // REDUCE STOCK
-    // ==========================
-    for (const item of items) {
-      const product =
-        await Product.findById(
-          item.productId
-        );
-
-      if (!product) continue;
-
-      const currentStock =
-        product.sizes.get(item.size) || 0;
-
-      const newStock =
-        currentStock - item.qty;
-
-console.log("BEFORE:", product.sizes);
-
-product.sizes.set(
-  item.size,
-  currentStock - item.qty
-);
-
-product.markModified("sizes");
-
-console.log("AFTER:", product.sizes);
-
-await product.save();
-
-console.log("SAVED");
-    }
-
-    // ==========================
-    // CLEAR USER CART
-    // ==========================
-    await Cart.deleteMany({
-      userEmail,
-    });
-
-    // ==========================
-    // SUCCESS
-    // ==========================
-    res.status(201).json({
-      success: true,
-      message: "Order placed successfully",
-      order,
-    });
-
-  } catch (error) {
-
-    console.log("ORDER ERROR:", error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// ==========================
-// GET USER ORDERS
-// ==========================
-router.get("/:email", async (req, res) => {
-  try {
-
-    const orders =
-      await Order.find({
-        userEmail: req.params.email,
-      }).sort({
-        createdAt: -1,
-      });
-
-    res.json(orders);
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// ==========================
-// GET ALL ORDERS (ADMIN)
+// GET ALL PRODUCTS
 // ==========================
 router.get("/", async (req, res) => {
   try {
-
-    const orders =
-      await Order.find().sort({
-        createdAt: -1,
-      });
-
-    res.json(orders);
-
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.json(products);
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
 // ==========================
-// UPDATE ORDER STATUS
+// GET SINGLE PRODUCT
 // ==========================
-router.put("/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-    const order =
-      await Order.findById(
-        req.params.id
-      );
+// ==========================
+// CREATE PRODUCT
+// ==========================
+router.post("/", upload.array("images"), async (req, res) => {
+  try {
+    const { name, slug, price, category, description, badge, sizes, isSpecialOffer } = req.body;
 
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Order not found",
+    const uploadedImages = [];
+
+    for (const file of req.files || []) {
+      const base64 = file.buffer.toString("base64");
+      const dataUri = `data:${file.mimetype};base64,${base64}`;
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "inspirit",
       });
+      uploadedImages.push({ url: result.secure_url, public_id: result.public_id });
     }
 
-    order.status =
-      req.body.status || order.status;
-
-    await order.save();
-
-    res.json({
-      success: true,
-      order,
+    const product = await Product.create({
+      name,
+      slug,
+      price,
+      category,
+      description,
+      badge,
+      isSpecialOffer,
+      sizes: sizes ? JSON.parse(sizes) : {},
+      images: uploadedImages,
     });
 
+    res.status(201).json(product);
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
 // ==========================
-// DELETE ORDER
+// UPDATE PRODUCT
+// ==========================
+router.put("/:id", upload.array("images"), async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const { name, slug, price, category, description, badge, sizes, isSpecialOffer } = req.body;
+
+    const newImages = [];
+    for (const file of req.files || []) {
+      const base64 = file.buffer.toString("base64");
+      const dataUri = `data:${file.mimetype};base64,${base64}`;
+      const result = await cloudinary.uploader.upload(dataUri, { folder: "inspirit" });
+      newImages.push({ url: result.secure_url, public_id: result.public_id });
+    }
+
+    product.name = name || product.name;
+    product.slug = slug || product.slug;
+    product.price = price || product.price;
+    product.category = category || product.category;
+    product.description = description || product.description;
+    product.badge = badge || product.badge;
+    product.isSpecialOffer = isSpecialOffer ?? product.isSpecialOffer;
+    product.sizes = sizes ? JSON.parse(sizes) : product.sizes;
+    if (newImages.length > 0) product.images = newImages;
+
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ==========================
+// DELETE PRODUCT
 // ==========================
 router.delete("/:id", async (req, res) => {
   try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const order =
-      await Order.findById(
-        req.params.id
-      );
-
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Order not found",
-      });
+    // Delete images from Cloudinary
+    for (const img of product.images || []) {
+      if (img.public_id) {
+        await cloudinary.uploader.destroy(img.public_id);
+      }
     }
 
-    await Order.findByIdAndDelete(
-      req.params.id
-    );
-
-    res.json({
-      success: true,
-      message: "Order deleted",
-    });
-
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Product deleted" });
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
