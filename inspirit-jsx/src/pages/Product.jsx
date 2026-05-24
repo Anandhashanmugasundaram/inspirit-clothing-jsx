@@ -16,6 +16,8 @@ import { FiMinus, FiPlus, FiStar } from "react-icons/fi";
 import { useApp } from "@/context/AppContext";
 import ProductCard from "@/components/site/ProductCard";
 
+import toast from "react-hot-toast";
+
 function ProductPage() {
   const { slug } = useParams();
 
@@ -47,7 +49,9 @@ function ProductPage() {
 
         setAllProducts(res.data);
 
-        const found = res.data.find((p) => p._id === slug || p.slug === slug);
+        const found = res.data.find(
+          (p) => p._id === slug || p.slug === slug
+        );
 
         setProduct(found);
       } catch (error) {
@@ -117,7 +121,11 @@ function ProductPage() {
   // RELATED PRODUCTS
   // ======================
   const relatedProducts = allProducts
-    .filter((p) => p.category === product.category && p._id !== product._id)
+    .filter(
+      (p) =>
+        p.category === product.category &&
+        p._id !== product._id
+    )
     .slice(0, 4);
 
   const wished = wishlist.includes(product._id);
@@ -125,13 +133,15 @@ function ProductPage() {
   // ======================
   // STOCK
   // ======================
-  const selectedStock = product.sizes?.[size] || 0;
+  const selectedStock =
+    product.sizes?.[size] || 0;
 
   return (
     <div className="pt-28 md:pt-36 pb-24">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
+
         {/* BREADCRUMB */}
-        <nav className="text-xs tracking-[0.3em] mb-8">
+        <nav className="text-[10px] md:text-xs tracking-[0.25em] md:tracking-[0.3em] mb-6 md:mb-8 break-words">
           <Link to="/">HOME</Link>
 
           {" / "}
@@ -143,15 +153,15 @@ function ProductPage() {
           <span>{product.name?.toUpperCase()}</span>
         </nav>
 
-        <div ref={galleryRef} className="grid lg:grid-cols-12 gap-10">
+        <div
+          ref={galleryRef}
+          className="grid lg:grid-cols-12 gap-8 md:gap-10"
+        >
+
           {/* LEFT */}
-          {/*
-            FIX 1: Changed grid-cols-[80px_minmax(0,1fr)] to grid-cols-1 on mobile,
-            so the thumbnail sidebar doesn't squeeze the main image.
-            The 80px thumb column is restored at md+ via md:grid-cols-[80px_minmax(0,1fr)].
-          */}
           <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-[80px_minmax(0,1fr)] gap-4 min-w-0">
-            {/* THUMBNAILS — hidden on mobile, shown at md+ */}
+
+            {/* THUMBNAILS */}
             <div className="hidden md:block">
               <Swiper
                 onSwiper={setThumbsSwiper}
@@ -166,7 +176,10 @@ function ProductPage() {
                 {product.images?.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
-                      src={img?.url || "/placeholder.png"}
+                      src={
+                        img?.url ||
+                        "/placeholder.png"
+                      }
                       className="h-[140px] w-full object-cover cursor-pointer"
                       alt={product.name}
                     />
@@ -176,109 +189,123 @@ function ProductPage() {
             </div>
 
             {/* MAIN IMAGE */}
-            {/*
-              FIX 2: Replaced h-[70vh] sm:h-[80vh] lg:h-[600px] with:
-                - aspect-[3/4]        → portrait ratio on mobile (scales with screen width)
-                - sm:aspect-auto      → disable aspect-ratio on sm+
-                - sm:h-[80vh]         → restore vh height on sm+
-                - lg:h-[600px]        → fixed height on desktop
-              This prevents the image from being too tall or cut off on small screens.
-            */}
-<div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px] relative">
-  <Swiper
-    modules={[Pagination, Thumbs]}
-    slidesPerView={1}
-    spaceBetween={0}
-    grabCursor={true}
-    touchRatio={1}
-    simulateTouch={true}
-    pagination={{
-      clickable: true,
-    }}
-    thumbs={{
-      swiper:
-        window.innerWidth >= 768 &&
-        thumbsSwiper &&
-        !thumbsSwiper.destroyed
-          ? thumbsSwiper
-          : null,
-    }}
-    className="h-full w-full product-swiper"
-  >
-    {product.images?.map((img, i) => (
-      <SwiperSlide key={i}>
-        <div className="relative w-full h-full">
-          <img
-            src={img?.url || "/placeholder.png"}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-</div>
+            <div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px] relative rounded-2xl">
+
+              <Swiper
+                modules={[Pagination, Thumbs]}
+                slidesPerView={1}
+                spaceBetween={0}
+                grabCursor={true}
+                touchRatio={1}
+                simulateTouch={true}
+                pagination={{
+                  clickable: true,
+                }}
+                thumbs={{
+                  swiper:
+                    window.innerWidth >= 768 &&
+                    thumbsSwiper &&
+                    !thumbsSwiper.destroyed
+                      ? thumbsSwiper
+                      : null,
+                }}
+                className="h-full w-full product-swiper"
+              >
+                {product.images?.map((img, i) => (
+                  <SwiperSlide key={i}>
+                    <div className="relative w-full h-full">
+                      <img
+                        src={
+                          img?.url ||
+                          "/placeholder.png"
+                        }
+                        alt={product.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           </div>
 
           {/* RIGHT */}
-          <div className="lg:col-span-5 lg:sticky lg:top-32">
+          <div className="lg:col-span-5 lg:sticky lg:top-32 h-fit">
+
             <div className="pd-fade">
+
               {product.badge && (
-                <span className="text-xs px-3 py-1 bg-black text-white">
+                <span className="text-[10px] md:text-xs px-3 py-1 bg-black text-white">
                   {product.badge}
                 </span>
               )}
 
-              <p className="mt-4 text-xs tracking-widest uppercase opacity-60">
+              <p className="mt-4 text-[10px] md:text-xs tracking-[0.2em] md:tracking-widest uppercase opacity-60">
                 {product.category}
               </p>
 
-              <h1 className="text-4xl mt-2 font-semibold">{product.name}</h1>
+              <h1 className="text-3xl sm:text-4xl mt-2 font-semibold leading-tight break-words">
+                {product.name}
+              </h1>
 
               {/* RATING */}
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex items-center flex-wrap gap-2 mt-3">
+
                 <div className="flex gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <FiStar key={i} />
-                  ))}
+                  {Array.from({ length: 5 }).map(
+                    (_, i) => (
+                      <FiStar key={i} />
+                    )
+                  )}
                 </div>
 
-                <span className="text-sm opacity-70">5.0 (120 Reviews)</span>
+                <span className="text-sm opacity-70">
+                  5.0 (120 Reviews)
+                </span>
               </div>
 
               {/* PRICE */}
-              <div className="mt-5 text-3xl font-semibold">
+              <div className="mt-5 text-2xl md:text-3xl font-semibold">
                 ₹{product.price}
               </div>
 
               {/* DESCRIPTION */}
-              <p className="mt-5 text-sm opacity-70 leading-7">
+              <p className="mt-5 text-sm md:text-[15px] opacity-70 leading-7 break-words">
                 {product.description}
               </p>
             </div>
 
             {/* SIZE */}
             <div className="mt-8">
-              <p className="text-xs tracking-widest mb-3">SIZE: {size}</p>
+
+              <p className="text-xs tracking-widest mb-3">
+                SIZE: {size}
+              </p>
 
               <div className="flex gap-2 flex-wrap">
-                {Object.entries(product.sizes || {}).map(([s, stock]) => {
-                  const outOfStock = stock <= 0;
+
+                {Object.entries(
+                  product.sizes || {}
+                ).map(([s, stock]) => {
+                  const outOfStock =
+                    stock <= 0;
 
                   return (
                     <button
                       key={s}
                       disabled={outOfStock}
                       onClick={() => setSize(s)}
-                      className={`px-4 py-2 border transition ${
-                        size === s ? "bg-black text-white" : ""
+                      className={`min-w-[52px] px-4 py-2 border text-sm transition ${
+                        size === s
+                          ? "bg-black text-white"
+                          : ""
                       } ${
                         outOfStock
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-black hover:text-white"
                       }`}
                     >
-                      {s} ({stock})
+                      {s}
                     </button>
                   );
                 })}
@@ -286,24 +313,38 @@ function ProductPage() {
             </div>
 
             {/* QUANTITY + CART */}
-            <div className="flex gap-3 mt-8 items-center flex-wrap">
+            <div className="flex flex-col sm:flex-row gap-3 mt-8 items-stretch sm:items-center">
+
               {/* QTY */}
-              <div className="flex border items-center h-[52px]">
+              <div className="flex border items-center h-[52px] w-full sm:w-fit justify-between sm:justify-normal">
+
                 <button
-                  className="px-4 h-full"
-                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  type="button"
+                  className="px-4 h-full flex items-center justify-center"
+                  onClick={() =>
+                    setQty(Math.max(1, qty - 1))
+                  }
                 >
                   <FiMinus />
                 </button>
 
-                <span className="px-5">{qty}</span>
+                <span className="px-5 font-medium">
+                  {qty}
+                </span>
 
                 <button
-                  className="px-4 h-full"
+                  type="button"
+                  className="px-4 h-full flex items-center justify-center"
                   onClick={() => {
-                    if (qty < selectedStock) {
-                      setQty(qty + 1);
+                    if (qty >= selectedStock) {
+                      toast.error(
+                        `Only ${selectedStock} items available`
+                      );
+
+                      return;
                     }
+
+                    setQty(qty + 1);
                   }}
                 >
                   <FiPlus />
@@ -315,18 +356,26 @@ function ProductPage() {
                 disabled={selectedStock === 0}
                 onClick={() => {
                   if (qty > selectedStock) {
-                    alert("Out of stock");
+                    toast.error(
+                      `Only ${selectedStock} items available`
+                    );
 
                     return;
                   }
 
                   addToCart(product, size, qty);
+
+                  toast.success(
+                    "Added to cart"
+                  );
                 }}
-                className="bg-black text-white px-8 py-4 hover:opacity-90 transition disabled:opacity-40"
+                className="w-full sm:w-auto bg-black text-white px-6 md:px-8 py-4 text-sm md:text-base hover:opacity-90 transition disabled:opacity-40"
               >
                 {selectedStock === 0
                   ? "OUT OF STOCK"
-                  : `ADD TO BAG • ₹${product.price * qty}`}
+                  : `ADD TO BAG • ₹${
+                      product.price * qty
+                    }`}
               </button>
             </div>
 
@@ -341,12 +390,18 @@ function ProductPage() {
 
         {/* RELATED PRODUCTS */}
         {relatedProducts.length > 0 && (
-          <div className="mt-28">
-            <h2 className="text-3xl mb-10">You Might Also Like</h2>
+          <div className="mt-20 md:mt-28">
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <h2 className="text-2xl md:text-3xl mb-8 md:mb-10">
+              You Might Also Like
+            </h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
               {relatedProducts.map((p) => (
-                <ProductCard key={p._id} p={p} />
+                <ProductCard
+                  key={p._id}
+                  p={p}
+                />
               ))}
             </div>
           </div>
