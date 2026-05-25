@@ -15,7 +15,7 @@ const AppCtx = createContext(null);
 
 const API =
   import.meta.env.VITE_API_URL ||
-  "https://your-backend-url.onrender.com";
+  "https://inspirit-clothing-jsx.onrender.com";
 
 // ======================
 // SAFE LOCAL STORAGE
