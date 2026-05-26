@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Counter from '@/components/site/Counter';
-import ImageOne from '../assets/cover_img1.jpg'
+import ImageOne from '../assets/inspirits-img.png'
 gsap.registerPlugin(ScrollTrigger);
 ({ component: About,
     head: () => ({ meta: [{ title: 'Story — INSPIRIT Clothing' }, { name: 'description', content: 'The INSPIRIT manifesto, atelier and the people behind the ritual.' }] }),
@@ -19,9 +19,9 @@ function About() {
         }, root);
         return () => ctx.revert();
     }, []);
-    return (<div ref={root} className="bone-section pt-32 md:pt-40 pb-24">
+    return (<div ref={root} className="bone-section pt-32 md:pt-40">
       <section className="ink-section -mt-32 md:-mt-40 pt-44 md:pt-56 pb-28 relative overflow-hidden">
-        <img src= {ImageOne} className="absolute inset-0 h-full w-full object-cover opacity-60"/>
+        <img src= "" className="absolute inset-0 h-full w-full object-cover opacity-60"/>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black"/>
         <div className="relative mx-auto max-w-[1500px] px-5 md:px-10">
           <p className="text-grotesk text-xs tracking-[0.4em] text-[oklch(0.65_0.25_27)]">— THE HOUSE</p>
@@ -72,6 +72,98 @@ function About() {
           <Counter to={1} suffix=" CITY" label="CHENNAI"/>
         </div>
       </section>
+<section className="py-24 md:py-32 bg-[#ece7df] overflow-hidden">
+  <div className="mx-auto max-w-7xl px-5 md:px-10">
+
+    {/* Heading */}
+    <div className="text-center reveal">
+      <p className="text-[11px] tracking-[0.45em] uppercase text-[oklch(0.65_0.25_27)]">
+        — OUR STREET ROOTS
+      </p>
+
+      <h2 className="mt-5 text-display text-5xl md:text-7xl uppercase leading-[0.9] text-[#111]">
+        BUILT FROM <br />
+        THE STREETS
+      </h2>
+
+      <p className="mt-6 max-w-2xl mx-auto text-black/55 leading-relaxed">
+        INSPIRIT began with a single push cart, moving through the streets of
+        Chennai with oversized silhouettes, heavyweight fabrics, and a vision
+        to build culture through clothing.
+      </p>
+    </div>
+
+    {/* Main Showcase */}
+    <div className="reveal mt-16 relative rounded-[36px] overflow-hidden border border-black/5 bg-[#f5efe7] shadow-[0_25px_80px_rgba(0,0,0,0.08)]">
+
+      {/* Soft Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-black/[0.03]" />
+
+      <div className="relative grid lg:grid-cols-2 gap-10 items-center p-8 md:p-14">
+
+        {/* Left Content */}
+        <div>
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-black text-white text-xs tracking-[0.25em] uppercase">
+            <span className="h-2 w-2 rounded-full bg-[oklch(0.65_0.25_27)] animate-pulse" />
+            Since 2025
+          </div>
+
+          <h3 className="mt-8 text-display text-4xl md:text-6xl leading-[0.95] text-[#111] uppercase">
+            From Push Cart <br />
+            To Culture
+          </h3>
+
+          <p className="mt-6 text-black/60 leading-relaxed max-w-lg">
+            What started as a moving cart became a statement. Every collection
+            carries the energy of Chennai streets — raw, fearless, and
+            community-driven.
+          </p>
+
+          {/* Stats */}
+          <div className="mt-10 grid grid-cols-2 gap-5">
+            <div className="rounded-3xl bg-white p-6 border border-black/5">
+              <h4 className="text-4xl font-black text-[#111]">01</h4>
+              <p className="mt-2 text-sm uppercase tracking-[0.2em] text-black/50">
+                Push Cart
+              </p>
+            </div>
+
+            <div className="rounded-3xl bg-white p-6 border border-black/5">
+              <h4 className="text-4xl font-black text-[#111]">100+</h4>
+              <p className="mt-2 text-sm uppercase tracking-[0.2em] text-black/50">
+                Pieces Sold
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Image */}
+        <div className="relative">
+
+          <div className="absolute -top-5 -right-5 h-40 w-40 rounded-full bg-[oklch(0.65_0.25_27/.15)] blur-3xl" />
+
+          <img
+            src={ImageOne}
+            alt="INSPIRIT Street Cart"
+            className="relative z-10 w-full object-contain"
+          />
+
+          {/* Floating Card */}
+          {/* <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 bg-white rounded-3xl px-6 py-5 shadow-2xl border border-black/5 z-20">
+
+            <p className="text-[10px] tracking-[0.35em] uppercase text-[oklch(0.65_0.25_27)]">
+              CHAPTER 01
+            </p>
+
+            <h4 className="mt-2 text-2xl md:text-4xl font-black uppercase text-[#111] leading-none">
+              STREET CART
+            </h4> */}
+          {/* </div> */}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
     </div>);
 }
 export default About;
