@@ -46,6 +46,7 @@ router.delete("/clear/:email", async (req, res) => {
       if (product) {
         const currentStock = product.sizes.get(item.size) || 0;
         product.sizes.set(item.size, currentStock + item.qty);
+        product.markModified("sizes"); // ✅
         await product.save();
       }
     }
