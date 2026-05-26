@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Counter from '@/components/site/Counter';
-import ImageOne from '../assets/inspirits-img.png'
+import ImageOne from '../assets/Inspirits-img.png'
 gsap.registerPlugin(ScrollTrigger);
 ({ component: About,
     head: () => ({ meta: [{ title: 'Story — INSPIRIT Clothing' }, { name: 'description', content: 'The INSPIRIT manifesto, atelier and the people behind the ritual.' }] }),
