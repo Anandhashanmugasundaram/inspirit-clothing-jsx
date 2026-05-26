@@ -48,10 +48,10 @@ function About() {
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-white/10"/>
             <div className="timeline-bar absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-[oklch(0.55_0.25_27)]" style={{ boxShadow: '0 0 12px oklch(0.55 0.25 27)' }}/>
             {[
-            { y: '2019', t: 'Founded', d: 'A one-room atelier in Lisbon. Three friends, one sewing machine, one promise.' },
-            { y: '2021', t: 'Chapter 01', d: 'Our first numbered jersey. 300 pieces. Sold out in 9 minutes.' },
-            { y: '2023', t: 'The Cathedral Cut', d: 'We unveiled the silhouette that defined the house. Architectural, sacred, heavy.' },
-            { y: '2026', t: 'Chapter 07 — Ashes', d: 'The current rite. Blood-tone palette. Unisex by faith.' },
+            { y: '2025', t: 'Founded', d: 'Started in Chennai with a vision, launched our Instagram page, and began selling our first collection online.' },
+            { y: '2025', t: 'Chapter 01', d: 'Opened our first push cart in Chennai, bringing the brand directly to the streets and community.' },
+            { y: '2026', t: 'The Chapter 02', d: 'Preparing to open our first official store in Chennai — a new chapter for the brand and its journey.' },
+            // { y: '202', t: 'Chapter 07 — Ashes', d: 'The current rite. Blood-tone palette. Unisex by faith.' },
         ].map((it, i) => (<div key={i} className={`reveal relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10 mb-14 ${i % 2 ? 'md:text-left' : 'md:text-right'}`}>
                 <div className={`absolute left-2.5 md:left-1/2 top-1.5 -ml-1.5 h-3 w-3 rounded-full bg-[oklch(0.55_0.25_27)] animate-pulse-glow`}/>
                 <div className={i % 2 ? 'md:col-start-2' : ''}>
