@@ -27,7 +27,6 @@ const getCartItems = async (req, res) => {
 
 // ==============================
 // ADD TO CART
-// ✅ Validates stock from DB and decrements it
 // ==============================
 const addToCart = async (req, res) => {
   try {
@@ -42,7 +41,6 @@ const addToCart = async (req, res) => {
 
     const addQty = qty || 1;
 
-    // ✅ Always read stock from DB — never trust the client
     const product = await Product.findById(productId);
     if (!product) {
       return res
@@ -57,13 +55,11 @@ const addToCart = async (req, res) => {
         .json({ success: false, message: `Size ${size} not found` });
     }
 
-    // ✅ Check if already in cart (same product + size)
     const existingItem = await Cart.findOne({ userEmail, productId, size });
 
     if (existingItem) {
       const newQty = existingItem.qty + addQty;
 
-      // ✅ Reject if combined qty exceeds stock
       if (newQty > currentStock) {
         return res.status(400).json({
           success: false,
@@ -72,11 +68,11 @@ const addToCart = async (req, res) => {
       }
 
       existingItem.qty = newQty;
-      existingItem.stock = currentStock; // keep snapshot fresh
+      existingItem.stock = currentStock;
       await existingItem.save();
 
-      // ✅ Decrement product stock
       product.sizes.set(size, currentStock - addQty);
+      product.markModified("sizes"); // ✅
       await product.save();
 
       return res.json({
@@ -86,7 +82,6 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // ✅ New item — check stock
     if (addQty > currentStock) {
       return res.status(400).json({
         success: false,
@@ -103,13 +98,13 @@ const addToCart = async (req, res) => {
       price,
       size,
       qty: addQty,
-      stock: currentStock, // ✅ Save real stock from DB
+      stock: currentStock,
     });
 
     await item.save();
 
-    // ✅ Decrement product stock
     product.sizes.set(size, currentStock - addQty);
+    product.markModified("sizes"); // ✅
     await product.save();
 
     res.status(201).json({
@@ -124,7 +119,6 @@ const addToCart = async (req, res) => {
 
 // ==============================
 // UPDATE CART QTY
-// ✅ Adjusts product stock based on qty change (diff)
 // ==============================
 const updateCartQty = async (req, res) => {
   try {
@@ -152,9 +146,8 @@ const updateCartQty = async (req, res) => {
 
     const currentStock = product.sizes.get(cartItem.size) || 0;
     const oldQty = cartItem.qty;
-    const diff = qty - oldQty; // positive = wants more, negative = reducing
+    const diff = qty - oldQty;
 
-    // ✅ Only block if user wants MORE than available
     if (diff > 0 && diff > currentStock) {
       return res.status(400).json({
         success: false,
@@ -162,13 +155,11 @@ const updateCartQty = async (req, res) => {
       });
     }
 
-    // ✅ Adjust product stock by the difference
     product.sizes.set(cartItem.size, currentStock - diff);
+    product.markModified("sizes"); // ✅
     await product.save();
 
-    // ✅ Update cart qty and refresh stock snapshot
     cartItem.qty = qty;
-    // stock snapshot = how many are left + what's in the cart (total available if emptied)
     cartItem.stock = currentStock - diff + qty;
     await cartItem.save();
 
@@ -184,7 +175,6 @@ const updateCartQty = async (req, res) => {
 
 // ==============================
 // DELETE CART ITEM
-// ✅ Restores product stock when item removed
 // ==============================
 const deleteCartItem = async (req, res) => {
   try {
@@ -201,11 +191,11 @@ const deleteCartItem = async (req, res) => {
         .json({ success: false, message: "Cart item not found" });
     }
 
-    // ✅ Give stock back to product
     const product = await Product.findById(deleted.productId);
     if (product) {
       const currentStock = product.sizes.get(deleted.size) || 0;
       product.sizes.set(deleted.size, currentStock + deleted.qty);
+      product.markModified("sizes"); // ✅
       await product.save();
     }
 

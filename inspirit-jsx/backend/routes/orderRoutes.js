@@ -8,24 +8,12 @@ const Product = require("../models/Product");
 // ======================
 router.post("/", async (req, res) => {
   try {
-    const {
-      userEmail,
-      customer,
-      items,
-      subtotal,
-      shipping,
-      total,
-    } = req.body;
+    const { userEmail, customer, items, subtotal, shipping, total } = req.body;
 
     if (!items || items.length === 0) {
-      return res.status(400).json({
-        message: "No items in order",
-      });
+      return res.status(400).json({ message: "No items in order" });
     }
 
-    // ======================
-    // FORMAT ITEMS (IMPORTANT)
-    // ======================
     const formattedItems = items.map((item) => ({
       productId: item.productId,
       name: item.name,
@@ -35,34 +23,9 @@ router.post("/", async (req, res) => {
       size: item.size,
     }));
 
-    // ======================
-    // CHECK STOCK + REDUCE
-    // ======================
-    for (const item of items) {
-      const product = await Product.findById(item.productId);
+    // ✅ NO stock check here — already handled at addToCart
+    // ✅ NO stock decrement here — already decremented at addToCart
 
-      if (!product) continue;
-
-      const currentStock = product.sizes.get(item.size) || 0;
-
-      if (currentStock < item.qty) {
-        return res.status(400).json({
-          message: `Only ${currentStock} left for ${product.name} (${item.size})`,
-        });
-      }
-
-      product.sizes.set(
-        item.size,
-        currentStock - item.qty
-      );
-
-      product.markModified("sizes");
-      await product.save();
-    }
-
-    // ======================
-    // CREATE ORDER
-    // ======================
     const order = await Order.create({
       userEmail,
       customer,
@@ -73,13 +36,10 @@ router.post("/", async (req, res) => {
       status: "Pending",
     });
 
-    res.json(order);
-
+    res.status(201).json(order);
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
