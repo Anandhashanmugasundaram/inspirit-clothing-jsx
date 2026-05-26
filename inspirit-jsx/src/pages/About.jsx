@@ -50,7 +50,7 @@ function About() {
             {[
             { y: '2025', t: 'Founded', d: 'Started in Chennai with a vision, launched our Instagram page, and began selling our first collection online.' },
             { y: '2025', t: 'Chapter 01', d: 'Opened our first push cart in Chennai, bringing the brand directly to the streets and community.' },
-            { y: '2026', t: 'The Cathedral Cut', d: 'Preparing to open our first official store in Chennai — a new chapter for the brand and its journey.' },
+            { y: '2026', t: 'The Chapter 02', d: 'Preparing to open our first official store in Chennai — a new chapter for the brand and its journey.' },
             // { y: '202', t: 'Chapter 07 — Ashes', d: 'The current rite. Blood-tone palette. Unisex by faith.' },
         ].map((it, i) => (<div key={i} className={`reveal relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10 mb-14 ${i % 2 ? 'md:text-left' : 'md:text-right'}`}>
                 <div className={`absolute left-2.5 md:left-1/2 top-1.5 -ml-1.5 h-3 w-3 rounded-full bg-[oklch(0.55_0.25_27)] animate-pulse-glow`}/>
@@ -65,11 +65,11 @@ function About() {
       </section>
 
       <section className="ink-section pb-28">
-        <div className="mx-auto max-w-[1500px] px-5 md:px-10 grid grid-cols-2 md:grid-cols-4 gap-10">
-          <Counter to={300} label="PIECES PER DROP"/>
-          <Counter to={7} label="CHAPTERS"/>
-          <Counter to={14} label="ATELIER HANDS"/>
-          <Counter to={1} suffix=" CITY" label="LISBON"/>
+        <div className="mx-auto max-w-375 px-5 md:px-10 grid grid-cols-2 md:grid-cols-4 gap-10">
+          <Counter to={150} label="PIECES DROP"/>
+          <Counter to={3} label="CHAPTERS"/>
+          <Counter to={1} label="ATELIER HANDS"/>
+          <Counter to={1} suffix=" CITY" label="CHENNAI"/>
         </div>
       </section>
     </div>);
