@@ -36,11 +36,11 @@ router.delete("/:id", deleteCartItem);
 // CLEAR USER CART
 // ✅ Restores stock for all items before clearing
 // ======================
+// ✅ MUST be before router.delete("/:id", ...)
 router.delete("/clear/:email", async (req, res) => {
   try {
     const items = await Cart.find({ userEmail: req.params.email });
 
-    // ✅ Restore each item's qty back to product stock
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (product) {
@@ -51,11 +51,13 @@ router.delete("/clear/:email", async (req, res) => {
     }
 
     await Cart.deleteMany({ userEmail: req.params.email });
-
     res.json({ success: true, message: "Cart cleared" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+// ⚠️ This must come AFTER /clear/:email
+router.delete("/:id", deleteCartItem);
 
 module.exports = router;
