@@ -74,12 +74,14 @@ function ProductPage() {
   }, [slug]);
 
   // ======================
-  // DEFAULT SIZE
+  // DEFAULT SIZE — pick first size WITH stock
   // ======================
   useEffect(() => {
     if (product?.sizes) {
-      const firstSize = Object.keys(product.sizes)[0];
-      setSize(firstSize);
+      const firstAvailable = Object.entries(product.sizes).find(
+        ([, stock]) => stock > 0
+      )?.[0];
+      setSize(firstAvailable || Object.keys(product.sizes)[0]);
     }
   }, [product]);
 
@@ -141,6 +143,13 @@ function ProductPage() {
   // ======================
   const selectedStock = product.sizes?.[size] || 0;
 
+  // ======================
+  // ALL SIZES OUT OF STOCK
+  // ======================
+  const allOutOfStock = Object.values(product.sizes || {}).every(
+    (stock) => stock <= 0
+  );
+
   return (
     <div className="pt-28 md:pt-36 pb-24">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
@@ -182,6 +191,15 @@ function ProductPage() {
 
             {/* MAIN IMAGE */}
             <div className="pd-image w-full min-w-0 overflow-hidden aspect-[3/4] sm:aspect-auto sm:h-[80vh] lg:h-[600px] relative rounded-2xl">
+              {/* SOLD OUT OVERLAY */}
+              {allOutOfStock && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px] rounded-2xl">
+                  <span className="bg-white text-black text-[10px] font-bold tracking-[0.35em] px-5 py-2 rounded-full shadow-lg">
+                    OUT OF STOCK
+                  </span>
+                </div>
+              )}
+
               <Swiper
                 modules={[Pagination, Thumbs]}
                 slidesPerView={1}
@@ -206,7 +224,9 @@ function ProductPage() {
                       <img
                         src={img?.url || "/placeholder.png"}
                         alt={product.name}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className={`absolute inset-0 w-full h-full object-cover ${
+                          allOutOfStock ? "grayscale opacity-60" : ""
+                        }`}
                       />
                     </div>
                   </SwiperSlide>
@@ -218,9 +238,15 @@ function ProductPage() {
           {/* RIGHT */}
           <div className="lg:col-span-5 lg:sticky lg:top-32 h-fit">
             <div className="pd-fade">
-              {product.badge && (
+              {product.badge && !allOutOfStock && (
                 <span className="text-[10px] md:text-xs px-3 py-1 bg-black text-white">
                   {product.badge}
+                </span>
+              )}
+
+              {allOutOfStock && (
+                <span className="text-[10px] md:text-xs px-3 py-1 bg-red-600 text-white">
+                  SOLD OUT
                 </span>
               )}
 
@@ -243,7 +269,7 @@ function ProductPage() {
               </div>
 
               {/* PRICE */}
-              <div className="mt-5 text-2xl md:text-3xl font-semibold">
+              <div className={`mt-5 text-2xl md:text-3xl font-semibold ${allOutOfStock ? "opacity-40" : ""}`}>
                 ₹{product.price}
               </div>
 
@@ -270,7 +296,7 @@ function ProductPage() {
                         size === s ? "bg-black text-white" : ""
                       } ${
                         outOfStock
-                          ? "opacity-40 cursor-not-allowed"
+                          ? "opacity-40 cursor-not-allowed line-through"
                           : "hover:bg-black hover:text-white"
                       }`}
                     >
@@ -284,7 +310,7 @@ function ProductPage() {
             {/* QUANTITY + CART */}
             <div className="flex flex-col sm:flex-row gap-3 mt-8 items-stretch sm:items-center">
               {/* QTY */}
-              <div className="flex border items-center h-[52px] w-full sm:w-fit justify-between sm:justify-normal">
+              <div className={`flex border items-center h-[52px] w-full sm:w-fit justify-between sm:justify-normal ${allOutOfStock ? "opacity-40 pointer-events-none" : ""}`}>
                 <button
                   type="button"
                   className="px-4 h-full flex items-center justify-center"
@@ -320,12 +346,14 @@ function ProductPage() {
                   }
 
                   await addToCart(product, size, qty);
-                  await refetchProduct(); // ✅ refresh stock display
-                  setQty(1); // ✅ reset qty
+                  await refetchProduct();
+                  setQty(1);
                 }}
-                className="w-full sm:w-auto bg-black text-white px-6 md:px-8 py-4 text-sm md:text-base hover:opacity-90 transition disabled:opacity-40"
+                className="w-full sm:w-auto bg-black text-white px-6 md:px-8 py-4 text-sm md:text-base hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {selectedStock === 0
+                {allOutOfStock
+                  ? "SOLD OUT"
+                  : selectedStock === 0
                   ? "OUT OF STOCK"
                   : `ADD TO BAG • ₹${product.price * qty}`}
               </button>
@@ -333,9 +361,11 @@ function ProductPage() {
 
             {/* STOCK TEXT */}
             <p className="mt-4 text-sm opacity-60">
-              {selectedStock > 0
+              {allOutOfStock
+                ? "This product is currently sold out"
+                : selectedStock > 0
                 ? `${selectedStock} items left`
-                : "Currently unavailable"}
+                : "This size is unavailable"}
             </p>
           </div>
         </div>
