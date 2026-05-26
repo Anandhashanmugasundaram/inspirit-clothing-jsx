@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Counter from '@/components/site/Counter';
-import ImageOne from '../assets/Inspirits-img.png'
+import ImageOne from '../assets/Inspirits-img.png';
+// import ImageTwo from '../assets/Inspirits-img-2.png';
 gsap.registerPlugin(ScrollTrigger);
 ({ component: About,
     head: () => ({ meta: [{ title: 'Story — INSPIRIT Clothing' }, { name: 'description', content: 'The INSPIRIT manifesto, atelier and the people behind the ritual.' }] }),
@@ -21,7 +22,7 @@ function About() {
     }, []);
     return (<div ref={root} className="bone-section pt-32 md:pt-40">
       <section className="ink-section -mt-32 md:-mt-40 pt-44 md:pt-56 pb-28 relative overflow-hidden">
-        <img src= "" className="absolute inset-0 h-full w-full object-cover opacity-60"/>
+        {/* <img src= {ImageOne} className="absolute inset-0 h-full w-full object-cover opacity-60"/> */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black"/>
         <div className="relative mx-auto max-w-[1500px] px-5 md:px-10">
           <p className="text-grotesk text-xs tracking-[0.4em] text-[oklch(0.65_0.25_27)]">— THE HOUSE</p>
@@ -95,7 +96,6 @@ function About() {
 
     {/* Main Showcase */}
     <div className="reveal mt-16 relative rounded-[36px] overflow-hidden border border-black/5 bg-[#f5efe7] shadow-[0_25px_80px_rgba(0,0,0,0.08)]">
-
       {/* Soft Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-black/[0.03]" />
 
