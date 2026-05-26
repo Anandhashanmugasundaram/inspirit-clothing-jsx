@@ -69,7 +69,7 @@ function Home() {
       try {
         const res = await axios.get(`${API}/api/products`);
 
-        console.log("HOME PRODUCTS:", res.data);
+        // console.log("HOME PRODUCTS:", res.data);
 
         setProducts(res.data);
       } catch (error) {

@@ -84,11 +84,11 @@ export default function Navbar() {
               <Link
                 key={n.to}
                 to={n.to}
-                className="text-grotesk text-sm tracking-[0.25em] text-slate-300 hover:text-cyan-400 relative group transition duration-300"
+                className="text-grotesk text-sm tracking-[0.25em] text-slate-300 hover:text-[oklch(0.65_0.25_27)] relative group transition duration-300"
               >
                 {n.label}
 
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-cyan-400 transition-all duration-500 group-hover:w-full" />
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-[oklch(0.65_0.25_27)] transition-all duration-500 group-hover:w-full" />
               </Link>
             ))}
           </nav>
@@ -97,7 +97,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-5 text-white">
             {/* SEARCH */}
             <button
-              className="hover:text-cyan-400 transition duration-300"
+              className="hover:text-[oklch(0.65_0.25_27)] transition duration-300"
               aria-label="Search"
             >
               <FiSearch className="text-xl" />
@@ -110,7 +110,7 @@ export default function Navbar() {
                   {/* AVATAR */}
                   <button
                     onClick={() => setProfileOpen((p) => !p)}
-                    className="hover:text-cyan-400 transition duration-300"
+                    className="hover:text-[oklch(0.65_0.25_27)] transition duration-300"
                   >
                     <img
                       src={
@@ -170,13 +170,13 @@ export default function Navbar() {
             {/* CART */}
             <Link
               to="/cart"
-              className="relative hover:text-cyan-400 transition duration-300"
+              className="relative hover:text-[oklch(0.65_0.25_27)] transition duration-300"
               aria-label="Bag"
             >
               <FiShoppingBag className="text-xl" />
 
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-[oklch(0.65_0.25_27)] text-black font-bold flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -189,12 +189,12 @@ export default function Navbar() {
   {/* CART */}
   <Link
     to="/cart"
-    className="relative hover:text-cyan-400 transition duration-300"
+    className="relative hover:text-[oklch(0.65_0.25_27)] transition duration-300"
   >
     <FiShoppingBag className="text-2xl" />
 
     {cartCount > 0 && (
-      <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
+      <span className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] rounded-full bg-[oklch(0.65_0.25_27)] text-black font-bold flex items-center justify-center">
         {cartCount}
       </span>
     )}
@@ -203,7 +203,7 @@ export default function Navbar() {
   {/* MENU */}
   <button
     onClick={() => setOpen(true)}
-    className="hover:text-cyan-400 transition duration-300"
+    className="hover:text-[oklch(0.65_0.25_27)] transition duration-300"
   >
     <HiOutlineMenuAlt4 className="text-2xl" />
   </button>
@@ -249,7 +249,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="group block py-4 border-b border-white/10"
               >
-                <span className="text-grotesk text-3xl text-white group-hover:text-cyan-400 transition duration-300">
+                <span className="text-grotesk text-3xl text-white group-hover:text-[oklch(0.65_0.25_27)] transition duration-300">
                   {String(i + 1).padStart(2, "0")}. {n.label}
                 </span>
               </Link>
@@ -260,7 +260,7 @@ export default function Navbar() {
           <div className="mt-10 flex flex-col gap-4">
             <Link
               to="/account"
-              className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+              className="flex items-center gap-3 text-white hover:text-[oklch(0.65_0.25_27)] transition"
             >
               <FiUser />
               Account
@@ -269,7 +269,7 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+                className="flex items-center gap-3 text-white hover:text-[oklch(0.65_0.25_27)] transition"
               >
                 <FiShield />
                 Admin
@@ -278,7 +278,7 @@ export default function Navbar() {
 
             <Link
               to="/cart"
-              className="flex items-center gap-3 text-white hover:text-cyan-400 transition"
+              className="flex items-center gap-3 text-white hover:text-[oklch(0.65_0.25_27)] transition"
             >
               <FiShoppingBag />
               Cart ({cartCount})
@@ -300,7 +300,7 @@ export default function Navbar() {
     {/* HOME */}
     <Link
       to="/"
-      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+      className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
     >
       <FiHome className="text-lg" />
 
@@ -312,7 +312,7 @@ export default function Navbar() {
     {/* SHOP */}
     <Link
       to="/shop"
-      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+      className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
     >
       <FiShoppingBag className="text-lg" />
 
@@ -323,7 +323,7 @@ export default function Navbar() {
     {/* SHOP */}
     <Link
       to="/offers"
-      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+      className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
     >
       <FiGift className="text-lg" />
 
@@ -335,7 +335,7 @@ export default function Navbar() {
     {/* ACCOUNT */}
     <Link
       to="/account"
-      className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+      className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
     >
       <FiUser className="text-lg" />
 
@@ -348,7 +348,7 @@ export default function Navbar() {
     {isAdmin && (
       <Link
         to="/admin"
-        className="flex flex-col items-center gap-1 hover:text-cyan-400 transition duration-300"
+        className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
       >
         <FiShield className="text-lg" />
 
