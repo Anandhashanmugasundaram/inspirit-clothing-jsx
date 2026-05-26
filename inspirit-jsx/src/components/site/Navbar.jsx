@@ -9,7 +9,8 @@ import {
   FiShoppingBag,
   FiShield,
   FiSearch,
-  FiGift
+  FiGift,
+  FiBook
 } from "react-icons/fi";
 
 import Logo from "./Logo";
@@ -329,6 +330,16 @@ export default function Navbar() {
 
       <span className="text-[10px] tracking-[0.2em] text-grotesk">
         OFFERS
+      </span>
+    </Link>
+    <Link
+      to="/story"
+      className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
+    >
+      <FiBook className="text-lg" />
+
+      <span className="text-[10px] tracking-[0.2em] text-grotesk">
+        STORY
       </span>
     </Link>
 
