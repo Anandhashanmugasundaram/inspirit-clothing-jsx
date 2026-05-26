@@ -32,10 +32,10 @@ function Checkout() {
   const [stateCode, setStateCode] = useState("TN");
   const [city, setCity] = useState("Chennai");
 
-  // ✅ Stores the pending order data while waiting for WhatsApp confirmation
+  // Stores the pending order data while waiting for WhatsApp confirmation
   const [pendingOrder, setPendingOrder] = useState(null);
 
-  // ✅ Shows the "Did you send?" confirmation dialog
+  // Shows the "Did you send?" confirmation dialog
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [saving, setSaving] = useState(false);
@@ -81,13 +81,38 @@ function Checkout() {
     if (!nameRegex.test(lastName)) return toast.error("Invalid last name");
     if (!city) return toast.error("Select city");
     if (!state) return toast.error("Select state");
-    if (address.length < 10 || !/[a-zA-Z]/.test(address) || !/[0-9]/.test(address)) {
+    if (
+      address.length < 10 ||
+      !/[a-zA-Z]/.test(address) ||
+      !/[0-9]/.test(address)
+    ) {
       return toast.error("Enter valid address");
     }
     const phoneNumber = parsePhoneNumberFromString(phone);
     if (!phoneNumber?.isValid()) return toast.error("Invalid phone number");
-    if (!validator.isPostalCode(postalCode, countryCode)) return toast.error("Invalid postal code");
+    if (!validator.isPostalCode(postalCode, countryCode))
+      return toast.error("Invalid postal code");
     if (cart.length === 0) return toast.error("Cart is empty");
+
+    // ✅ STOCK VALIDATION — check before opening WhatsApp
+    for (const item of cart) {
+      const product = item?.product || item;
+      const productName = product?.name || "A product";
+      const size = item?.size || product?.size || "N/A";
+      const qty = item?.qty || 1;
+
+      // Support both `stock` and `quantity` field names
+     // ✅ CORRECT — total available = stock remaining + qty already reserved by this user
+const reservedQty = item?.qty || 1;
+const remainingStock = product?.stock ?? product?.quantity ?? null;
+const totalAvailable = remainingStock !== null ? remainingStock + reservedQty : null;
+
+if (totalAvailable !== null && totalAvailable < reservedQty) {
+  return toast.error(
+    `"${productName}" (${size}) is out of stock. Please remove it from your cart.`
+  );
+}
+    }
 
     // BUILD ORDER DATA (not saved yet)
     const orderData = {
@@ -164,13 +189,13 @@ Total: ₹${total.toFixed(2)}
     const whatsappNumber = "917397284491";
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-    // ✅ Save pending order data in state (not in DB yet)
+    // Save pending order data in state (not in DB yet)
     setPendingOrder(orderData);
 
-    // ✅ Open WhatsApp
+    // Open WhatsApp
     window.open(whatsappURL, "_blank");
 
-    // ✅ Show confirmation dialog
+    // Show confirmation dialog
     setShowConfirm(true);
   };
 
@@ -215,6 +240,12 @@ Total: ₹${total.toFixed(2)}
     toast("Order cancelled. Your cart is still saved.");
   };
 
+  // Helper: get stock for a cart item
+  const getStock = (item) => {
+    const product = item?.product || item;
+    return product?.stock ?? product?.quantity ?? null;
+  };
+
   // ======================
   // SUCCESS PAGE
   // ======================
@@ -256,7 +287,7 @@ Total: ₹${total.toFixed(2)}
           </h1>
         </div>
 
-        {/* ✅ WHATSAPP CONFIRMATION DIALOG */}
+        {/* WHATSAPP CONFIRMATION DIALOG */}
         {showConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
@@ -270,8 +301,9 @@ Total: ₹${total.toFixed(2)}
               </h2>
 
               <p className="text-gray-500 text-sm mt-3 leading-relaxed">
-                Your order will only be confirmed after you send the WhatsApp message to us.
-                If you closed WhatsApp without sending, tap <strong>Cancel</strong>.
+                Your order will only be confirmed after you send the WhatsApp
+                message to us. If you closed WhatsApp without sending, tap{" "}
+                <strong>Cancel</strong>.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-8">
@@ -407,7 +439,10 @@ Total: ₹${total.toFixed(2)}
                   required
                   name="state"
                   value={stateCode}
-                  onChange={(e) => { setStateCode(e.target.value); setCity(""); }}
+                  onChange={(e) => {
+                    setStateCode(e.target.value);
+                    setCity("");
+                  }}
                   className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base"
                 >
                   <option value="">Select State</option>
@@ -454,7 +489,7 @@ Total: ₹${total.toFixed(2)}
             </button>
           </div>
 
-          {/* RIGHT */}
+          {/* RIGHT — ORDER SUMMARY */}
           <aside className="bg-white border rounded-2xl md:rounded-3xl p-5 md:p-7 h-fit lg:sticky lg:top-28 shadow-sm">
             <h3 className="text-2xl md:text-3xl font-black">Order Summary</h3>
 
@@ -462,6 +497,12 @@ Total: ₹${total.toFixed(2)}
               {cart.map((item, index) => {
                 const product = item?.product || item;
                 if (!product) return null;
+
+                const stock = getStock(item);
+                const qty = item?.qty || 1;
+                const outOfStock = stock !== null && stock <= 0;
+                const lowStock = stock !== null && stock > 0 && stock < qty;
+
                 return (
                   <div
                     key={product?._id || index}
@@ -484,14 +525,26 @@ Total: ₹${total.toFixed(2)}
                         Size: {item?.size || product?.size || "N/A"}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500">
-                        Qty: {item?.qty || 1}
+                        Qty: {qty}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500">
                         ₹{product?.price || 0}
                       </p>
+
+                      {/* ✅ Stock warnings */}
+                      {outOfStock && (
+                        <p className="text-xs text-red-500 font-semibold mt-1">
+                          ❌ Out of stock — remove from cart
+                        </p>
+                      )}
+                      {lowStock && (
+                        <p className="text-xs text-orange-500 font-semibold mt-1">
+                          ⚠️ Only {stock} left — update qty
+                        </p>
+                      )}
                     </div>
                     <div className="font-semibold text-sm md:text-base whitespace-nowrap">
-                      ₹{((product?.price || 0) * (item?.qty || 1)).toFixed(2)}
+                      ₹{((product?.price || 0) * qty).toFixed(2)}
                     </div>
                   </div>
                 );
