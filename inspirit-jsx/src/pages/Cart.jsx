@@ -20,10 +20,11 @@ function Cart() {
     updateQty,
     cartTotal = 0,
     cartLoading,
+    discount = 0,
+    setDiscount,
   } = useApp();
 
   const [coupon, setCoupon] = useState("");
-  const [discount, setDiscount] = useState(0);
 
   // ======================
   // SHIPPING
@@ -39,8 +40,8 @@ function Cart() {
     e.preventDefault();
 
     if (coupon.toUpperCase() === "RITUAL10") {
-      setDiscount(cartTotal * 0.1);
-      toast.success("10% discount applied");
+      setDiscount(50);
+      toast.success("₹50 discount applied!");
     } else {
       toast.error("Invalid promo code");
     }
@@ -181,7 +182,6 @@ function Cart() {
                                   </span>
                                 )}
 
-                                {/* ✅ Show stock badge only when stock is known (not the 99 fallback) */}
                                 {item?.stock !== undefined && (
                                   <span
                                     className={`text-xs font-medium ${
@@ -227,7 +227,6 @@ function Cart() {
                                 {item?.qty || 1}
                               </div>
 
-                              {/* ✅ + BUTTON DISABLED WHEN AT MAX STOCK */}
                               <button
                                 onClick={() => increaseQty(item)}
                                 disabled={atMax}

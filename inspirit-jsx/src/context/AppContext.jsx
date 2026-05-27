@@ -37,6 +37,7 @@ export function AppProvider({ children }) {
 
   const [user, setUser] = useState(() => safeGet("inspirit:user", null));
   const [cart, setCart] = useState([]);
+  const [discount, setDiscount] = useState(0);
   const [cartLoading, setCartLoading] = useState(true);
   const [wishlist, setWishlist] = useState(() => safeGet("inspirit:wish", []));
 
@@ -265,6 +266,8 @@ export function AppProvider({ children }) {
     fetchCart,
     wishlist,
     toggleWishlist,
+      discount,
+  setDiscount,
   };
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
