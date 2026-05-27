@@ -3,7 +3,7 @@ const router = express.Router();
 const Product = require("../models/Product");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = require("../middleware/upload"); 
 
 // ==========================
 // PARSE SIZES HELPER
