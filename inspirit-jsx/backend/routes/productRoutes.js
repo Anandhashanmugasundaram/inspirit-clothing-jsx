@@ -1,4 +1,4 @@
-const express = require("express");
+=const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const cloudinary = require("cloudinary").v2;
@@ -7,17 +7,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // ==========================
 // PARSE SIZES HELPER
-// Accepts both:
-//   "S:2,M:5,L:5,XL:3"   (admin form input)
-//   '{"S":2,"M":5}'       (valid JSON)
 // ==========================
 const parseSizes = (str) => {
   if (!str) return {};
-  // Try JSON first
   try {
     return JSON.parse(str);
   } catch {}
-  // Fall back to S:2,M:5 format
   return Object.fromEntries(
     str.split(",").map((pair) => {
       const [key, val] = pair.split(":");
@@ -27,6 +22,16 @@ const parseSizes = (str) => {
 };
 
 // ==========================
+// AUTO GENERATE SLUG
+// ==========================
+const generateSlug = (name) =>
+  name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+
+// ==========================
 // GET ALL PRODUCTS
 // ==========================
 router.get("/", async (req, res) => {
@@ -34,6 +39,7 @@ router.get("/", async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
+    console.error("GET ALL ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -47,6 +53,7 @@ router.get("/:id", async (req, res) => {
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
   } catch (error) {
+    console.error("GET ONE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -56,14 +63,32 @@ router.get("/:id", async (req, res) => {
 // ==========================
 router.post("/", upload.array("images"), async (req, res) => {
   try {
-    const { name, slug, price, category, description, badge, sizes, isSpecialOffer } = req.body;
+    const {
+      name,
+      price,
+      category,
+      description,
+      badge,
+      sizes,
+      isSpecialOffer,
+    } = req.body;
+
+    // Auto-generate slug from name
+    const slug = req.body.slug?.trim()
+      ? req.body.slug.trim()
+      : generateSlug(name);
 
     const uploadedImages = [];
     for (const file of req.files || []) {
       const base64 = file.buffer.toString("base64");
       const dataUri = `data:${file.mimetype};base64,${base64}`;
-      const result = await cloudinary.uploader.upload(dataUri, { folder: "inspirit" });
-      uploadedImages.push({ url: result.secure_url, public_id: result.public_id });
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "inspirit",
+      });
+      uploadedImages.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
     }
 
     const product = await Product.create({
@@ -73,13 +98,14 @@ router.post("/", upload.array("images"), async (req, res) => {
       category,
       description,
       badge,
-      isSpecialOffer,
-      sizes: parseSizes(sizes), // ✅ handles both formats
+      isSpecialOffer: isSpecialOffer === "true" || isSpecialOffer === true,
+      sizes: parseSizes(sizes),
       images: uploadedImages,
     });
 
     res.status(201).json(product);
   } catch (error) {
+    console.error("CREATE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -92,36 +118,57 @@ router.put("/:id", upload.array("images"), async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const { name, slug, price, category, description, badge, sizes, isSpecialOffer } = req.body;
+    const {
+      name,
+      price,
+      category,
+      description,
+      badge,
+      sizes,
+      isSpecialOffer,
+    } = req.body;
+
+    // Auto-generate slug if name changed and no slug provided
+    const slug = req.body.slug?.trim()
+      ? req.body.slug.trim()
+      : name
+      ? generateSlug(name)
+      : product.slug;
 
     const newImages = [];
     for (const file of req.files || []) {
       const base64 = file.buffer.toString("base64");
       const dataUri = `data:${file.mimetype};base64,${base64}`;
-      const result = await cloudinary.uploader.upload(dataUri, { folder: "inspirit" });
-      newImages.push({ url: result.secure_url, public_id: result.public_id });
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "inspirit",
+      });
+      newImages.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
     }
 
     product.name = name || product.name;
-    product.slug = slug || product.slug;
+    product.slug = slug;
     product.price = price || product.price;
     product.category = category || product.category;
-    product.description = description || product.description;
+    product.description = description !== undefined ? description : product.description;
     product.badge = badge !== undefined ? badge : product.badge;
-    product.isSpecialOffer = isSpecialOffer ?? product.isSpecialOffer;
-    product.sizes = sizes ? parseSizes(sizes) : product.sizes; // ✅ handles both formats
+    product.isSpecialOffer =
+      isSpecialOffer !== undefined
+        ? isSpecialOffer === "true" || isSpecialOffer === true
+        : product.isSpecialOffer;
+    product.sizes = sizes ? parseSizes(sizes) : product.sizes;
     if (newImages.length > 0) product.images = newImages;
 
     await product.save();
     res.json(product);
   } catch (error) {
+    console.error("UPDATE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
 
-// ==========================
-// DELETE PRODUCT
-// ==========================
 // ==========================
 // DELETE PRODUCT
 // ==========================
@@ -130,7 +177,6 @@ router.delete("/:id", async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Delete all images from Cloudinary first
     for (const img of product.images || []) {
       try {
         await cloudinary.uploader.destroy(img.public_id);
@@ -142,7 +188,37 @@ router.delete("/:id", async (req, res) => {
     await product.deleteOne();
     res.json({ success: true });
   } catch (error) {
+    console.error("DELETE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
+// ==========================
+// DELETE SINGLE IMAGE
+// ==========================
+router.delete("/:id/image/:publicId", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const publicId = decodeURIComponent(req.params.publicId);
+
+    try {
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.log("Cloudinary image delete error:", err.message);
+    }
+
+    product.images = product.images.filter(
+      (img) => img.public_id !== publicId
+    );
+
+    await product.save();
+    res.json({ success: true });
+  } catch (error) {
+    console.error("DELETE IMAGE ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
