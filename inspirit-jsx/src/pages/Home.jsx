@@ -144,7 +144,7 @@ function Home() {
     <div ref={heroRef}>
 
    {/* ======================== HERO ======================== */}
-<section className="relative h-[70svh] w-full overflow-hidden ink-section">
+<section className="relative h-[80svh] w-full overflow-hidden ink-section">
   <Swiper
     modules={[Autoplay, EffectFade, Pagination]}
     effect="fade"
