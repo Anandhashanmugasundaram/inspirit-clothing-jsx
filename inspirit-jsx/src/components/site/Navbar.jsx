@@ -333,7 +333,7 @@ export default function Navbar() {
       </span>
     </Link>
     <Link
-      to="/story"
+      to="/about"
       className="flex flex-col items-center gap-1 hover:text-[oklch(0.65_0.25_27)] transition duration-300"
     >
       <FiBook className="text-lg" />
