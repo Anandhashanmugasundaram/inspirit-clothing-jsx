@@ -10,15 +10,23 @@ const upload = multer({ storage: multer.memoryStorage() });
 // ==========================
 const parseSizes = (str) => {
   if (!str) return {};
+
   try {
     return JSON.parse(str);
-  } catch {}
-  return Object.fromEntries(
-    str.split(",").map((pair) => {
-      const [key, val] = pair.split(":");
-      return [key.trim(), Number(val.trim())];
-    })
-  );
+  } catch (error) {
+    console.log("JSON parse failed, using manual parser");
+
+    return Object.fromEntries(
+      str.split(",").map((pair) => {
+        const [key, val] = pair.split(":");
+
+        return [
+          key.trim(),
+          Number(val.trim()),
+        ];
+      })
+    );
+  }
 };
 
 // ==========================
@@ -39,9 +47,12 @@ router.get("/", async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
-    console.error("GET ALL ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 // ==========================
@@ -52,10 +63,13 @@ router.get("/:id", async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
-  } catch (error) {
-    console.error("GET ONE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  }catch (error) {
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 // ==========================
@@ -105,9 +119,12 @@ router.post("/", upload.array("images"), async (req, res) => {
 
     res.status(201).json(product);
   } catch (error) {
-    console.error("CREATE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 // ==========================
@@ -164,9 +181,12 @@ router.put("/:id", upload.array("images"), async (req, res) => {
     await product.save();
     res.json(product);
   } catch (error) {
-    console.error("UPDATE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 // ==========================
@@ -188,9 +208,12 @@ router.delete("/:id", async (req, res) => {
     await product.deleteOne();
     res.json({ success: true });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 // ==========================
@@ -216,9 +239,12 @@ router.delete("/:id/image/:publicId", async (req, res) => {
     await product.save();
     res.json({ success: true });
   } catch (error) {
-    console.error("DELETE IMAGE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
+  console.log(error);
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 });
 
 module.exports = router;

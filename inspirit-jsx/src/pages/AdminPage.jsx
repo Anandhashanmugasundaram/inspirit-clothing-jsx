@@ -123,10 +123,19 @@ function AdminPage() {
 
       resetForm();
       fetchProducts();
-    } catch (error) {
-      console.log(error);
-      alert("Error: " + (error.response?.data?.message || error.message));
-    } finally {
+    } 
+    catch (error) {
+  console.log(error);
+
+  console.log(error.response?.data);
+
+  alert(
+    error.response?.data?.message ||
+    error.message ||
+    "Server Error"
+  );
+}
+     finally {
       setLoading(false);
     }
   };
