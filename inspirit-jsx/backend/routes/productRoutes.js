@@ -1,29 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
-const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
-const upload = require("../middleware/upload"); 
+const cloudinary = require("../config/cloudinary");
+const upload = require("../middleware/upload"); // ✅ use your existing middleware
 
 // ==========================
 // PARSE SIZES HELPER
 // ==========================
 const parseSizes = (str) => {
   if (!str) return {};
-
   try {
     return JSON.parse(str);
   } catch (error) {
-    console.log("JSON parse failed, using manual parser");
-
     return Object.fromEntries(
       str.split(",").map((pair) => {
         const [key, val] = pair.split(":");
-
-        return [
-          key.trim(),
-          Number(val.trim()),
-        ];
+        return [key.trim(), Number(val.trim())];
       })
     );
   }
@@ -47,12 +39,9 @@ router.get("/", async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 // ==========================
@@ -63,13 +52,10 @@ router.get("/:id", async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
-  }catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 // ==========================
@@ -87,23 +73,15 @@ router.post("/", upload.array("images"), async (req, res) => {
       isSpecialOffer,
     } = req.body;
 
-    // Auto-generate slug from name
     const slug = req.body.slug?.trim()
       ? req.body.slug.trim()
       : generateSlug(name);
 
-    const uploadedImages = [];
-    for (const file of req.files || []) {
-      const base64 = file.buffer.toString("base64");
-      const dataUri = `data:${file.mimetype};base64,${base64}`;
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder: "inspirit",
-      });
-      uploadedImages.push({
-        url: result.secure_url,
-        public_id: result.public_id,
-      });
-    }
+    // ✅ multer-storage-cloudinary already uploaded — just read file.path and file.filename
+    const uploadedImages = (req.files || []).map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
 
     const product = await Product.create({
       name,
@@ -119,12 +97,9 @@ router.post("/", upload.array("images"), async (req, res) => {
 
     res.status(201).json(product);
   } catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 // ==========================
@@ -145,31 +120,24 @@ router.put("/:id", upload.array("images"), async (req, res) => {
       isSpecialOffer,
     } = req.body;
 
-    // Auto-generate slug if name changed and no slug provided
     const slug = req.body.slug?.trim()
       ? req.body.slug.trim()
       : name
       ? generateSlug(name)
       : product.slug;
 
-    const newImages = [];
-    for (const file of req.files || []) {
-      const base64 = file.buffer.toString("base64");
-      const dataUri = `data:${file.mimetype};base64,${base64}`;
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder: "inspirit",
-      });
-      newImages.push({
-        url: result.secure_url,
-        public_id: result.public_id,
-      });
-    }
+    // ✅ same fix for update
+    const newImages = (req.files || []).map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
 
     product.name = name || product.name;
     product.slug = slug;
     product.price = price || product.price;
     product.category = category || product.category;
-    product.description = description !== undefined ? description : product.description;
+    product.description =
+      description !== undefined ? description : product.description;
     product.badge = badge !== undefined ? badge : product.badge;
     product.isSpecialOffer =
       isSpecialOffer !== undefined
@@ -181,12 +149,9 @@ router.put("/:id", upload.array("images"), async (req, res) => {
     await product.save();
     res.json(product);
   } catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 // ==========================
@@ -208,12 +173,9 @@ router.delete("/:id", async (req, res) => {
     await product.deleteOne();
     res.json({ success: true });
   } catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 // ==========================
@@ -239,12 +201,9 @@ router.delete("/:id/image/:publicId", async (req, res) => {
     await product.save();
     res.json({ success: true });
   } catch (error) {
-  console.log(error);
-  res.status(500).json({
-    message: error.message,
-    stack: error.stack,
-  });
-}
+    console.log(error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 });
 
 module.exports = router;
