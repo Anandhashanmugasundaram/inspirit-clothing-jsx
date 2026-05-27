@@ -122,43 +122,27 @@ router.put("/:id", upload.array("images"), async (req, res) => {
 // ==========================
 // DELETE PRODUCT
 // ==========================
-router.delete("/:id/image/:publicId", async (req, res) => {
+// ==========================
+// DELETE PRODUCT
+// ==========================
+router.delete("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(
-      req.params.id
-    );
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
+    // Delete all images from Cloudinary first
+    for (const img of product.images || []) {
+      try {
+        await cloudinary.uploader.destroy(img.public_id);
+      } catch (err) {
+        console.log("Cloudinary delete error:", err.message);
+      }
     }
 
-    const publicId = decodeURIComponent(
-      req.params.publicId
-    );
-
-    try {
-      await cloudinary.uploader.destroy(
-        publicId
-      );
-    } catch (err) {
-      console.log(err.message);
-    }
-
-    product.images = product.images.filter(
-      (img) => img.public_id !== publicId
-    );
-
-    await product.save();
-
-    res.json({
-      success: true,
-    });
+    await product.deleteOne();
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 module.exports = router;
