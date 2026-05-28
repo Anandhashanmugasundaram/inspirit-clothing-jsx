@@ -127,36 +127,30 @@ export default function Footer() {
 
             {/* SUPPORT */}
             <div>
-              <h4 className="text-grotesk text-white text-sm tracking-[0.3em] mb-5">
-                SUPPORT
-              </h4>
+  <h4 className="text-grotesk text-white text-sm tracking-[0.3em] mb-5">
+    Legal Policies
+  </h4>
 
-              <ul className="space-y-3 text-white/60">
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Shipping Info
-                  </a>
-                </li>
+  <ul className="space-y-3 text-white/60">
+    <li>
+      <Link to="/return-policy" className="hover:text-white transition">
+        Return Policy
+      </Link>
+    </li>
 
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Returns
-                  </a>
-                </li>
+    <li>
+      <Link to="/terms" className="hover:text-white transition">
+        Terms & Conditions
+      </Link>
+    </li>
 
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Size Guide
-                  </a>
-                </li>
-
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Help Center
-                  </a>
-                </li>
-              </ul>
-            </div>
+    <li>
+      <Link to="/privacy-policy" className="hover:text-white transition">
+        Privacy Policy
+      </Link>
+    </li>
+  </ul>
+</div>
           </div>
         </div>
 

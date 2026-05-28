@@ -29,9 +29,9 @@ import { useApp } from "@/context/AppContext";
 gsap.registerPlugin(ScrollTrigger);
 
 const HERO_SLIDES = [
-  { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageOne },
+  // { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageOne },
   { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageTwo },
-  { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageThree },
+  // { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageThree },
 ];
 
 function Home() {
