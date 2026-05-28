@@ -159,13 +159,12 @@ function Home() {
           <img
             src={s.img}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:object-center opacity-40"
-          />
+className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:object-center opacity-85"          />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, oklch(0.06 0.005 20 / 0.3) 0%, oklch(0.06 0.005 20 / 0.85) 100%)",
+  "linear-gradient(180deg, rgba(255,248,240,0.15) 0%, rgba(245,230,220,0.22) 50%, rgba(255,255,255,0.08) 100%)",
             }}
           />
         </div>

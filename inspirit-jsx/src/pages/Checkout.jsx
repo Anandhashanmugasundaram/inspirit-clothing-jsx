@@ -184,11 +184,6 @@
 
   💰 *Order Summary*
   Subtotal: ₹${cartTotal.toFixed(2)}
-  {discount > 0 && (
-  <div className="flex justify-between text-sm md:text-base text-green-600">
-    <span>Discount</span>
-    <span>-₹{discount.toFixed(2)}</span>
-  </div>
 )}
   Shipping: ₹${shipping}
   Total: ₹${total.toFixed(2)}
