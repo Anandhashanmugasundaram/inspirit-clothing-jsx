@@ -184,7 +184,6 @@
 
   💰 *Order Summary*
   Subtotal: ₹${cartTotal.toFixed(2)}
-)}
   Shipping: ₹${shipping}
   Total: ₹${total.toFixed(2)}
   `;
