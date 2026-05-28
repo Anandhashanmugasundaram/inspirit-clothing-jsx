@@ -166,27 +166,27 @@
         })
         .join("\n");
 
-      const message = `
-  🛍 *NEW ORDER — INSPIRIT CLOTHING*
+  const message = `
+🛍️ *NEW ORDER — INSPIRIT CLOTHING*
 
-  👤 *Customer Details*
-  Name: ${firstName} ${lastName}
-  Email: ${user?.email}
-  Phone: ${phone}
+👤 *Customer Details*
+Name: ${firstName} ${lastName}
+Email: ${user?.email}
+Phone: ${phone}
 
-  📍 *Shipping Address*
-  ${address}
-  ${city}, ${stateName}
-  ${countryName} - ${postalCode}
+📍 *Shipping Address*
+${address}
+${city}, ${stateName}
+${countryName} - ${postalCode}
 
-  📦 *Order Items*
-  ${productsText}
+📦 *Order Items*
+${productsText}
 
-  💰 *Order Summary*
-  Subtotal: ₹${cartTotal.toFixed(2)}
-  Shipping: ₹${shipping}
-  Total: ₹${total.toFixed(2)}
-  `;
+💰 *Order Summary*
+Subtotal: ₹${cartTotal.toFixed(2)}
+Shipping: ₹${shipping}
+Total: ₹${total.toFixed(2)}
+`;
 
       const whatsappNumber = "917397284491";
       const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
