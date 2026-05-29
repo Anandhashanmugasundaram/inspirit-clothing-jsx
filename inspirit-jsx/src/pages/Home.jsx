@@ -20,7 +20,7 @@ import Counter from "@/components/site/Counter";
 
 import ImageOne from "../assets/cover_img1.jpg";
 import ImageTwo from "../assets/cover_img2.png";
-import ImageThree from "../assets/cover_img3.png";
+import ImageThree from "../assets/covercompimg.png";
 
 import { TESTIMONIALS } from "@/data/products";
 
@@ -30,8 +30,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 const HERO_SLIDES = [
   // { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageOne },
-  { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageTwo },
-  // { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageThree },
+  // { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageTwo },
+  { tag: "MINIMAL FITS", title: "BLACK &\nWHITE", img: ImageThree },
 ];
 
 function Home() {
