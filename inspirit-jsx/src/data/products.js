@@ -93,9 +93,9 @@ export const CATEGORIES = [
     { key: 'Pants', label: 'Pants', image: u('1594633312681-425c7b97ccd1', 900) },
 ];
 export const TESTIMONIALS = [
-    { name: 'Aria K.', city: 'Tokyo', text: 'INSPIRIT pieces fit like couture but hit like the street. Nothing else feels like this.', rating: 5 },
-    { name: 'Mateo R.', city: 'Berlin', text: 'The weight, the cut, the red. Every drop is an event. I plan my week around the release.', rating: 5 },
-    { name: 'Noor S.', city: 'Dubai', text: "I bought one jersey and replaced half my wardrobe. The craftsmanship is genuinely insane.", rating: 5 },
-    { name: 'Kai L.', city: 'New York', text: 'Worn it through three winters. Still looks like it just left the studio.', rating: 5 },
+    { name: 'Dhanush', place: 'Ashok Nagar', text: 'INSPIRIT pieces fit like couture but hit like the street. Nothing else feels like this.', rating: 5 },
+    { name: 'Suriya Prakash', place: 'Kodambakkam', text: 'The weight, the cut, the red. Every drop is an event. I plan my week around the release.', rating: 5 },
+    { name: 'Harish', place: 'T.Nagar', text: "I bought one jersey and replaced half my wardrobe. The craftsmanship is genuinely insane.", rating: 5 },
+    { name: 'Bala', place: 'Tambaram', text: 'Worn it through three winters. Still looks like it just left the studio.', rating: 5 },
 ];
 export const findProduct = (slug) => PRODUCTS.find(p => p.slug === slug);
