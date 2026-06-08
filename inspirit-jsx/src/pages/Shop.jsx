@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { FiSearch, FiFilter, FiX } from "react-icons/fi";
 import ProductCard from "@/components/site/ProductCard";
+import ImageThree from "../assets/covercompimg.png";
 
 function Shop() {
   const API =
@@ -50,7 +51,6 @@ function Shop() {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${API}/api/products`);
-
         setProducts(res.data || []);
       } catch (error) {
         console.log(error);
@@ -82,7 +82,7 @@ function Shop() {
   // ======================
   // FILTER PRODUCTS
   // ======================
-const filtered = useMemo(() => {
+  const filtered = useMemo(() => {
     let list = products.filter((p) => {
       const categoryMatch = cat === "All" || p.category === cat;
       const sizeMatch =
@@ -107,11 +107,10 @@ const filtered = useMemo(() => {
       );
     }
 
-    // ✅ PUSH OUT OF STOCK TO END (after all other sorting)
+    // PUSH OUT OF STOCK TO END
     const isOOS = (p) => {
-      const sizesObj = p.sizes instanceof Map
-        ? Object.fromEntries(p.sizes)
-        : p.sizes || {};
+      const sizesObj =
+        p.sizes instanceof Map ? Object.fromEntries(p.sizes) : p.sizes || {};
       return Object.values(sizesObj).every((stock) => stock <= 0);
     };
 
@@ -136,7 +135,24 @@ const filtered = useMemo(() => {
   return (
     <div className="bone-section pt-32 md:pt-40 pb-24">
       {/* HEADER */}
-      <section className="ink-section pb-20 md:pb-28 -mt-32 md:-mt-40 pt-44 md:pt-56 relative overflow-hidden">
+      <section className="relative -mt-32 md:-mt-40 pt-44 md:pt-56 pb-20 md:pb-28 overflow-hidden">
+        {/* BACKGROUND IMAGE */}
+        <img
+          src={ImageThree}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:object-center opacity-85"
+        />
+
+        {/* WARM GRADIENT OVERLAY */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,248,240,0.15) 0%, rgba(245,230,220,0.22) 50%, rgba(255,255,255,0.08) 100%)",
+          }}
+        />
+
+        {/* RED ACCENT GLOW */}
         <div
           className="absolute inset-0 opacity-25"
           style={{
@@ -153,9 +169,7 @@ const filtered = useMemo(() => {
           <h1 className="mt-4 text-display text-6xl md:text-[8rem] leading-[0.9] text-white">
             Shop the
             <br />
-            <em className="text-[oklch(0.65_0.25_27)] not-italic">
-              canon.
-            </em>
+            <em className="text-[oklch(0.65_0.25_27)] not-italic">canon.</em>
           </h1>
 
           <p className="mt-6 max-w-xl text-white/60">
@@ -188,32 +202,30 @@ const filtered = useMemo(() => {
           </div>
 
           {/* SIZE FILTER */}
-         {/* SIZE FILTER */}
-<div className="flex flex-wrap items-center gap-2 mt-4">
-  {sizes.map((s) => (
-    <button
-      key={s}
-      onClick={() => {
-        setSize(s);
-        scrollTop();
-      }}
-      className={`text-grotesk text-xs tracking-[0.25em] px-4 py-2 rounded-full border transition ${
-        size === s
-          ? "bg-black text-white border-black"
-          : "border-black/15 hover:border-black"
-      }`}
-    >
-      SIZE {s}
-    </button>
-  ))}
-</div>
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            {sizes.map((s) => (
+              <button
+                key={s}
+                onClick={() => {
+                  setSize(s);
+                  scrollTop();
+                }}
+                className={`text-grotesk text-xs tracking-[0.25em] px-4 py-2 rounded-full border transition ${
+                  size === s
+                    ? "bg-black text-white border-black"
+                    : "border-black/15 hover:border-black"
+                }`}
+              >
+                SIZE {s}
+              </button>
+            ))}
+          </div>
 
           {/* SEARCH + SORT */}
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 mt-5">
             {/* SEARCH */}
             <div className="flex-1 relative">
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" />
-
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -233,9 +245,7 @@ const filtered = useMemo(() => {
                 className="text-grotesk text-xs tracking-[0.25em] py-3 px-4 bg-[oklch(0.94_0.005_60)] rounded-sm border border-transparent focus:border-black/20 outline-none"
               >
                 <option value="latest">LATEST</option>
-
                 <option value="price-asc">PRICE ↑</option>
-
                 <option value="price-desc">PRICE ↓</option>
               </select>
 
@@ -245,7 +255,6 @@ const filtered = useMemo(() => {
                 className="md:hidden inline-flex items-center gap-2 px-4 py-3 border border-black/15 rounded-sm"
               >
                 <FiFilter />
-
                 <span className="text-grotesk text-xs tracking-[0.25em]">
                   FILTERS
                 </span>
@@ -290,7 +299,6 @@ const filtered = useMemo(() => {
                 {/* PAGE NUMBERS */}
                 {[...Array(totalPages)].map((_, i) => {
                   const pageNum = i + 1;
-
                   return (
                     <button
                       key={pageNum}
@@ -330,14 +338,10 @@ const filtered = useMemo(() => {
             {/* EMPTY */}
             {filtered.length === 0 && (
               <div className="py-24 text-center">
-                <p className="text-display text-3xl">
-                  Nothing in this corner.
-                </p>
-
+                <p className="text-display text-3xl">Nothing in this corner.</p>
                 <p className="mt-2 text-[oklch(0.45_0.01_20)]">
                   Try clearing your filters.
                 </p>
-
                 <button
                   onClick={() => {
                     setCat("All");
@@ -363,11 +367,9 @@ const filtered = useMemo(() => {
             className="absolute inset-0 bg-black/60"
             onClick={() => setOpen(false)}
           />
-
           <div className="absolute bottom-0 inset-x-0 bg-white p-6 rounded-t-3xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-display text-2xl">Filters</h3>
-
               <button onClick={() => setOpen(false)}>
                 <FiX />
               </button>

@@ -80,7 +80,7 @@ function Contact() {
           Reach the
           <br />
           <em className="text-[oklch(0.48_0.22_25)] not-italic">
-            atelier.
+          Shop
           </em>
         </h1>
 
