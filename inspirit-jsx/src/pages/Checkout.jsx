@@ -188,7 +188,7 @@ Shipping: ₹${shipping}
 Total: ₹${total.toFixed(2)}
 `;
 
-      const whatsappNumber = "917397284491";
+      const whatsappNumber = "919940404491";
       const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
       // Save pending order data in state (not in DB yet)
