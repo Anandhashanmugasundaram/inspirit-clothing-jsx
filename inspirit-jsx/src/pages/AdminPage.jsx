@@ -5,7 +5,7 @@ import axios from "axios";
 function AdminPage() {
   const API =
     import.meta.env.VITE_API_URL ||
-    "https://inspirit-clothing-jsx.onrender.com";
+    "https://inspirit-clothing-jsx-1.onrender.com";
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 

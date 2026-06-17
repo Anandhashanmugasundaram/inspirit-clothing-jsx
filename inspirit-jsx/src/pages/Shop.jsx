@@ -7,7 +7,7 @@ import ImageThree from "../assets/covercompimg.png";
 function Shop() {
   const API =
     import.meta.env.VITE_API_URL ||
-    "https://inspirit-clothing-jsx.onrender.com";
+    "https://inspirit-clothing-jsx-1.onrender.com";
 
   // ======================
   // STATES
@@ -144,13 +144,13 @@ function Shop() {
         />
 
         {/* WARM GRADIENT OVERLAY */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,248,240,0.15) 0%, rgba(245,230,220,0.22) 50%, rgba(255,255,255,0.08) 100%)",
-          }}
-        />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+  "linear-gradient(180deg, rgba(255,248,240,0.15) 0%, rgba(245,230,220,0.22) 50%, rgba(255,255,255,0.08) 100%)",
+            }}
+          />
 
         {/* RED ACCENT GLOW */}
         <div

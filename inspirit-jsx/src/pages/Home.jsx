@@ -42,7 +42,7 @@ function Home() {
 
   const API =
     import.meta.env.VITE_API_URL ||
-    "https://inspirit-clothing-jsx.onrender.com";
+    "https://inspirit-clothing-jsx-1.onrender.com";
 
   // ======================
   // FETCH PRODUCTS

@@ -29,7 +29,7 @@ function Account() {
 
   const [loading, setLoading] = useState(true);
 
-  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx.onrender.com";
+  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx-1.onrender.com";
 
   // ======================
   // FETCH ORDERS
