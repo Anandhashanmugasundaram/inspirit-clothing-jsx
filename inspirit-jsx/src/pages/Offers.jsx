@@ -6,7 +6,7 @@ import axios from "axios";
 import ProductCard from "@/components/site/ProductCard";
 
 
-  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx-1.onrender.com";
+  const API = import.meta.env.VITE_API_URL || "https://inspirit-clothing-jsx-oi4h.vercel.app";
 
 function useCountdown(target) {
   const [t, setT] = useState(target - Date.now());

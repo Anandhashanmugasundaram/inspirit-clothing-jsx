@@ -7,7 +7,7 @@ import ImageThree from "../assets/covercompimg.png";
 function Shop() {
   const API =
     import.meta.env.VITE_API_URL ||
-    "https://inspirit-clothing-jsx-1.onrender.com";
+    "https://inspirit-clothing-jsx-oi4h.vercel.app";
 
   // ======================
   // STATES
