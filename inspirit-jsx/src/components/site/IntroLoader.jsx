@@ -33,7 +33,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import logo from '@/assets/inspirit-logo.jpeg';
+import logo from '@/assets/inspirit-logo.png'
 export default function IntroLoader() {
     const [done, setDone] = useState(false);
     const root = useRef(null);
