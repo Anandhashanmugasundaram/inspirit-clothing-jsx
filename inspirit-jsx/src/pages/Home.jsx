@@ -463,7 +463,7 @@ function Home() {
   second rule and keep the vh fallback instead of collapsing to 0.
 */}
 <section className="hero-viewport relative w-full overflow-hidden ink-section">
-<Swiper
+{/* <Swiper
   modules={[Autoplay, EffectFade, Pagination]}
   effect="fade"
   fadeEffect={{ crossFade: true }}
@@ -495,7 +495,7 @@ function Home() {
         </div>
       </SwiperSlide>
     ))}
-  </Swiper>
+  </Swiper> */}
 
   {/* HERO TEXT */}
   <div className="absolute inset-0 z-10 h-full flex flex-col justify-end pb-2">
