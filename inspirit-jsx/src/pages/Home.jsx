@@ -329,6 +329,7 @@ import Marquee from "@/components/site/Marquee";
 import ProductCard from "@/components/site/ProductCard";
 import Counter from "@/components/site/Counter";
 
+
 import ImageOne from "../assets/cover_img1.jpg";
 import ImageTwo from "../assets/cover_img2.png";
 import ImageThree from "../assets/covercompimg.png";
@@ -462,22 +463,19 @@ function Home() {
   second rule and keep the vh fallback instead of collapsing to 0.
 */}
 <section className="hero-viewport relative w-full overflow-hidden ink-section">
-  <Swiper
-    modules={[Autoplay, EffectFade, Pagination]}
-    effect="fade"
-    /*
-      FIX: Safari's compositor doesn't blend the outgoing/incoming
-      slide opacity the same way Chrome does with EffectFade, which
-      causes a black/blank flash between slides. `crossFade: true`
-      forces Swiper to animate both slides' opacity simultaneously
-      instead of relying on z-index stacking, which fixes the flash.
-    */
-    fadeEffect={{ crossFade: true }}
-    autoplay={{ delay: 5500 }}
-    loop
-    pagination={{ clickable: true }}
-    className="absolute inset-0 h-full w-full"
-  >
+<Swiper
+  modules={[Autoplay, EffectFade, Pagination]}
+  effect="fade"
+  fadeEffect={{ crossFade: true }}
+  autoplay={
+    HERO_SLIDES.length > 1
+      ? { delay: 5500 }
+      : false
+  }
+  loop={HERO_SLIDES.length > 1}
+  pagination={{ clickable: true }}
+  className="absolute inset-0 h-full w-full"
+>
     {HERO_SLIDES.map((s, i) => (
       <SwiperSlide key={i}>
         <div className="absolute inset-0">
