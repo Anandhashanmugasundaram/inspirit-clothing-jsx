@@ -463,6 +463,39 @@ function Home() {
   second rule and keep the vh fallback instead of collapsing to 0.
 */}
 <section className="hero-viewport relative w-full overflow-hidden ink-section">
+<Swiper
+  modules={[Autoplay, EffectFade, Pagination]}
+  effect="fade"
+  fadeEffect={{ crossFade: true }}
+  autoplay={
+    HERO_SLIDES.length > 1
+      ? { delay: 5500 }
+      : false
+  }
+  loop={HERO_SLIDES.length > 1}
+  pagination={{ clickable: true }}
+  className="absolute inset-0 h-full w-full"
+>
+    {HERO_SLIDES.map((s, i) => (
+      <SwiperSlide key={i}>
+        <div className="absolute inset-0">
+          <img
+            src={s.img}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:object-center opacity-85"
+          />
+          {/*
+            FIX: this overlay only ever used rgba(), so it was already
+            Safari-safe — but it's now pulled into a CSS class
+            (`.hero-overlay` in styles.css) instead of an inline style
+            object, so it lives next to its svh/oklch-fallback
+            siblings and isn't duplicated per-slide.
+          */}
+          <div className="hero-overlay absolute inset-0" />
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
 
   {/* HERO TEXT */}
   <div className="absolute inset-0 z-10 h-full flex flex-col justify-end pb-2">
