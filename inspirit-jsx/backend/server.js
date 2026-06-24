@@ -16,7 +16,16 @@ const app = express();
 connectDB();
 
 // MIDDLEWARE
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://inspiritclothings.in",
+      "https://www.inspiritclothings.in",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
