@@ -8,7 +8,8 @@
 
 /* ============================================================
    INSPIRIT CLOTHING — Luxury Streetwear Design System
-   Red / White / Black cinematic theme. All tokens oklch.
+   Red / White / Black cinematic theme. All tokens oklch,
+   with hex fallbacks for Safari < 15.4 (see @supports block below).
 ============================================================ */
 
 @theme inline {
@@ -102,6 +103,66 @@
   --ring: oklch(0.55 0.25 27);
 }
 
+/*
+  FIX — oklch() Safari fallback.
+  oklch() only landed in Safari 15.4 (March 2022). Any Safari/iOS
+  Safari older than that silently drops every declaration that uses
+  it, which means --primary, --blood, --ember, etc. all resolve to
+  nothing and text/backgrounds across the whole site disappear.
+  `@supports not (color: oklch(1 0 0))` only runs in browsers that
+  can't parse oklch at all, so modern Safari/Chrome/Firefox ignore
+  this block entirely and keep the oklch values above.
+*/
+@supports not (color: oklch(1 0 0)) {
+  :root {
+    --background: #fafaf8;
+    --foreground: #1f1b1a;
+    --card: #ffffff;
+    --card-foreground: #1f1b1a;
+    --popover: #1f1b1a;
+    --popover-foreground: #fafaf8;
+    --primary: #af1d29;
+    --primary-foreground: #fafaf8;
+    --secondary: #2b2625;
+    --secondary-foreground: #fafaf8;
+    --muted: #efeeec;
+    --muted-foreground: #6e6766;
+    --accent: #d4232f;
+    --accent-foreground: #fafaf8;
+    --destructive: #d4232f;
+    --destructive-foreground: #fafaf8;
+    --border: #dedcd9;
+    --input: #dedcd9;
+    --ring: #af1d29;
+
+    --blood: #af1d29;
+    --ember: #e8462f;
+    --ink: #151212;
+    --bone: #fafaf8;
+    --ash: #a6a09e;
+  }
+
+  .dark {
+    --background: #151212;
+    --foreground: #fafaf8;
+    --card: #1f1b1a;
+    --card-foreground: #fafaf8;
+    --popover: #1f1b1a;
+    --popover-foreground: #fafaf8;
+    --primary: #d4232f;
+    --primary-foreground: #fafaf8;
+    --secondary: #2b2625;
+    --secondary-foreground: #fafaf8;
+    --muted: #2b2625;
+    --muted-foreground: #a6a09e;
+    --accent: #d4232f;
+    --accent-foreground: #fafaf8;
+    --border: rgba(255, 255, 255, 0.12);
+    --input: rgba(255, 255, 255, 0.15);
+    --ring: #d4232f;
+  }
+}
+
 @layer base {
   * { border-color: var(--color-border); }
   html, body { background-color: var(--color-background); color: var(--color-foreground); }
@@ -116,50 +177,96 @@
   ::selection { background: var(--blood); color: var(--bone); }
 }
 
-/* Cinematic utilities */
-@utility ink-section {
-  background: radial-gradient(ellipse at top, oklch(0.14 0.02 22) 0%, oklch(0.06 0.005 20) 70%);
-  color: var(--bone);
-}
-@utility bone-section { background: var(--bone); color: var(--ink); }
+/*
+  FIX — `@utility` is a Tailwind v4-only at-rule. If the build
+  pipeline (PostCSS version, Vite plugin version, or a Safari-targeted
+  fallback bundler) doesn't fully resolve it, these utilities vanish
+  silently with no build error. Moving everything into a standard
+  `@layer utilities { ... }` block makes these plain CSS classes that
+  any Tailwind version (and any browser) will apply reliably.
+*/
+@layer utilities {
+  .ink-section {
+    background: radial-gradient(ellipse at top, oklch(0.14 0.02 22) 0%, oklch(0.06 0.005 20) 70%);
+    color: var(--bone);
+  }
+  .bone-section { background: var(--bone); color: var(--ink); }
 
-@utility text-display { font-family: var(--font-display); }
-@utility text-grotesk { font-family: var(--font-grotesk); letter-spacing: 0.04em; }
+  .text-display { font-family: var(--font-display); }
+  .text-grotesk { font-family: var(--font-grotesk); letter-spacing: 0.04em; }
 
-@utility glass {
-  background: color-mix(in oklab, var(--ink) 35%, transparent);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid color-mix(in oklab, var(--bone) 12%, transparent);
-}
-@utility glass-light {
-  background: color-mix(in oklab, var(--bone) 65%, transparent);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
-}
+  .glass {
+    background: color-mix(in oklab, var(--ink) 35%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid color-mix(in oklab, var(--bone) 12%, transparent);
+  }
+  .glass-light {
+    background: color-mix(in oklab, var(--bone) 65%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+  }
 
-@utility glow-red {
-  box-shadow: 0 0 60px -10px color-mix(in oklab, var(--blood) 60%, transparent),
-              0 0 120px -20px color-mix(in oklab, var(--ember) 40%, transparent);
-}
+  .glow-red {
+    box-shadow: 0 0 60px -10px color-mix(in oklab, var(--blood) 60%, transparent),
+                0 0 120px -20px color-mix(in oklab, var(--ember) 40%, transparent);
+  }
 
-@utility btn-blood {
-  background: linear-gradient(135deg, var(--blood), oklch(0.35 0.20 25));
-  color: var(--bone);
-  box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--blood) 55%, transparent);
-  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
-}
-@utility btn-blood-hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 60px -10px color-mix(in oklab, var(--blood) 70%, transparent);
-}
+  .btn-blood {
+    background: linear-gradient(135deg, var(--blood), oklch(0.35 0.20 25));
+    color: var(--bone);
+    box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--blood) 55%, transparent);
+    -webkit-transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .btn-blood-hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 60px -10px color-mix(in oklab, var(--blood) 70%, transparent);
+  }
 
-@utility hover-zoom {
-  overflow: hidden;
-}
-@utility hover-zoom-img {
-  transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter .6s;
+  .hover-zoom {
+    overflow: hidden;
+  }
+  .hover-zoom-img {
+    -webkit-transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter .6s;
+    transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter .6s;
+  }
+
+  /*
+    FIX — hero section height.
+    `svh` (small viewport height) isn't recognized by Safari < 15.4 or
+    by some iOS PWA/in-app webviews, and an unrecognized unit makes
+    the WHOLE declaration invalid — collapsing the hero to 0px height.
+    Declaring `vh` first and `svh` second means unsupported browsers
+    keep the vh value, while supporting ones get the more accurate
+    svh value (which accounts for collapsing mobile browser chrome).
+  */
+  .hero-viewport {
+    height: 80vh;
+    height: 80svh;
+  }
+
+  /* Pulled out of the inline `style` prop in Home.jsx so it sits
+     next to its siblings and stays plain rgba (already Safari-safe,
+     no oklch involved). */
+  .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 248, 240, 0.15) 0%,
+      rgba(245, 230, 220, 0.22) 50%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+  }
+
+  .animate-marquee { animation: marquee 30s linear infinite; }
+  .animate-float { animation: float-y 6s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, oklch(0.18 0.01 20) 0%, oklch(0.25 0.01 20) 50%, oklch(0.18 0.01 20) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
 }
 
 /* Marquee */
@@ -167,28 +274,20 @@
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-@utility animate-marquee { animation: marquee 30s linear infinite; }
 
 @keyframes float-y {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-12px); }
 }
-@utility animate-float { animation: float-y 6s ease-in-out infinite; }
 
 @keyframes pulse-glow {
   0%,100% { opacity: .6; transform: scale(1); }
   50%     { opacity: 1; transform: scale(1.06); }
 }
-@utility animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
-}
-@utility skeleton-shimmer {
-  background: linear-gradient(90deg, oklch(0.18 0.01 20) 0%, oklch(0.25 0.01 20) 50%, oklch(0.18 0.01 20) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
 }
 
 /* hide scrollbar but keep scroll */
@@ -200,6 +299,7 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: clip; }
+
 .product-swiper {
   overflow: hidden;
 }
@@ -218,6 +318,7 @@ html.lenis, html.lenis body { height: auto; }
   background: rgba(255,255,255,0.45);
   opacity: 1;
   border-radius: 999px;
+  -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease;
   margin: 0 4px !important;
 }
