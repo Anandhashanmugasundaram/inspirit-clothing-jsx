@@ -63,7 +63,7 @@ export default function App() {
       <Cursor />
       <Navbar />
       <main className="min-h-screen">
-        <Routes>
+        {/* <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:slug" element={<Product />} />
@@ -80,7 +80,7 @@ export default function App() {
             <Route path="/return-policy" element={<ReturnPolicy />} />
       <Route path="/terms" element={<TermsAndConditions />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        </Routes>
+        </Routes> */}
       </main>
       <Footer />
       <BackToTop />
