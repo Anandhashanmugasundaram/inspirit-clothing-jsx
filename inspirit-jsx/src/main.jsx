@@ -44,10 +44,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AppProvider>
-            {/* <App />
+            <App />
             <Toaster position="top-center" toastOptions={{
               style: { background: 'oklch(0.08 0.005 20)', color: 'oklch(0.985 0.003 60)', border: '1px solid oklch(1 0 0 / 12%)', borderRadius: '2px', padding: '14px 18px', fontFamily: 'Inter', letterSpacing: '0.05em' },
-            }} /> */}
+            }} />
           </AppProvider>
         </BrowserRouter>
       </QueryClientProvider>
