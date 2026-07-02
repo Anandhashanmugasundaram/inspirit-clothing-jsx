@@ -65,7 +65,7 @@ export default function App() {
       <main className="min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
+          {/* <Route path="/shop" element={<Shop />} />
           <Route path="/product/:slug" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -79,7 +79,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
             <Route path="/return-policy" element={<ReturnPolicy />} />
       <Route path="/terms" element={<TermsAndConditions />} />
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} /> */}
         </Routes>
       </main>
       <Footer />
