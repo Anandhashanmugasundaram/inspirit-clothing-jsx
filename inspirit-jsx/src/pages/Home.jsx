@@ -360,6 +360,7 @@ function Home() {
   // FETCH PRODUCTS
   // ======================
   useEffect(() => {
+
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${API}/api/products`);
@@ -470,7 +471,7 @@ function Home() {
 <section className="hero-viewport relative w-full overflow-hidden ink-section">
 <Swiper
   modules={[Autoplay, EffectFade, Pagination]}
-  effect="fade"
+  effect="slide"
   fadeEffect={{ crossFade: true }}
   autoplay={
     HERO_SLIDES.length > 1
