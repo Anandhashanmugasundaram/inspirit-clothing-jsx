@@ -1,25 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function ScrollProgress() {
-  const [p, setP] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => {
-      const h = document.documentElement;
-      const total = h.scrollHeight - h.clientHeight;
-      setP(total > 0 ? (h.scrollTop / total) * 100 : 0);
+    const updateProgress = () => {
+      const doc = document.documentElement;
+
+      const scrollTop = window.scrollY || doc.scrollTop;
+      const total = doc.scrollHeight - window.innerHeight;
+
+      const value = total > 0 ? (scrollTop / total) * 100 : 0;
+      setProgress(Math.min(100, Math.max(0, value)));
     };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    updateProgress();
+
+    window.addEventListener("scroll", updateProgress, { passive: true });
+
+    // Support Lenis
+    if (window.lenis) {
+      window.lenis.on("scroll", updateProgress);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+
+      if (window.lenis) {
+        window.lenis.off("scroll", updateProgress);
+      }
+    };
   }, []);
 
   return (
-    <div className="fixed left-0 top-0 z-[60] h-[2px] w-full bg-transparent">
-      <div
-        className="h-full bg-[var(--ember)] transition-[width] duration-150"
-        style={{ width: `${p}%`, boxShadow: '0 0 16px var(--ember)' }}
-      />
-    </div>
+    <div
+      className="h-full bg-[var(--ember)] transition-[width] duration-150"
+      style={{
+        width: `${progress}%`,
+        boxShadow: "0 0 16px var(--ember)",
+      }}
+    />
   );
 }
