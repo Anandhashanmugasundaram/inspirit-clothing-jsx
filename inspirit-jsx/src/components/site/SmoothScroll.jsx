@@ -8,14 +8,12 @@ export default function SmoothScroll() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+  
     const lenis = new Lenis({
-      duration: 1.2,
-      smoothWheel: true,
-      // smoothTouch intentionally omitted — forcing JS-driven touch
-      // scroll fights Safari's native momentum scroll and can make
-      // the page feel stuck or janky on iOS.
-    });
-
+  autoRaf: true,
+  smoothWheel: true,
+  syncTouch: true,
+});
     window.lenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
