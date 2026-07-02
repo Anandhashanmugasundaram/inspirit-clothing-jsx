@@ -423,22 +423,27 @@ function Home() {
         });
       });
 
-      // HORIZONTAL
+    // HORIZONTAL
       if (horizRef.current) {
         const track = horizRef.current.querySelector(".h-track");
         if (track) {
-          const dist = track.scrollWidth - window.innerWidth;
-          gsap.to(track, {
-            x: -dist,
-            ease: "none",
-            scrollTrigger: {
-              trigger: horizRef.current,
-              start: "top top",
-              end: `+=${dist}`,
-              scrub: 1,
-              pin: true,
-              invalidateOnRefresh: true,
-            },
+          // wait a tick so images have laid out before measuring
+          requestAnimationFrame(() => {
+            const dist = track.scrollWidth - window.innerWidth;
+            if (dist > 0) {
+              gsap.to(track, {
+                x: -dist,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: horizRef.current,
+                  start: "top top",
+                  end: `+=${dist}`,
+                  scrub: 1,
+                  pin: true,
+                  invalidateOnRefresh: true,
+                },
+              });
+            }
           });
         }
       }

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
+import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function SmoothScroll() {
@@ -8,20 +9,27 @@ export default function SmoothScroll() {
 
   useEffect(() => {
     const lenis = new Lenis({
-      autoRaf: true,
       smoothWheel: true,
-      syncTouch: true,
+      // syncTouch removed — let iOS use native touch scrolling
     });
 
     window.lenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
-    // Refresh ScrollTrigger after Lenis initializes
+    function raf(time) {
+      lenis.raf(time * 1000);
+    }
+    gsap.ticker.add(raf);
+    gsap.ticker.lagSmoothing(0);
+
+    // Stops iOS address-bar show/hide from spamming ScrollTrigger.refresh()
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
     ScrollTrigger.refresh();
 
     return () => {
-      lenis.off("scroll", ScrollTrigger.update);
+      gsap.ticker.remove(raf);
       lenis.destroy();
       window.lenis = null;
     };
@@ -29,10 +37,7 @@ export default function SmoothScroll() {
 
   useEffect(() => {
     if (window.lenis) {
-      window.lenis.scrollTo(0, {
-        immediate: true,
-      });
-
+      window.lenis.scrollTo(0, { immediate: true });
       ScrollTrigger.refresh();
     }
   }, [pathname]);
