@@ -470,7 +470,7 @@ function Home() {
 */}
 <section className="hero-viewport relative w-full overflow-hidden ink-section">
 <Swiper
-  modules={[Autoplay, EffectFade, Pagination]}
+  modules={[Autoplay, Pagination]}
   effect="slide"
   fadeEffect={{ crossFade: true }}
   autoplay={
