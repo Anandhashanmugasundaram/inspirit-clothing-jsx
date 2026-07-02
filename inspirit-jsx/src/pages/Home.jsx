@@ -374,83 +374,83 @@ function Home() {
   // ======================
   // GSAP
   // ======================
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // HERO TEXT
-      gsap.utils.toArray(".split-line").forEach((el, i) => {
-        gsap.from(el, {
-          y: "110%",
-          duration: 1.2,
-          ease: "expo.out",
-          delay: 0.2 + i * 0.1,
-        });
-      });
+  // useEffect(() => {
+  //   const ctx = gsap.context(() => {
+  //     // HERO TEXT
+  //     gsap.utils.toArray(".split-line").forEach((el, i) => {
+  //       gsap.from(el, {
+  //         y: "110%",
+  //         duration: 1.2,
+  //         ease: "expo.out",
+  //         delay: 0.2 + i * 0.1,
+  //       });
+  //     });
 
-      gsap.from(".hero-fade", {
-        opacity: 0,
-        y: 30,
-        duration: 1,
-        ease: "power3.out",
-        stagger: 0.15,
-        delay: 0.6,
-      });
+  //     gsap.from(".hero-fade", {
+  //       opacity: 0,
+  //       y: 30,
+  //       duration: 1,
+  //       ease: "power3.out",
+  //       stagger: 0.15,
+  //       delay: 0.6,
+  //     });
 
-      // REVEAL
-      gsap.utils.toArray(".reveal").forEach((el) => {
-        gsap.from(el, {
-          y: 60,
-          opacity: 0,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 85%",
-          },
-        });
-      });
+  //     // REVEAL
+  //     gsap.utils.toArray(".reveal").forEach((el) => {
+  //       gsap.from(el, {
+  //         y: 60,
+  //         opacity: 0,
+  //         duration: 1,
+  //         ease: "power3.out",
+  //         scrollTrigger: {
+  //           trigger: el,
+  //           start: "top 85%",
+  //         },
+  //       });
+  //     });
 
-      // PARALLAX
-      gsap.utils.toArray("[data-parallax]").forEach((el) => {
-        gsap.to(el, {
-          yPercent: -15,
-          ease: "none",
-          scrollTrigger: {
-            trigger: el,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      });
+  //     // PARALLAX
+  //     gsap.utils.toArray("[data-parallax]").forEach((el) => {
+  //       gsap.to(el, {
+  //         yPercent: -15,
+  //         ease: "none",
+  //         scrollTrigger: {
+  //           trigger: el,
+  //           start: "top bottom",
+  //           end: "bottom top",
+  //           scrub: true,
+  //         },
+  //       });
+  //     });
 
-    // HORIZONTAL
-      if (horizRef.current) {
-        const track = horizRef.current.querySelector(".h-track");
-        if (track) {
-          // wait a tick so images have laid out before measuring
-          requestAnimationFrame(() => {
-            const dist = track.scrollWidth - window.innerWidth;
-            if (dist > 0) {
-              gsap.to(track, {
-                x: -dist,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: horizRef.current,
-                  start: "top top",
-                  end: `+=${dist}`,
-                  scrub: 1,
-                  pin: true,
-                  invalidateOnRefresh: true,
-                },
-              });
-            }
-          });
-        }
-      }
-    }, heroRef);
+  //   // HORIZONTAL
+  //     if (horizRef.current) {
+  //       const track = horizRef.current.querySelector(".h-track");
+  //       if (track) {
+  //         // wait a tick so images have laid out before measuring
+  //         requestAnimationFrame(() => {
+  //           const dist = track.scrollWidth - window.innerWidth;
+  //           if (dist > 0) {
+  //             gsap.to(track, {
+  //               x: -dist,
+  //               ease: "none",
+  //               scrollTrigger: {
+  //                 trigger: horizRef.current,
+  //                 start: "top top",
+  //                 end: `+=${dist}`,
+  //                 scrub: 1,
+  //                 pin: true,
+  //                 invalidateOnRefresh: true,
+  //               },
+  //             });
+  //           }
+  //         });
+  //       }
+  //     }
+  //   }, heroRef);
 
-    return () => ctx.revert();
-  }, []);
+  //   return () => ctx.revert();
+  // }, []);
 
   // ONLY LATEST 5 PRODUCTS
   const featured = [...products]
