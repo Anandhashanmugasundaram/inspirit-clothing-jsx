@@ -47,10 +47,9 @@
       import.meta.env.VITE_API_URL ||
       "https://inspirit-clothing-jsx-oi4h.vercel.app";
 
-    const countries = Country.getAllCountries();
-    const states = State.getStatesOfCountry(country);
-    const cities = City.getCitiesOfState(country, stateCode);
-
+   const countries = useMemo(() => Country.getAllCountries(), []);
+const states = useMemo(() => State.getStatesOfCountry(country), [country]);
+const cities = useMemo(() => City.getCitiesOfState(country, stateCode), [country, stateCode]);
     const shipping = cartTotal > 250 || cartTotal === 0 ? 0 : 20;
   const total = Math.max(0, cartTotal - discount) + shipping;
 
