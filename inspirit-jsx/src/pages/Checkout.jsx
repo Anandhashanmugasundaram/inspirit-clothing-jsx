@@ -1908,7 +1908,7 @@ Total: ₹${total.toFixed(2)}
                 />
 
                 {/* COUNTRY */}
-                {/* <select
+                <select
                   required
                   name="country"
                   value={country}
@@ -1928,7 +1928,7 @@ Total: ₹${total.toFixed(2)}
                       {c.name}
                     </option>
                   ))}
-                </select> */}
+                </select>
 
                 {/* STATE */}
                 <select
