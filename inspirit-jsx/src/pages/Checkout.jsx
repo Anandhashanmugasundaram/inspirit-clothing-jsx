@@ -592,7 +592,7 @@ Total: ₹${total.toFixed(2)}
                 />
 
                 {/* COUNTRY */}
-                <select
+                {/* <select
                   required
                   name="country"
                   value={country}
@@ -612,10 +612,10 @@ Total: ₹${total.toFixed(2)}
                       {c.name}
                     </option>
                   ))}
-                </select>
+                </select> */}
 
                 {/* STATE */}
-                <select
+                {/* <select
                   required
                   name="state"
                   value={stateCode}
@@ -634,10 +634,10 @@ Total: ₹${total.toFixed(2)}
                       {s.name}
                     </option>
                   ))}
-                </select>
+                </select> */}
 
                 {/* CITY — plain text input now (no more City dataset load) */}
-                <input
+                {/* <input
                   required
                   name="city"
                   placeholder="City"
@@ -647,15 +647,15 @@ Total: ₹${total.toFixed(2)}
                     setCity(e.target.value);
                   }}
                   className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
-                />
+                /> */}
 
                 {/* POSTAL */}
-                <input
+                {/* <input
                   required
                   name="postalCode"
                   placeholder="Postal code"
                   className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
-                />
+                /> */}
               </div>
             </section>
 
