@@ -1845,7 +1845,228 @@ Total: ₹${total.toFixed(2)}
           </div>
         )}
 
+        <form
+          onSubmit={submit}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10"
+        >
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-8 md:space-y-10">
+            {/* CONTACT */}
+            <section>
+              <h3 className="text-[11px] md:text-sm tracking-[0.25em] md:tracking-[0.3em] mb-4 md:mb-5 font-semibold">
+                CONTACT
+              </h3>
+              <input
+                required
+                type="email"
+                defaultValue={user?.email}
+                disabled
+                className="w-full px-4 py-3 md:py-4 border rounded-xl outline-none bg-gray-100 text-sm md:text-base"
+              />
+            </section>
 
+            {/* SHIPPING */}
+            <section>
+              <h3 className="text-[11px] md:text-sm tracking-[0.25em] md:tracking-[0.3em] mb-4 md:mb-5 font-semibold">
+                SHIPPING
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <input
+                  required
+                  name="firstName"
+                  placeholder="First name"
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
+                />
+                <input
+                  required
+                  name="lastName"
+                  placeholder="Last name"
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
+                />
+
+                {/* PHONE */}
+                <div className="md:col-span-2">
+                  <PhoneInput
+                    international
+                    defaultCountry={country}
+                    value={phone}
+                    onChange={(val) => {
+                      console.log("[Checkout] PhoneInput onChange", val);
+                      setPhone(val);
+                    }}
+                    placeholder="Enter phone number"
+                    className="border rounded-xl px-4 py-3 md:py-4 text-sm md:text-base"
+                  />
+                </div>
+
+                {/* ADDRESS */}
+                <input
+                  required
+                  name="address"
+                  placeholder="Address"
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
+                />
+
+                {/* COUNTRY */}
+                {/* <select
+                  required
+                  name="country"
+                  value={country}
+                  disabled={locationLoading}
+                  onChange={(e) => {
+                    console.log("[Checkout] country changed ->", e.target.value);
+                    setCountry(e.target.value);
+                    setStateCode("");
+                  }}
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base disabled:opacity-50"
+                >
+                  <option value="">
+                    {locationLoading ? "Loading countries..." : "Select Country"}
+                  </option>
+                  {countries.map((c) => (
+                    <option key={c.isoCode} value={c.isoCode}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select> */}
+
+                {/* STATE */}
+                <select
+                  required
+                  name="state"
+                  value={stateCode}
+                  disabled={locationLoading}
+                  onChange={(e) => {
+                    console.log("[Checkout] state changed ->", e.target.value);
+                    setStateCode(e.target.value);
+                  }}
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black bg-white text-sm md:text-base disabled:opacity-50"
+                >
+                  <option value="">
+                    {locationLoading ? "Loading states..." : "Select State"}
+                  </option>
+                  {states.map((s) => (
+                    <option key={s.isoCode} value={s.isoCode}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* CITY — plain text input now (no more City dataset load) */}
+                <input
+                  required
+                  name="city"
+                  placeholder="City"
+                  defaultValue={city}
+                  onChange={(e) => {
+                    console.log("[Checkout] city changed ->", e.target.value);
+                    setCity(e.target.value);
+                  }}
+                  className="px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
+                />
+
+                {/* POSTAL */}
+                <input
+                  required
+                  name="postalCode"
+                  placeholder="Postal code"
+                  className="md:col-span-2 px-4 py-3 md:py-4 border rounded-xl outline-none focus:border-black text-sm md:text-base"
+                />
+              </div>
+            </section>
+
+            {/* BUTTON */}
+            <button
+              type="submit"
+              className="mt-4 md:mt-8 w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-3 text-sm md:text-base"
+            >
+              <FaWhatsapp className="text-xl md:text-2xl text-green-400" />
+              ORDER VIA WHATSAPP
+            </button>
+          </div>
+
+          {/* RIGHT — ORDER SUMMARY */}
+          <aside className="bg-white border rounded-2xl md:rounded-3xl p-5 md:p-7 h-fit lg:sticky lg:top-28 shadow-sm">
+            <h3 className="text-2xl md:text-3xl font-black">Order Summary</h3>
+
+            <div className="mt-5 md:mt-6 space-y-4 max-h-80 md:max-h-96 overflow-auto">
+              {cart.map((item, index) => {
+                const product = item?.product || item;
+                if (!product) return null;
+
+                const stock = getStock(item);
+                const qty = item?.qty || 1;
+                const outOfStock = stock !== null && stock <= 0;
+                const lowStock = stock !== null && stock > 0 && stock < qty;
+
+                return (
+                  <div
+                    key={product?._id || index}
+                    className="flex gap-3 md:gap-4 border-b pb-4"
+                  >
+                    <img
+                      src={
+                        product?.images?.[0]?.url ||
+                        product?.image ||
+                        "/placeholder.png"
+                      }
+                      alt={product?.name}
+                      className="h-20 w-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm md:text-base line-clamp-2 break-words">
+                        {product?.name}
+                      </p>
+                      <p className="text-xs md:text-sm text-gray-500 mt-1">
+                        Size: {item?.size || product?.size || "N/A"}
+                      </p>
+                      <p className="text-xs md:text-sm text-gray-500">
+                        Qty: {qty}
+                      </p>
+                      <p className="text-xs md:text-sm text-gray-500">
+                        ₹{product?.price || 0}
+                      </p>
+
+                      {/* ✅ Stock warnings */}
+                      {outOfStock && (
+                        <p className="text-xs text-red-500 font-semibold mt-1">
+                          ❌ Out of stock — remove from cart
+                        </p>
+                      )}
+                      {lowStock && (
+                        <p className="text-xs text-orange-500 font-semibold mt-1">
+                          ⚠️ Only {stock} left — update qty
+                        </p>
+                      )}
+                    </div>
+                    <div className="font-semibold text-sm md:text-base whitespace-nowrap">
+                      ₹{((product?.price || 0) * qty).toFixed(2)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 pt-6 border-t space-y-3">
+              <div className="flex justify-between text-sm md:text-base text-gray-600">
+                <span>Subtotal</span>
+                <span>₹{cartTotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm md:text-base text-gray-600">
+                <span>Shipping</span>
+                <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
+              </div>
+              <div className="flex justify-between pt-4 border-t text-xl md:text-2xl font-black">
+                <span>Total</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] md:text-xs text-gray-400 text-center mt-4">
+              Secure payments • Fast delivery
+            </p>
+          </aside>
+        </form>
       </div>
     </div>
   );
