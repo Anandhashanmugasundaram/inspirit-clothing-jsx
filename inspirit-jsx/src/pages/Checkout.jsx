@@ -87,34 +87,34 @@ function Checkout() {
   // ✅ Dynamically import country-state-city ONLY when Checkout mounts,
   // instead of at app bundle load time. Also: we never touch `City` at all
   // anymore, which avoids loading the huge cities dataset entirely.
-  useEffect(() => {
-    let cancelled = false;
-    console.log("[Checkout] dynamically importing country-state-city");
-    import("country-state-city")
-      .then((mod) => {
-        if (cancelled) return;
-        console.log("[Checkout] country-state-city loaded OK");
-        setCsc(mod);
-        try {
-          const allCountries = mod.Country.getAllCountries();
-          console.log("[Checkout] countries computed OK, count =", allCountries?.length);
-          setCountries(allCountries);
-        } catch (err) {
-          console.error("[Checkout] Country.getAllCountries() THREW", err);
-        }
-      })
-      .catch((err) => {
-        console.error("[Checkout] Failed to load country-state-city", err);
-        toast.error("Failed to load location data. Please refresh.");
-      })
-      .finally(() => {
-        if (!cancelled) setLocationLoading(false);
-      });
+  // useEffect(() => {
+  //   let cancelled = false;
+  //   console.log("[Checkout] dynamically importing country-state-city");
+  //   import("country-state-city")
+  //     .then((mod) => {
+  //       if (cancelled) return;
+  //       console.log("[Checkout] country-state-city loaded OK");
+  //       setCsc(mod);
+  //       try {
+  //         const allCountries = mod.Country.getAllCountries();
+  //         console.log("[Checkout] countries computed OK, count =", allCountries?.length);
+  //         setCountries(allCountries);
+  //       } catch (err) {
+  //         console.error("[Checkout] Country.getAllCountries() THREW", err);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error("[Checkout] Failed to load country-state-city", err);
+  //       toast.error("Failed to load location data. Please refresh.");
+  //     })
+  //     .finally(() => {
+  //       if (!cancelled) setLocationLoading(false);
+  //     });
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  //   return () => {
+  //     cancelled = true;
+  //   };
+  // }, []);
 
   // Recompute states whenever country or the loaded module changes
   useEffect(() => {
