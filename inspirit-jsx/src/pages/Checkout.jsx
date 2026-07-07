@@ -10,7 +10,7 @@ import { useApp } from "@/context/AppContext";
 
 import toast from "react-hot-toast";
 
-import validator from "validator";
+// import validator from "validator";
 
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
@@ -57,10 +57,10 @@ function Checkout() {
 
   const [phone, setPhone] = useState("");
 
-  const [country, setCountry] = useState("IN");
+  // const [country, setCountry] = useState("IN");
 
-  const [stateCode, setStateCode] = useState("TN");
-  const [city, setCity] = useState("Chennai");
+  // const [stateCode, setStateCode] = useState("TN");
+  // const [city, setCity] = useState("Chennai");
 
   // Stores the pending order data while waiting for WhatsApp confirmation
   const [pendingOrder, setPendingOrder] = useState(null);
@@ -71,10 +71,10 @@ function Checkout() {
   const [saving, setSaving] = useState(false);
 
   // Lazy-loaded country-state-city module + data
-  const [csc, setCsc] = useState(null); // the module itself (Country, State)
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const [locationLoading, setLocationLoading] = useState(true);
+  // const [csc, setCsc] = useState(null); // the module itself (Country, State)
+  // const [countries, setCountries] = useState([]);
+  // const [states, setStates] = useState([]);
+  // const [locationLoading, setLocationLoading] = useState(true);
 
   const nav = useNavigate();
 
@@ -82,8 +82,9 @@ function Checkout() {
     import.meta.env.VITE_API_URL ||
     "https://inspirit-clothing-jsx-oi4h.vercel.app";
 
-  console.log("[Checkout] state initialized", { country, stateCode, city, phone });
-
+console.log("[Checkout] state initialized", {
+  phone,
+});
   // ✅ Dynamically import country-state-city ONLY when Checkout mounts,
   // instead of at app bundle load time. Also: we never touch `City` at all
   // anymore, which avoids loading the huge cities dataset entirely.
@@ -117,18 +118,18 @@ function Checkout() {
   // }, []);
 
   // Recompute states whenever country or the loaded module changes
-  useEffect(() => {
-    if (!csc) return;
-    console.log("[Checkout] computing states list for country =", country);
-    try {
-      const result = csc.State.getStatesOfCountry(country);
-      console.log("[Checkout] states computed OK, count =", result?.length);
-      setStates(result || []);
-    } catch (err) {
-      console.error("[Checkout] State.getStatesOfCountry() THREW", err);
-      setStates([]);
-    }
-  }, [csc, country]);
+  // useEffect(() => {
+  //   if (!csc) return;
+  //   console.log("[Checkout] computing states list for country =", country);
+  //   try {
+  //     const result = csc.State.getStatesOfCountry(country);
+  //     console.log("[Checkout] states computed OK, count =", result?.length);
+  //     setStates(result || []);
+  //   } catch (err) {
+  //     console.error("[Checkout] State.getStatesOfCountry() THREW", err);
+  //     setStates([]);
+  //   }
+  // }, [csc, country]);
 
   const shipping = cartTotal > 250 || cartTotal === 0 ? 0 : 20;
   const total = Math.max(0, cartTotal - discount) + shipping;
@@ -157,28 +158,24 @@ function Checkout() {
 
       const firstName = form.get("firstName")?.trim();
       const lastName = form.get("lastName")?.trim();
-      const cityValue = form.get("city")?.trim();
-      const state = form.get("state")?.trim();
-      const postalCode = form.get("postalCode")?.trim();
-      const countryCode = form.get("country");
+      // const cityValue = form.get("city")?.trim();
+      // const state = form.get("state")?.trim();
+      // const postalCode = form.get("postalCode")?.trim();
+      // const countryCode = form.get("country");
       const address = form.get("address")?.trim();
 
-      console.log("[Checkout] raw form values", {
-        firstName,
-        lastName,
-        cityValue,
-        state,
-        postalCode,
-        countryCode,
-        address,
-      });
+console.log("[Checkout] raw form values", {
+  firstName,
+  lastName,
+  address,
+});
 
-      const selectedCountry = countries.find((c) => c.isoCode === countryCode);
-      const selectedState = states.find((s) => s.isoCode === state);
-      const countryName = selectedCountry?.name || countryCode;
-      const stateName = selectedState?.name || state;
+      // const selectedCountry = countries.find((c) => c.isoCode === countryCode);
+      // const selectedState = states.find((s) => s.isoCode === state);
+      // const countryName = selectedCountry?.name || countryCode;
+      // const stateName = selectedState?.name || state;
 
-      console.log("[Checkout] resolved names", { countryName, stateName });
+      // console.log("[Checkout] resolved names", { countryName, stateName });
 
       // VALIDATION
       const nameRegex = /^[A-Za-z\s]+$/;
@@ -190,14 +187,14 @@ function Checkout() {
         console.warn("[Checkout] validation failed: lastName", lastName);
         return toast.error("Invalid last name");
       }
-      if (!cityValue) {
-        console.warn("[Checkout] validation failed: city missing");
-        return toast.error("Enter city");
-      }
-      if (!state) {
-        console.warn("[Checkout] validation failed: state missing");
-        return toast.error("Select state");
-      }
+      // if (!cityValue) {
+      //   console.warn("[Checkout] validation failed: city missing");
+      //   return toast.error("Enter city");
+      // }
+      // if (!state) {
+      //   console.warn("[Checkout] validation failed: state missing");
+      //   return toast.error("Select state");
+      // }
       if (
         address.length < 10 ||
         !/[a-zA-Z]/.test(address) ||
@@ -217,12 +214,12 @@ function Checkout() {
         return toast.error("Invalid phone number");
       }
 
-      const postalValid = validator.isPostalCode(postalCode, countryCode);
-      console.log("[Checkout] postal code validation", { postalCode, countryCode, postalValid });
-      if (!postalValid) {
-        console.warn("[Checkout] validation failed: postalCode");
-        return toast.error("Invalid postal code");
-      }
+      // const postalValid = validator.isPostalCode(postalCode, countryCode);
+      // console.log("[Checkout] postal code validation", { postalCode, countryCode, postalValid });
+      // if (!postalValid) {
+      //   console.warn("[Checkout] validation failed: postalCode");
+      //   return toast.error("Invalid postal code");
+      // }
 
       if (cart.length === 0) {
         console.warn("[Checkout] validation failed: cart empty");
@@ -262,17 +259,13 @@ function Checkout() {
       // BUILD ORDER DATA (not saved yet)
       const orderData = {
         userEmail: user.email,
-        customer: {
-          firstName,
-          lastName,
-          email: user.email,
-          phone,
-          address,
-          city: cityValue,
-          state: stateName,
-          postalCode,
-          country: countryName,
-        },
+customer: {
+  firstName,
+  lastName,
+  email: user.email,
+  phone,
+  address,
+},
         items: cart.map((item) => ({
           productId: item.productId || item._id || item?.product?._id,
           name: item.name || item?.product?.name,
@@ -322,8 +315,6 @@ Phone: ${phone}
 
 📍 *Shipping Address*
 ${address}
-${cityValue}, ${stateName}
-${countryName} - ${postalCode}
 
 📦 *Order Items*
 ${productsText}
@@ -509,7 +500,7 @@ Total: ₹${total.toFixed(2)}
                         .join("\n");
 
                       const c = pendingOrder.customer;
-                      const message = `🛍 *NEW ORDER — INSPIRIT CLOTHING*\n\n👤 *Customer Details*\nName: ${c.firstName} ${c.lastName}\nEmail: ${c.email}\nPhone: ${c.phone}\n\n📍 *Shipping Address*\n${c.address}\n${c.city}, ${c.state}\n${c.country} - ${c.postalCode}\n\n📦 *Order Items*\n${productsText}\n\n💰 *Order Summary*\nSubtotal: ₹${pendingOrder.subtotal.toFixed(2)}\nShipping: ₹${pendingOrder.shipping}\nTotal: ₹${pendingOrder.total.toFixed(2)}`;
+                      const message = `🛍 *NEW ORDER — INSPIRIT CLOTHING*\n\n👤 *Customer Details*\nName: ${c.firstName} ${c.lastName}\nEmail: ${c.email}\nPhone: ${c.phone}\n\n📍 *Shipping Address* ${c.address}\n\n📦 *Order Items*\n${productsText}\n\n💰 *Order Summary*\nSubtotal: ₹${pendingOrder.subtotal.toFixed(2)}\nShipping: ₹${pendingOrder.shipping}\nTotal: ₹${pendingOrder.total.toFixed(2)}`;
 
                       const opened = window.open(
                         `https://wa.me/917397284491?text=${encodeURIComponent(message)}`,
@@ -572,7 +563,7 @@ Total: ₹${total.toFixed(2)}
                 <div className="md:col-span-2">
                   <PhoneInput
                     international
-                    defaultCountry={country}
+                    defaultCountry="IN"
                     value={phone}
                     onChange={(val) => {
                       console.log("[Checkout] PhoneInput onChange", val);
