@@ -103,10 +103,10 @@ function Checkout() {
           console.error("[Checkout] Country.getAllCountries() THREW", err);
         }
       })
-.catch((err) => {
-  console.error(err);
-  toast.error("Failed to load location data. Please refresh.");
-})
+      .catch((err) => {
+        console.error("[Checkout] Failed to load country-state-city", err);
+        toast.error("Failed to load location data. Please refresh.");
+      })
       .finally(() => {
         if (!cancelled) setLocationLoading(false);
       });
