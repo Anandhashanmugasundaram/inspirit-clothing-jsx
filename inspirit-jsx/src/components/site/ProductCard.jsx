@@ -134,7 +134,7 @@ export default function ProductCard({ p }) {
           </Link>
 
           {/* PRICE */}
-          <div className="mt-2 flex items-center gap-2">
+          {/* <div className="mt-2 flex items-center gap-2">
             <p className={`text-sm font-bold ${isOutOfStock ? "text-gray-400" : "text-black"}`}>
               ₹{p.price}
             </p>
@@ -146,7 +146,26 @@ export default function ProductCard({ p }) {
                 SOLD OUT
               </span>
             )}
-          </div>
+          </div> */}
+          {/* PRICE */}
+<div className="mt-2 flex items-center gap-2">
+  <p className={`text-sm font-bold ${isOutOfStock ? "text-gray-400" : "text-black"}`}>
+    ₹{p.price}
+  </p>
+  {p.oldPrice > p.price && (
+    <>
+      <p className="text-xs text-gray-400 line-through">₹{p.oldPrice}</p>
+      <span className="text-[10px] font-semibold text-green-600">
+        {Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}% OFF
+      </span>
+    </>
+  )}
+  {isOutOfStock && (
+    <span className="text-[10px] text-red-500 font-semibold tracking-wider">
+      SOLD OUT
+    </span>
+  )}
+</div>
         </div>
       </div>
     </article>
