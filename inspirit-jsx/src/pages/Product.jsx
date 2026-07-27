@@ -269,9 +269,21 @@ function ProductPage() {
               </div>
 
               {/* PRICE */}
-              <div className={`mt-5 text-2xl md:text-3xl font-semibold ${allOutOfStock ? "opacity-40" : ""}`}>
+              {/* <div className={`mt-5 text-2xl md:text-3xl font-semibold ${allOutOfStock ? "opacity-40" : ""}`}>
                 ₹{product.price}
-              </div>
+              </div> */}
+              {/* PRICE */}
+<div className="mt-5 flex items-center gap-3 flex-wrap">
+  <span className={`text-2xl md:text-3xl font-semibold ${allOutOfStock ? "opacity-40" : ""}`}>
+    ₹{product.price}
+  </span>
+  <span className="text-base md:text-lg text-gray-400 line-through">
+    ₹{Math.round(product.price * 1.15)}
+  </span>
+  <span className="text-xs font-semibold text-green-600">
+    15% OFF
+  </span>
+</div>
 
               {/* DESCRIPTION */}
               <p className="mt-5 text-sm md:text-[15px] opacity-70 leading-7 break-words">
