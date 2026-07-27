@@ -26,7 +26,7 @@ function Shop() {
   // PAGINATION
   const [page, setPage] = useState(1);
 
-  const PRODUCTS_PER_PAGE = 12;
+  const PRODUCTS_PER_PAGE = 20;
 
   // ======================
   // SCROLL TO TOP
