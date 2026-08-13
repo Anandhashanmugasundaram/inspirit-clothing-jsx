@@ -119,8 +119,7 @@ app.use(
   })
 );
 
-// Handle preflight
-app.options("*", cors());
+
 
 // ===============================
 // BODY SIZE LIMIT
