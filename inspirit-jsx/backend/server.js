@@ -1,5 +1,4 @@
 const express = require("express");
-
 const cors = require("cors");
 
 require("dotenv").config();
@@ -15,7 +14,9 @@ const app = express();
 // CONNECT DATABASE
 connectDB();
 
-// MIDDLEWARE
+// ==========================
+// CORS
+// ==========================
 app.use(
   cors({
     origin: [
@@ -24,29 +25,55 @@ app.use(
       "http://localhost:5173",
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.use(express.json());
+// ==========================
+// BODY PARSER
+// ==========================
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
+// ==========================
+// REQUEST LOGGER
+// ==========================
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// ==========================
 // HOME ROUTE
+// ==========================
 app.get("/", (req, res) => {
   res.send("Server Running");
 });
 
-// CART ROUTE
+// ==========================
+// ROUTES
+// ==========================
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 
+// ==========================
+// ERROR HANDLER
+// ==========================
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
+
+  res.status(err.status || 500).json({
+    message: err.message || "Something went wrong",
+  });
+});
+
+// ==========================
 // PORT
+// ==========================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
-});
-
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
 });
