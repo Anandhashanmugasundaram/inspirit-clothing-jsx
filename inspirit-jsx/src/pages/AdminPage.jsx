@@ -110,14 +110,16 @@ function AdminPage() {
       const isEditing = editingId && editingId !== "null" && editingId !== "";
 
       if (isEditing) {
-        await axios.put(`${API}/api/products/${editingId}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        // await axios.put(`${API}/api/products/${editingId}`, data, {
+        //   headers: { "Content-Type": "multipart/form-data" },
+        // });
+        await axios.put(`${API}/api/products/${editingId}`, data);
         alert("Product Updated");
       } else {
-        await axios.post(`${API}/api/products`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        // await axios.post(`${API}/api/products`, data, {
+        //   headers: { "Content-Type": "multipart/form-data" },
+        // });
+        await axios.post(`${API}/api/products`, data);
         alert("Product Added");
       }
 
