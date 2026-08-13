@@ -1,22 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-
-require("dotenv").config();
-
 const connectDB = require("./config/db");
-
-const cartRoutes = require("./routes/cartRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
-// CONNECT DATABASE
 connectDB();
 
-// ==========================
-// CORS
-// ==========================
 app.use(
   cors({
     origin: [
@@ -24,52 +13,31 @@ app.use(
       "https://www.inspiritclothings.in",
       "http://localhost:5173",
     ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
-// ==========================
-// BODY PARSER
-// ==========================
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.options("*", cors());
 
-// ==========================
-// REQUEST LOGGER
-// ==========================
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ==========================
-// HOME ROUTE
-// ==========================
+// routes
+app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
+
 app.get("/", (req, res) => {
-  res.send("Server Running");
-});
-
-// ==========================
-// ROUTES
-// ==========================
-app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/products", productRoutes);
-
-// ==========================
-// ERROR HANDLER
-// ==========================
-app.use((err, req, res, next) => {
-  console.error("SERVER ERROR:", err);
-
-  res.status(err.status || 500).json({
-    message: err.message || "Something went wrong",
+  res.json({
+    message: "INSPIRIT API running",
   });
 });
 
-// ==========================
-// VERCEL
-// ==========================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 module.exports = app;

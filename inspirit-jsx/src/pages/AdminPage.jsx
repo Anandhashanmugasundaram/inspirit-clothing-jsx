@@ -792,28 +792,28 @@ function AdminPage() {
   // ======================
   // COMPRESS IMAGE
   // ======================
-  const compressImage = async (file) => {
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1600,
-      useWebWorker: true,
-    };
-
-    try {
-      const compressedFile = await imageCompression(file, options);
-
-      console.log(
-        `${file.name}: ${(file.size / 1024 / 1024).toFixed(2)} MB → ` +
-          `${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`
-      );
-
-      return compressedFile;
-    } catch (error) {
-      console.error("Image compression failed:", error);
-      return file;
-    }
+ const compressImage = async (file) => {
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1600,
+    useWebWorker: true,
+    fileType: "image/webp",
   };
 
+  try {
+    const compressedFile = await imageCompression(file, options);
+
+    console.log(
+      `${file.name}: ${(file.size / 1024 / 1024).toFixed(2)} MB → ` +
+        `${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`
+    );
+
+    return compressedFile;
+  } catch (error) {
+    console.error("Compression failed:", error);
+    throw error;
+  }
+};
   // ======================
   // FETCH PRODUCTS
   // ======================
