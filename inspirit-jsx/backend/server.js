@@ -11,97 +11,49 @@ const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
+// CONNECT DATABASE
+connectDB();
+
 // ==========================
 // CORS
 // ==========================
-
-const allowedOrigins = [
-  "https://inspiritclothings.in",
-  "https://www.inspiritclothings.in",
-  "http://localhost:5173",
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests without Origin
-      // such as Postman/server-to-server
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-
+    origin: [
+      "https://inspiritclothings.in",
+      "https://www.inspiritclothings.in",
+      "http://localhost:5173",
+    ],
     credentials: true,
-
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "DELETE",
-      "PATCH",
-      "OPTIONS",
-    ],
-
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
-
-    optionsSuccessStatus: 204,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// Explicit OPTIONS handling
-app.options("*", cors());
 
 // ==========================
 // BODY PARSER
 // ==========================
-
 app.use(express.json({ limit: "1mb" }));
-
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "1mb",
-  })
-);
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // ==========================
-// LOGGER
+// REQUEST LOGGER
 // ==========================
-
 app.use((req, res, next) => {
-  console.log(
-    `[API] ${req.method} ${req.originalUrl}`,
-    "Origin:",
-    req.headers.origin
-  );
-
+  console.log(`${req.method} ${req.url}`);
   next();
 });
 
 // ==========================
-// HOME
+// HOME ROUTE
 // ==========================
-
 app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "INSPIRIT API Server Running",
-  });
+  res.send("Server Running");
 });
 
 // ==========================
 // ROUTES
 // ==========================
-
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
@@ -109,14 +61,15 @@ app.use("/api/products", productRoutes);
 // ==========================
 // ERROR HANDLER
 // ==========================
-
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
   res.status(err.status || 500).json({
-    success: false,
     message: err.message || "Something went wrong",
   });
 });
 
+// ==========================
+// VERCEL
+// ==========================
 module.exports = app;
