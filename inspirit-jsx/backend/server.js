@@ -1,57 +1,89 @@
 const express = require("express");
 const cors = require("cors");
+
 const connectDB = require("./config/db");
+
+const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
-// ======================
+// ==========================
 // CORS
-// ======================
+// ==========================
+
+const allowedOrigins = [
+  "https://inspiritclothings.in",
+  "https://www.inspiritclothings.in",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://inspiritclothings.in",
-      "https://www.inspiritclothings.in",
-      "http://localhost:5173",
-    ],
+    origin: function (origin, callback) {
+      // Allow requests without origin
+      // such as Postman/server-side requests
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+
+    credentials: true,
   })
 );
 
 app.options("*", cors());
 
-// ======================
+// ==========================
 // BODY PARSER
-// ======================
+// ==========================
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ======================
+// ==========================
 // DATABASE
-// ======================
+// ==========================
+
 connectDB();
 
-// ======================
-// ROUTES
-// ======================
-app.use("/api/products", require("./routes/productRoutes"));
-app.use("/api/cart", require("./routes/cartRoutes"));
-app.use("/api/orders", require("./routes/orderRoutes"));
+// ==========================
+// TEST ROUTE
+// ==========================
 
-// ======================
-// TEST
-// ======================
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
-    message: "INSPIRIT API is running",
+    message: "INSPIRIT backend is running",
   });
 });
 
-// ======================
+// ==========================
+// API ROUTES
+// ==========================
+
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+
+// ==========================
 // ERROR HANDLER
-// ======================
+// ==========================
+
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
