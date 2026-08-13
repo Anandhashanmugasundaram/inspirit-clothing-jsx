@@ -4,8 +4,9 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-connectDB();
-
+// ======================
+// CORS
+// ======================
 app.use(
   cors({
     origin: [
@@ -15,29 +16,49 @@ app.use(
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
 
 app.options("*", cors());
 
+// ======================
+// BODY PARSER
+// ======================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// routes
+// ======================
+// DATABASE
+// ======================
+connectDB();
+
+// ======================
+// ROUTES
+// ======================
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 
+// ======================
+// TEST
+// ======================
 app.get("/", (req, res) => {
   res.json({
-    message: "INSPIRIT API running",
+    success: true,
+    message: "INSPIRIT API is running",
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// ======================
+// ERROR HANDLER
+// ======================
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
 module.exports = app;
