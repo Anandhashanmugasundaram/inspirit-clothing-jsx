@@ -1,80 +1,41 @@
-// const multer = require("multer");
-// const {
-//   CloudinaryStorage,
-// } = require("multer-storage-cloudinary");
-
-// const cloudinary = require("../config/cloudinary");
-
-// const storage = new CloudinaryStorage({
-//   cloudinary: cloudinary,
-
-//   params: {
-//     folder: "inspirit",
-//     allowed_formats: [
-//       "jpg",
-//       "jpeg",
-//       "png",
-//       "webp",
-//     ],
-//   },
-// });
-
-// const upload = multer({
-//   storage,
-
-//   limits: {
-//     fileSize: 5 * 1024 * 1024,
-//     files: 5,
-//   },
-// });
-
-// module.exports = upload;
-
-
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
-// =====================================
+// ==========================
 // CLOUDINARY STORAGE
-// =====================================
-
+// ==========================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
 
-  params: async (req, file) => {
-    return {
-      folder: "inspirit-products",
+  params: {
+    folder: "inspirit-products",
 
-      resource_type: "image",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
 
-      allowed_formats: [
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-        "avif",
-      ],
+    resource_type: "image",
 
-      public_id: `${Date.now()}-${file.originalname
-        .split(".")[0]
-        .replace(/[^a-zA-Z0-9-_]/g, "-")}`,
-    };
+    // Automatically optimize uploaded images
+    transformation: [
+      {
+        quality: "auto",
+        fetch_format: "auto",
+      },
+    ],
   },
 });
 
-// =====================================
+// ==========================
 // MULTER
-// =====================================
-
+// ==========================
 const upload = multer({
-  storage: storage,
+  storage,
 
   limits: {
-    // 10 MB maximum per file
+    // 10 MB maximum PER IMAGE
     fileSize: 10 * 1024 * 1024,
 
-    // Maximum number of files in one request
+    // Maximum number of images
     files: 10,
   },
 
@@ -84,7 +45,6 @@ const upload = multer({
       "image/jpg",
       "image/png",
       "image/webp",
-      "image/avif",
     ];
 
     if (allowedTypes.includes(file.mimetype)) {
@@ -92,9 +52,8 @@ const upload = multer({
     } else {
       cb(
         new Error(
-          "Only JPG, JPEG, PNG, WEBP and AVIF images are allowed."
-        ),
-        false
+          "Only JPG, JPEG, PNG and WEBP images are allowed."
+        )
       );
     }
   },
